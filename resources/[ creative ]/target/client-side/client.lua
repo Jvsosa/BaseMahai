@@ -32,17 +32,6 @@ local innerEntity = {}
 local sucessTarget = false
 local targetActive = false
 -----------------------------------------------------------------------------------------------------------------------------------------
--- LOCATELOCS
------------------------------------------------------------------------------------------------------------------------------------------
-local locateLocs = {
-	{ -832.41,-393.87,31.32,"Desmanche" },
-	{ 2645.42,4253.48,44.79,"Desmanche" },
-	{ 963.18,-1856.79,31.19,"Desmanche" },
-	{ -142.24,-1174.19,23.76,"Reboque" },
-	{ 1724.84,3715.31,34.22,"Reboque" },
-	{ -305.45,6117.62,31.49,"Reboque" }
-}
------------------------------------------------------------------------------------------------------------------------------------------
 -- THREADSYSTEM
 -----------------------------------------------------------------------------------------------------------------------------------------
 Citizen.CreateThread(function()
@@ -79,7 +68,7 @@ Citizen.CreateThread(function()
 		}
 	})
 
-	AddCircleZone("treatment02",vector3(1833.21,3676.09,34.27),0.75,{
+	AddCircleZone("treatment02",vector3(-675.45,329.25,83.09),0.75,{
 		name = "treatment02",
 		heading = 3374176
 	},{
@@ -156,95 +145,24 @@ Citizen.CreateThread(function()
 		distance = 0.75
 	})
 
-	AddCircleZone("Yoga01",vec3(-492.83,-217.31,35.61),0.75,{
-		name = "Yoga01",
-		heading = 3374176
-	},{
-		distance = 1.25,
-		options = {
-			{
-				event = "player:Yoga",
-				label = "Yoga",
-				tunnel = "client"
-			}
-		}
-	})
-
-	AddCircleZone("Yoga02",vec3(-492.87,-219.03,36.55),0.75,{
-		name = "Yoga02",
-		heading = 3374176
-	},{
-		distance = 1.25,
-		options = {
-			{
-				event = "player:Yoga",
-				label = "Yoga",
-				tunnel = "client"
-			}
-		}
-	})
-
-	AddCircleZone("Yoga03",vec3(-492.89,-220.68,36.51),0.75,{
-		name = "Yoga03",
-		heading = 3374176
-	},{
-		distance = 1.25,
-		options = {
-			{
-				event = "player:Yoga",
-				label = "Yoga",
-				tunnel = "client"
-			}
-		}
-	})
-
-	AddCircleZone("Yoga04",vec3(-490.21,-220.91,36.51),0.75,{
-		name = "Yoga04",
-		heading = 3374176
-	},{
-		distance = 1.25,
-		options = {
-			{
-				event = "player:Yoga",
-				label = "Yoga",
-				tunnel = "client"
-			}
-		}
-	})
-
-	AddCircleZone("Yoga05",vec3(-490.18,-219.24,36.58),0.75,{
-		name = "Yoga05",
-		heading = 3374176
-	},{
-		distance = 1.25,
-		options = {
-			{
-				event = "player:Yoga",
-				label = "Yoga",
-				tunnel = "client"
-			}
-		}
-	})
-
-	AddCircleZone("Yoga06",vec3(-490.16,-217.33,36.63),0.75,{
-		name = "Yoga06",
-		heading = 3374176
-	},{
-		distance = 1.25,
-		options = {
-			{
-				event = "player:Yoga",
-				label = "Yoga",
-				tunnel = "client"
-			}
-		}
-	})
 
 	AddTargetModel({ 1631638868,2117668672,-1498379115,-1519439119,-289946279,1570477186 },{
 		options = {
 			{
 				event = "target:animDeitar",
 				label = "Deitar",
+				tunnel = "client"
+			}
+		},
+		distance = 1.0
+	})
+
+
+	AddTargetModel({ 1219739426 },{
+		options = {
+			{
+				event = "target:animDeitar2",
+				label = "Deitar maca",
 				tunnel = "client"
 			}
 		},
@@ -317,16 +235,6 @@ Citizen.CreateThread(function()
 		distance = 0.75
 	})
 
-	AddTargetModel({ -272361894 },{
-		options = {
-			{
-				event = "shops:Chihuahua",
-				label = "Comprar",
-				tunnel = "client"
-			}
-		},
-		distance = 0.75
-	})
 
 	AddTargetModel({ 1099892058 },{
 		options = {
@@ -349,17 +257,6 @@ Citizen.CreateThread(function()
 		},
 		distance = 1.50
 	})
-	
-	AddTargetModel({ -205311355 },{
-		options = {
-			{
-				event = "tryDeleteObject",
-				label = "Remover",
-				tunnel = "objects"
-			}
-		},
-		distance = 1.50
-	})
 
 	AddTargetModel({ 1281992692,1158960338,1511539537,-78626473 },{
 		options = {
@@ -375,446 +272,25 @@ Citizen.CreateThread(function()
 	AddTargetModel({ -206690185,666561306,218085040,-58485588,1511880420,682791951 },{
 		options = {
 			{
-				event = "inventory:verifyObjects",
-				label = "Vasculhar",
-				tunnel = "police",
-				service = "Lixeiro"
-			},
-			{
 				event = "player:enterTrash",
 				label = "Esconder",
 				tunnel = "client"
-			}
+			},
 		},
 		distance = 0.75
 	})
 
-	AddTargetModel({ 1211559620,1363150739,-1186769817,261193082,-756152956,-1383056703,720581693 },{
-		options = {
-			{
-				event = "inventory:verifyObjects",
-				label = "Vasculhar",
-				tunnel = "police",
-				service = "Jornaleiro"
-			}
-		},
-		distance = 0.75
-	})
+	-- AddTargetModel({ -2007231801,1339433404,1694452750,1933174915,-462817101,-469694731,-164877493 },{
+	-- 	options = {
+	-- 		{
+	-- 			event = "crafting:fuelShop",
+	-- 			label = "Combustível",
+	-- 			tunnel = "client"
+	-- 		}
+	-- 	},
+	-- 	distance = 0.75
+	-- })
 
-	AddTargetModel({ -2007231801,1339433404,1694452750,1933174915,-462817101,-469694731,-164877493 },{
-		options = {
-			{
-				event = "crafting:fuelShop",
-				label = "Combustível",
-				tunnel = "client"
-			}
-		},
-		distance = 0.75
-	})
-
-	AddCircleZone("foodJuice01",vector3(-1190.78,-904.23,13.99),0.5,{
-		name = "foodJuice01",
-		heading = 3374176
-	},{
-		distance = 1.25,
-		options = {
-			{
-				event = "inventory:makeProducts",
-				label = "Encher Copo",
-				tunnel = "police",
-				service = "foodJuice"
-			}
-		}
-	})
-
-	AddCircleZone("foodJuice02",vector3(-1190.12,-905.16,13.99),0.5,{
-		name = "foodJuice02",
-		heading = 3374176
-	},{
-		distance = 1.0,
-		options = {
-			{
-				event = "inventory:makeProducts",
-				label = "Encher Copo",
-				tunnel = "police",
-				service = "foodJuice"
-			}
-		}
-	})
-
-	AddCircleZone("foodBurger01",vector3(-1202.08,-897.21,13.99),0.5,{
-		name = "foodBurger01",
-		heading = 3374176
-	},{
-		distance = 1.0,
-		options = {
-			{
-				event = "inventory:makeProducts",
-				label = "Montar Lanche",
-				tunnel = "police",
-				service = "foodBurger"
-			}
-		}
-	})
-
-	AddCircleZone("foodBurger02",vector3(-1202.55,-896.55,13.99),0.5,{
-		name = "foodBurger02",
-		heading = 3374176
-	},{
-		distance = 1.0,
-		options = {
-			{
-				event = "inventory:makeProducts",
-				label = "Montar Lanche",
-				tunnel = "police",
-				service = "foodBurger"
-			}
-		}
-	})
-
-	AddCircleZone("foodBurger04",vector3(1587.33,6458.44,26.02),0.5,{
-		name = "foodBurger04",
-		heading = 3374176
-	},{
-		distance = 1.0,
-		options = {
-			{
-				event = "inventory:makeProducts",
-				label = "Montar Lanche",
-				tunnel = "police",
-				service = "foodBurger"
-			}
-		}
-	})
-
-	AddCircleZone("foodBox01",vector3(-1197.91,-892.21,13.99),0.5,{
-		name = "foodBox01",
-		heading = 3374176
-	},{
-		distance = 1.25,
-		options = {
-			{
-				event = "inventory:makeProducts",
-				label = "Montar Combo",
-				tunnel = "police",
-				service = "foodBox"
-			}
-		}
-	})
-
-	AddCircleZone("jewelry01",vector3(-626.67,-238.58,38.05),0.75,{
-		name = "jewelry01",
-		heading = 3374176
-	},{
-		shop = "1",
-		distance = 1.0,
-		options = {
-			{
-				event = "robberys:jewelry",
-				label = "Roubar",
-				tunnel = "server"
-			}
-		}
-	})
-
-	AddCircleZone("jewelry02",vector3(-625.66,-237.86,38.05),0.75,{
-		name = "jewelry02",
-		heading = 3374176
-	},{
-		shop = "2",
-		distance = 1.0,
-		options = {
-			{
-				event = "robberys:jewelry",
-				label = "Roubar",
-				tunnel = "server"
-			}
-		}
-	})
-
-	AddCircleZone("jewelry03",vector3(-626.84,-235.35,38.05),0.75,{
-		name = "jewelry03",
-		heading = 3374176
-	},{
-		shop = "3",
-		distance = 1.0,
-		options = {
-			{
-				event = "robberys:jewelry",
-				label = "Roubar",
-				tunnel = "server"
-			}
-		}
-	})
-
-	AddCircleZone("jewelry04",vector3(-625.83,-234.6,38.05),0.75,{
-		name = "jewelry04",
-		heading = 3374176
-	},{
-		shop = "4",
-		distance = 1.0,
-		options = {
-			{
-				event = "robberys:jewelry",
-				label = "Roubar",
-				tunnel = "server"
-			}
-		}
-	})
-
-	AddCircleZone("jewelry05",vector3(-626.9,-233.15,38.05),0.75,{
-		name = "jewelry05",
-		heading = 3374176
-	},{
-		shop = "5",
-		distance = 1.0,
-		options = {
-			{
-				event = "robberys:jewelry",
-				label = "Roubar",
-				tunnel = "server"
-			}
-		}
-	})
-
-	AddCircleZone("jewelry06",vector3(-627.94,-233.92,38.05),0.75,{
-		name = "jewelry06",
-		heading = 3374176
-	},{
-		shop = "6",
-		distance = 1.0,
-		options = {
-			{
-				event = "robberys:jewelry",
-				label = "Roubar",
-				tunnel = "server"
-			}
-		}
-	})
-
-	AddCircleZone("jewelry07",vector3(-620.22,-234.44,38.05),0.75,{
-		name = "jewelry07",
-		heading = 3374176
-	},{
-		shop = "7",
-		distance = 1.0,
-		options = {
-			{
-				event = "robberys:jewelry",
-				label = "Roubar",
-				tunnel = "server"
-			}
-		}
-	})
-
-	AddCircleZone("jewelry08",vector3(-619.16,-233.7,38.05),0.75,{
-		name = "jewelry08",
-		heading = 3374176
-	},{
-		shop = "8",
-		distance = 1.0,
-		options = {
-			{
-				event = "robberys:jewelry",
-				label = "Roubar",
-				tunnel = "server"
-			}
-		}
-	})
-
-	AddCircleZone("jewelry09",vector3(-617.56,-230.57,38.05),0.75,{
-		name = "jewelry09",
-		heading = 3374176
-	},{
-		shop = "9",
-		distance = 1.0,
-		options = {
-			{
-				event = "robberys:jewelry",
-				label = "Roubar",
-				tunnel = "server"
-			}
-		}
-	})
-
-	AddCircleZone("jewelry10",vector3(-618.29,-229.49,38.05),0.75,{
-		name = "jewelry10",
-		heading = 3374176
-	},{
-		shop = "10",
-		distance = 1.0,
-		options = {
-			{
-				event = "robberys:jewelry",
-				label = "Roubar",
-				tunnel = "server"
-			}
-		}
-	})
-
-	AddCircleZone("jewelry11",vector3(-619.68,-227.63,38.05),0.75,{
-		name = "jewelry11",
-		heading = 3374176
-	},{
-		shop = "11",
-		distance = 1.0,
-		options = {
-			{
-				event = "robberys:jewelry",
-				label = "Roubar",
-				tunnel = "server"
-			}
-		}
-	})
-
-	AddCircleZone("jewelry12",vector3(-620.43,-226.56,38.05),0.75,{
-		name = "jewelry12",
-		heading = 3374176
-	},{
-		shop = "12",
-		distance = 1.0,
-		options = {
-			{
-				event = "robberys:jewelry",
-				label = "Roubar",
-				tunnel = "server"
-			}
-		}
-	})
-
-	AddCircleZone("jewelry13",vector3(-623.92,-227.06,38.05),0.75,{
-		name = "jewelry13",
-		heading = 3374176
-	},{
-		shop = "13",
-		distance = 1.0,
-		options = {
-			{
-				event = "robberys:jewelry",
-				label = "Roubar",
-				tunnel = "server"
-			}
-		}
-	})
-
-	AddCircleZone("jewelry14",vector3(-624.97,-227.84,38.05),0.75,{
-		name = "jewelry14",
-		heading = 3374176
-	},{
-		shop = "14",
-		distance = 1.0,
-		options = {
-			{
-				event = "robberys:jewelry",
-				label = "Roubar",
-				tunnel = "server"
-			}
-		}
-	})
-
-	AddCircleZone("jewelry15",vector3(-624.42,-231.08,38.05),0.75,{
-		name = "jewelry15",
-		heading = 3374176
-	},{
-		shop = "15",
-		distance = 1.0,
-		options = {
-			{
-				event = "robberys:jewelry",
-				label = "Roubar",
-				tunnel = "server"
-			}
-		}
-	})
-
-	AddCircleZone("jewelry16",vector3(-623.98,-228.18,38.05),0.75,{
-		name = "jewelry16",
-		heading = 3374176
-	},{
-		shop = "16",
-		distance = 1.0,
-		options = {
-			{
-				event = "robberys:jewelry",
-				label = "Roubar",
-				tunnel = "server"
-			}
-		}
-	})
-
-	AddCircleZone("jewelry17",vector3(-621.08,-228.58,38.05),0.75,{
-		name = "jewelry17",
-		heading = 3374176
-	},{
-		shop = "17",
-		distance = 1.0,
-		options = {
-			{
-				event = "robberys:jewelry",
-				label = "Roubar",
-				tunnel = "server"
-			}
-		}
-	})
-
-	AddCircleZone("jewelry18",vector3(-619.72,-230.43,38.05),0.75,{
-		name = "jewelry18",
-		heading = 3374176
-	},{
-		shop = "18",
-		distance = 1.0,
-		options = {
-			{
-				event = "robberys:jewelry",
-				label = "Roubar",
-				tunnel = "server"
-			}
-		}
-	})
-
-	AddCircleZone("jewelry19",vector3(-620.14,-233.31,38.05),0.75,{
-		name = "jewelry19",
-		heading = 3374176
-	},{
-		shop = "19",
-		distance = 1.0,
-		options = {
-			{
-				event = "robberys:jewelry",
-				label = "Roubar",
-				tunnel = "server"
-			}
-		}
-	})
-
-	AddCircleZone("jewelry20",vector3(-623.05,-232.95,38.05),0.75,{
-		name = "jewelry20",
-		heading = 3374176
-	},{
-		shop = "20",
-		distance = 1.0,
-		options = {
-			{
-				event = "robberys:jewelry",
-				label = "Roubar",
-				tunnel = "server"
-			}
-		}
-	})
-
-	AddCircleZone("jewelryHacker",vector3(-631.38,-230.24,38.05),0.75,{
-		name = "jewelryHacker",
-		heading = 3374176
-	},{
-		distance = 0.75,
-		options = {
-			{
-				event = "robberys:initJewelry",
-				label = "Hackear",
-				tunnel = "server"
-			}
-		}
-	})
 
 	AddCircleZone("divingStore",vector3(1521.08,3780.19,34.46),0.5,{
 		name = "divingStore",
@@ -834,20 +310,6 @@ Citizen.CreateThread(function()
 		}
 	})
 
-
-	AddCircleZone("cemiteryMan",vector3(-1745.57,-205.19,57.37),0.75,{
-		name = "cemiteryMan",
-		heading = 3374176
-	},{
-		distance = 1.0,
-		options = {
-			{
-				event = "cemitery:initBody",
-				label = "Conversar",
-				tunnel = "client"
-			}
-		}
-	})
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- POLICEMENU
@@ -861,13 +323,28 @@ local policeMenu = {
 		event = "police:prisonClothes",
 		label = "Uniforme Presidiário",
 		tunnel = "police"
-	}
+	 },
+	{
+		event = "paramedic:Revive",
+		label = "Reanimar",
+		tunnel = "paramedic"
+	},
+	{
+		event = "wnOutros:Porte",
+		label = "Verificar Porte",
+		tunnel = "paramedic"
+	},
 }
 
 local PlayerMenu = {
 	{
 		event = "player:runInspect",
 		label = "Revistar",
+		tunnel = "police"
+	},
+	{
+		event = "player:Cobrar",
+		label = "Cobrar",
 		tunnel = "police"
 	},
 }
@@ -889,38 +366,56 @@ local paramedicMenu = {
 		label = "Reanimar",
 		tunnel = "paramedic"
 	},{
-		event = "paramedic:Diagnostic",
-		label = "Diagnóstico",
-		tunnel = "paramedic"
-	},{
 		event = "paramedic:Treatment",
 		label = "Tratamento",
-		tunnel = "paramedic"
-	},{
-		event = "paramedic:Repose",
-		label = "Colocar de Repouso",
 		tunnel = "paramedic"
 	},{
 		event = "paramedic:Bleeding",
 		label = "Sangramento",
 		tunnel = "paramedic"
 	},{
-		event = "paramedic:Bed",
-		label = "Deitar Paciente",
-		tunnel = "paramedic"
-	},{
-		event = "paramedic:presetBurn",
-		label = "Roupa de Queimadura",
-		tunnel = "paramedic"
-	},{
-		event = "paramedic:presetPlaster",
-		label = "Roupa de Gesso",
-		tunnel = "paramedic"
-	},{
 		event = "paramedic:extractBlood",
 		label = "Extrair Sangue",
 		tunnel = "paramedic"
-	}
+	},
+	{
+		event = "player:Cobrar",
+		label = "Cobrar",
+		tunnel = "police"
+	},
+}
+local paramedicVeh = {
+	{
+		event = "police:runPlate",
+		label = "Verificar Placa",
+		tunnel = "police"
+	},{
+		event = "trunkchest:openTrunk",
+		label = "Abrir Porta-Malas",
+		tunnel = "server"
+	},{
+		event = "inventory:applyPlate",
+		label = "Trocar Placa",
+		tunnel = "police"
+	},{
+		event = "garages:vehicleKey",
+		label = "Criar Chave Cópia",
+		tunnel = "police"
+	},{
+		event = "inventory:stealTrunk",
+		label = "Arrombar Porta-Malas",
+		tunnel = "client"
+	},{
+		event = "player:enterTrunk",
+		label = "Entrar no Porta-Malas",
+		tunnel = "client"
+	},
+	{
+		event = "player:Cobrar",
+		label = "Cobrar",
+		tunnel = "police"
+	},
+
 }
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- POLICEVEH
@@ -1068,16 +563,14 @@ function playerTargetEnable()
 
 							innerEntity = { vehPlate,vRP.vehicleModel(vehModel),entity,vehNet }
 
+
 							if LocalPlayer["state"]["Police"] then
 								SendNUIMessage({ response = "validTarget", data = policeVeh })
+							elseif LocalPlayer["state"]["Paramedic"] then
+								SendNUIMessage({ response = "validTarget", data = paramedicVeh })
 							else
 								local locateMenu = false
-								for k,v in pairs(locateLocs) do
-									local distance = #(coords - vector3(v[1],v[2],v[3]))
-									if distance <= 10 then
-										locateMenu = v[4]
-									end
-								end
+		
 
 								if locateMenu then
 									SendNUIMessage({ response = "validTarget", data = locateVeh[locateMenu] })
@@ -1214,9 +707,17 @@ function playerTargetEnable()
 									SetNuiFocus(true,true)
 								end
 
-								if not Zones[k]:isPointInside(entCoords) or #(coords - Zones[k]["center"]) > v["targetoptions"]["distance"] then
+								if k and Zones and Zones[k] then
+									if not Zones[k]:isPointInside(entCoords) then
+										sucessTarget = false
+									elseif coords and Zones[k]["center"] and v["targetoptions"] and v["targetoptions"]["distance"] then
+										if #(coords - Zones[k]["center"]) > v["targetoptions"]["distance"] then
+											sucessTarget = false
+										end
+									end
+								else
 									sucessTarget = false
-								end
+								end								
 
 								Citizen.Wait(1)
 							end
@@ -1240,6 +741,7 @@ local beds = {
 	[1570477186] = { 1.0,0.0 },
 	[-1498379115] = { 1.0,90.0 },
 	[-1519439119] = { 1.0,0.0 },
+	[1219739426] = { 1.5,1.5 },
 	[-289946279] = { 1.0,0.0 }
 }
 
@@ -1257,6 +759,25 @@ AddEventHandler("target:animDeitar",function()
 		end
 	end
 end)
+
+
+RegisterNetEvent("target:animDeitar2")
+AddEventHandler("target:animDeitar2",function()
+	if not LocalPlayer["state"]["Commands"] and not LocalPlayer["state"]["Handcuff"] then
+		local ped = PlayerPedId()
+		if GetEntityHealth(ped) > 101 then
+			local objCoords = GetEntityCoords(innerEntity[1])
+
+			SetEntityCoords(ped,objCoords["x"],objCoords["y"],objCoords["z"] + beds[innerEntity[2]][1],1,0,0,0)
+			print(GetEntityHeading(innerEntity[1]) + 0)
+			SetEntityHeading(ped,GetEntityHeading(innerEntity[1]) - 90)
+
+
+			vRP.playAnim(false,{"amb@world_human_sunbathe@female@back@idle_a","idle_a"},true)
+		end
+	end
+end)
+
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- TARGET:PACIENTEDEITAR
 -----------------------------------------------------------------------------------------------------------------------------------------
