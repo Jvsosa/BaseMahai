@@ -20,16 +20,16 @@ client_scripts {
 	"config/bloquear-roupas.lua",
 	"config/blips-mapa.lua",
 	"vrp.lua",
-	"system-admin/client/*.lua",
-	"system-client/*.lua",
+	"mahai-admin/client/*.lua",
+	"mahai-client/*.lua",
 }
 server_scripts {
 	"@vrp/lib/Utils.lua",
 	"@vrp/lib/itemlist.lua",
 	"@vrp/lib/vehicles.lua",
 	"vrp.lua",
-	"system-admin/server/*.lua",
-	"system-server/*.lua",
+	"mahai-admin/server/*.lua",
+	"mahai-server/*.lua",
 }
 files {
 	"web-side/*",

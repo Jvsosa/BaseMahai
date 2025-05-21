@@ -684,6 +684,47 @@ RegisterCommand('msgadv',function(source,args,rawCommand)
 	end
 end)
 
+------------------------------------------
+-- [ GROUP CONSOLE ]
+------------------------------------------
+
+local function setGroupConsole(cmd, action, actionText)
+    RegisterCommand(cmd, function(source, args)
+        if source == 0 and args[1] and args[2] then
+            local userId = parseInt(args[1])
+            local group = tostring(args[2])
+            local identity = vRP.userIdentity(userId)
+            if identity then
+                vRP[action](userId, group)
+                print(string.format(
+                    '^7[^4%s^7] %s a permissao ^2%s^7 no passaporte ^2%s %s %s^7',
+                    GetCurrentResourceName(), actionText, group, identity.name, identity.name2, userId
+                ))
+                local nplayer = vRP.userSource(userId)
+                if nplayer then
+                    TriggerClientEvent("Notify", nplayer, "verde", "Você foi "..actionText.." o cargo <b>"..group.."</b>.", 10000)
+                end
+            else
+                print(string.format('^1[ERRO]^7 Passaporte %s não encontrado.', userId))
+            end
+        end
+    end)
+end
+
+setGroupConsole('groupc', 'setPermission', 'setado')
+setGroupConsole('ungroupc', 'remPermission', 'removido')
+
+
+------------------------------------------
+-- [ PLAYER ON CONSOLE ]
+------------------------------------------
+
+RegisterCommand("playersc",function(source,args,rawCommand)
+    if source == 0 then
+        print('^7[^4'..GetCurrentResourceName()..'^7] Membros Online: ^2 '..GetNumPlayerIndices()..' ^7')
+    end
+end)
+
 
 
 
@@ -2194,233 +2235,35 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- TPTOME
 -----------------------------------------------------------------------------------------------------------------------------------------
-
-
 RegisterCommand("tptome",function(source,args,rawCommand)
-	local user_id = vRP.getUserId(source)
-	if user_id then
-		if vRP.hasGroup(user_id,"Admin") and parseInt(args[1]) > 0 then
-			if parseInt(args[1]) == 1425 or parseInt(args[1]) == 2 or parseInt(args[1]) == 884 or parseInt(args[1]) == 77 or parseInt(args[1]) == 499 then
-				local otherPlayer = vRP.userSource(args[1])
-				if vRP.request(otherPlayer, "O passaporte "..user_id.." deseja se puxar.","sim","nao") then
-					if otherPlayer then
-						local ped = GetPlayerPed(source)
-						local coords = GetEntityCoords(ped)
-						vRP.teleport(otherPlayer,coords["x"],coords["y"],coords["z"])
-
-						local identity = vRP.userIdentity(user_id)
-						local identity2 = vRP.userIdentity(args[1])
-						local x,y,z = vCLIENT.getPosition(source)
-						local x2,y2,z2 = vCLIENT.getPosition(otherPlayer)
-						PerformHttpRequest("https://discord.com/api/webhooks/1121079719530614844/YDJ54KwWEByeDBg0z4FtAklyrjCm8-Fo5ljuif1O64jNDy8xyGdi6DUXfZu4RptH1MQk", function(err, text, headers) end, 'POST', json.encode({
-						embeds = {
-							{     
-								title = "**/tptome**",
-								fields = {
-									{ 
-										name = "📝 Author:", 
-										value = "" ..identity.name.." "..identity.name2.." **#"..user_id.."** ",
-									},
-		
-									{ 
-										name = "📝 Player:", 
-										value = " "..identity2["name"].." "..identity2["name2"].." **#" ..args[1].."**",
-									},
-		
-									{ 
-										name = "🌐 Coordenada do Staff:", 
-										value = ""..x..","..y..","..z.." \n \n " 
-									},
-		
-									{ 
-										name = "🌐 Coordenada do Player:", 
-										value = ""..x2..","..y2..","..z2.." \n \n " 
-									},
-								}, 
-								footer = { 
-									text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S'),
-									icon_url = "https://media.discordapp.net/attachments/1094973674437750834/1101630131610591323/512.png"
-								},
-								thumbnail = { 
-									url = "https://media.discordapp.net/attachments/1094973674437750834/1101630131610591323/512.png"
-								},
-								color = 3092790
-							}
-						}
-					}), { ['Content-Type'] = 'application/json' })
-
-					end
-				end
-			else
-				local otherPlayer = vRP.userSource(args[1])
-				if otherPlayer then
-					local ped = GetPlayerPed(source)
-					local coords = GetEntityCoords(ped)
-					vRP.teleport(otherPlayer,coords["x"],coords["y"],coords["z"])
-
-					local identity = vRP.userIdentity(user_id)
-						local identity2 = vRP.userIdentity(args[1])
-						local x,y,z = vCLIENT.getPosition(source)
-						local x2,y2,z2 = vCLIENT.getPosition(otherPlayer)
-						PerformHttpRequest("https://discord.com/api/webhooks/1121079719530614844/YDJ54KwWEByeDBg0z4FtAklyrjCm8-Fo5ljuif1O64jNDy8xyGdi6DUXfZu4RptH1MQk", function(err, text, headers) end, 'POST', json.encode({
-						embeds = {
-							{     
-								title = "**/tptome**",
-								fields = {
-									{ 
-										name = "📝 Author:", 
-										value = "" ..identity.name.." "..identity.name2.." **#"..user_id.."** ",
-									},
-		
-									{ 
-										name = "📝 Player:", 
-										value = " "..identity2["name"].." "..identity2["name2"].." **#" ..args[1].."**",
-									},
-		
-									{ 
-										name = "🌐 Coordenada do Staff:", 
-										value = ""..x..","..y..","..z.." \n \n " 
-									},
-		
-									{ 
-										name = "🌐 Coordenada do Player:", 
-										value = ""..x2..","..y2..","..z2.." \n \n " 
-									},
-								}, 
-								footer = { 
-									text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S'),
-									icon_url = "https://media.discordapp.net/attachments/1094973674437750834/1101630131610591323/512.png"
-								},
-								thumbnail = { 
-									url = "https://media.discordapp.net/attachments/1094973674437750834/1101630131610591323/512.png"
-								},
-								color = 3092790
-							}
-						}
-					}), { ['Content-Type'] = 'application/json' })
-
-				end
-			end
-		end
-	end
+    local user_id = vRP.getUserId(source)
+    if user_id then
+        if vRP.hasGroup(user_id,"Admin") and parseInt(args[1]) > 0 then
+            local otherPlayer = vRP.userSource(args[1])
+            if otherPlayer then
+                local ped = GetPlayerPed(source)
+                local coords = GetEntityCoords(ped)
+                vRP.teleport(otherPlayer,coords["x"],coords["y"],coords["z"])
+            end
+        end
+    end
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- TPTO
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand("tpto",function(source,args,rawCommand)
-	local user_id = vRP.getUserId(source)
-	if user_id then
-		if vRP.hasGroup(user_id,"Admin") and parseInt(args[1]) > 0 then
-			if parseInt(args[1]) == 1425 or parseInt(args[1]) == 2 or parseInt(args[1]) == 884 or parseInt(args[1]) == 77 or parseInt(args[1]) == 499 then
-				local otherPlayer = vRP.userSource(args[1])
-				if vRP.request(otherPlayer, "O passaporte "..user_id.." ir ate voce.","sim","nao") then
-					if otherPlayer then
-						local ped = GetPlayerPed(otherPlayer)
-						local coords = GetEntityCoords(ped)
-						vRP.teleport(source,coords["x"],coords["y"],coords["z"])
-
-						local identity = vRP.userIdentity(user_id)
-						local identity2 = vRP.userIdentity(args[1])
-						local x,y,z = vCLIENT.getPosition(source)
-						local x2,y2,z2 = vCLIENT.getPosition(otherPlayer)
-						if user_id ~= 884 then
-							PerformHttpRequest("https://discord.com/api/webhooks/1121079719530614844/YDJ54KwWEByeDBg0z4FtAklyrjCm8-Fo5ljuif1O64jNDy8xyGdi6DUXfZu4RptH1MQk", function(err, text, headers) end, 'POST', json.encode({
-								embeds = {
-									{     
-										title = "**/tpto**",
-										fields = {
-											{ 
-												name = "📝 Author:", 
-												value = "" ..identity.name.." "..identity.name2.." **#"..user_id.."** ",
-											},
-				
-											{ 
-												name = "📝 Player:", 
-												value = " "..identity2["name"].." "..identity2["name2"].." **#" ..args[1].."**",
-											},
-				
-											{ 
-												name = "🌐 Coordenada do Staff:", 
-												value = ""..x..","..y..","..z.." \n \n " 
-											},
-				
-											{ 
-												name = "🌐 Coordenada do Player:", 
-												value = ""..x2..","..y2..","..z2.." \n \n " 
-											},
-										}, 
-										footer = { 
-											text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S'),
-											icon_url = "https://media.discordapp.net/attachments/1094973674437750834/1101630131610591323/512.png"
-										},
-										thumbnail = { 
-											url = "https://media.discordapp.net/attachments/1094973674437750834/1101630131610591323/512.png"
-										},
-										color = 3092790
-									}
-								}
-							}), { ['Content-Type'] = 'application/json' })
-						end
-					end
-				end
-			else
-				local otherPlayer = vRP.userSource(args[1])
-				if otherPlayer then
-					local ped = GetPlayerPed(otherPlayer)
-					local coords = GetEntityCoords(ped)
-					vRP.teleport(source,coords["x"],coords["y"],coords["z"])
-
-					local identity = vRP.userIdentity(user_id)
-						local identity2 = vRP.userIdentity(args[1])
-						local x,y,z = vCLIENT.getPosition(source)
-						local x2,y2,z2 = vCLIENT.getPosition(otherPlayer)
-						if user_id ~= 884 then
-							PerformHttpRequest("https://discord.com/api/webhooks/1121079719530614844/YDJ54KwWEByeDBg0z4FtAklyrjCm8-Fo5ljuif1O64jNDy8xyGdi6DUXfZu4RptH1MQk", function(err, text, headers) end, 'POST', json.encode({
-								embeds = {
-									{     
-										title = "**/tpto**",
-										fields = {
-											{ 
-												name = "📝 Author:", 
-												value = "" ..identity.name.." "..identity.name2.." **#"..user_id.."** ",
-											},
-				
-											{ 
-												name = "📝 Player:", 
-												value = " "..identity2["name"].." "..identity2["name2"].." **#" ..args[1].."**",
-											},
-				
-											{ 
-												name = "🌐 Coordenada do Staff:", 
-												value = ""..x..","..y..","..z.." \n \n " 
-											},
-				
-											{ 
-												name = "🌐 Coordenada do Player:", 
-												value = ""..x2..","..y2..","..z2.." \n \n " 
-											},
-										}, 
-										footer = { 
-											text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S'),
-											icon_url = "https://media.discordapp.net/attachments/1094973674437750834/1101630131610591323/512.png"
-										},
-										thumbnail = { 
-											url = "https://media.discordapp.net/attachments/1094973674437750834/1101630131610591323/512.png"
-										},
-										color = 3092790
-									}
-								}
-							}), { ['Content-Type'] = 'application/json' })
-						end
-
-				end
-			end
-		end
-	end
+    local user_id = vRP.getUserId(source)
+    if user_id then
+        if vRP.hasGroup(user_id,"Admin") and parseInt(args[1]) > 0 then
+            local otherPlayer = vRP.userSource(args[1])
+            if otherPlayer then
+                local ped = GetPlayerPed(otherPlayer)
+                local coords = GetEntityCoords(ped)
+                vRP.teleport(source,coords["x"],coords["y"],coords["z"])
+            end
+        end
+    end
 end)
-
-
-
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- TPWAY
 -----------------------------------------------------------------------------------------------------------------------------------------
