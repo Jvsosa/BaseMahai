@@ -1,0 +1,119 @@
+<html lang="pt-br">
+	<head>
+		<title>#creative</title>
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+		<script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js" integrity="sha256-hlKLmzaRlE8SCJC1Kw8zoUbU8BxA+8kR3gseuKfMjxA=" crossorigin="anonymous"></script>
+		<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" integrity="sha256-KzZiKy0DWYsnwMF+X1DvQngQ2/FxF7MF3Ff72XcpuPs=" crossorigin="anonymous"></script>
+		<link href="css.css" rel="stylesheet" type="text/css"/>
+	</head>
+
+	<body>
+		<div class="body">
+			<!-- <div class="notification">
+				<div class="content">
+					<div class="img-wrapper">
+						<img class="img-notify" src="https://media.discordapp.net/attachments/1133629985215742032/1133630006426353724/marijuana.png?width=460&height=460" alt="">
+					</div>
+					<div class="text-wrapper">
+						<div class="titulo">Procurado</div>
+						<div class="content-line">Houve uma denuncia de trafico de drogas, va ate ao local e verifique o ocorrido</div>
+					</div>
+					<div class="buttons">
+						<div class="chamados" id="loc" data-x="${data.x}" data-y="${data.y}"><i class="fas fa-map-marker-alt fa-lg"></i></div>
+						<div class="horario">00:00</div>
+					</div>
+				</div>
+			</div>			   -->
+		</div>
+	</body>
+
+	<script>
+		$(document).ready(function(){
+			let blocked = false
+			let list = []
+
+			window.addEventListener("message",function(event){
+				switch(event.data.action){
+					case 'notify':
+						addNotification(event.data.data)
+					break
+
+					case 'showAll':
+						if (list.length > 0){
+							showLast()
+							$.post("http://notifycall/focusOn")
+						}
+					break
+
+					case 'hideAll':
+						hideAll()
+						$.post("http://notifycall/focusOff")
+					break
+				}
+			});
+
+			document.onkeyup = function(data){
+				if (data.which == 27){
+					hideAll()
+					$.post("http://notifycall/focusOff")
+				}
+			};
+
+			$(document).on("click","#loc",function(){
+				$.post("http://notifycall/setWay",JSON.stringify({ x: $(this).attr("data-x"), y: $(this).attr("data-y") }))
+			});
+
+			$(document).on("click","#phone",function(){
+				$.post("http://notifycall/phoneCall",JSON.stringify({ phone: $(this).attr("data-phone") }))
+			});
+
+			const hideAll = () => {
+				blocked = false
+				$(".body").css("overflow","hidden")
+				$(".body").html("")
+			};
+
+			const addNotification = data => {
+				if (list.length > 9) list.shift()
+
+				const html = `<div class="notification" id="${data.imagem}">
+					<div class="content">
+						
+							<div class="img-wrapper">
+								<img class="img-notify" src="images/${data.imagem}.png" alt="">
+							</div>
+							<div class="text-wrapper">
+								<div class="titulo">${data.title}</div>
+								<div class="content-line">${data.criminal}</div>
+							</div>
+							<div class="buttons">
+								<div class="chamados" id="loc" data-x="${data.x}" data-y="${data.y}"><i class="fas fa-map-marker-alt fa-lg"></i></div>
+								<div class="horario">${data.time}</div>
+							</div>
+					</div>
+				</div>`
+
+				list.push(html)
+
+				if (!blocked){
+					$(html).prependTo(".body")
+					.hide()
+					.show("slide",{ direction: "right" },250)
+					.delay(5000)
+					.hide("slide",{ direction: "right" },250)
+				}
+			};
+
+			const showLast = () => {
+				hideAll()
+				blocked = true
+
+				$(".body").css("overflow-y","scroll")
+				for (i in list){
+					$(list[i]).prependTo(".body")
+				}
+			};
+		});
+	</script>
+</html>

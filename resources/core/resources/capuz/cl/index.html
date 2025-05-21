@@ -1,0 +1,23 @@
+<html>
+    <style>
+        body{
+            display: none;
+            background-image: url(./capuz.png);
+        } 
+    </style>
+    <body id="main"></body>
+    <script>
+        window.addEventListener('message',function(event){
+            var item = event.data.show;
+            let el = document.getElementById("main")
+            if(item) {
+                el.style.display = "block"
+            } else{
+                el.style.display = "none"
+            }
+        });
+    </script>
+
+    <!-- Developed By Trigueiro -->
+    
+</html>

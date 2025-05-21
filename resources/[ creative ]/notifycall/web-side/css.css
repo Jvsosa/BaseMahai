@@ -1,0 +1,169 @@
+::-webkit-scrollbar { background: transparent; width: 0; }
+::selection { background: transparent; }
+::-moz-selection { background: transparent; }
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Mukta:wght@700&display=swap');
+
+* {
+	color: #fff;
+	font-size: 13px;
+	text-shadow: 1px 1px #2c303c;
+	-webkit-user-select: none;
+	font-family: 'Montserrat', sans-serif;
+}
+
+.body {
+	right: 0;
+	top: 15%;
+	height: 62%;
+	width: 350px;
+	overflow: hidden;
+	position: absolute;
+}
+
+.notification {
+	float: left;
+	width: 335px;
+	margin-bottom: 10px;
+	padding: 15px 10px 15px 15px;
+	color: #fff;
+	background: linear-gradient(90deg, rgba(15,15,15, 0.4) 0%, rgba(15,15,15, 0.9) 100%);
+	border-radius: 5px 0px 0px 5px;
+}
+
+.content {
+	display: flex;
+	align-items: center;
+	width: 230px;
+  }
+  
+  .img-wrapper {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 60px; /* Adjust the width as needed */
+	margin-right: 10px;
+  }
+  
+  .text-wrapper {
+	flex: 1;
+	margin-left: 5%;
+  }
+  
+
+.buttons {
+	float: left;
+	width: 30px;
+}
+
+.content-line {
+	float: left;
+	margin-top: 5px;
+	min-width: 220px;
+	max-width: 220px;
+}
+
+.img-notify{
+	max-width: 30px;
+}
+
+.chamados {
+	float: left;
+	width: 30px;
+	height: 30px;
+	margin-top: 3px;
+	text-align: center;
+}
+
+.chamados svg {
+	font-size: 22px;
+}
+
+.code {
+	float: left;
+	color: #fff;
+	font-size: 11px;
+	padding: 5px 10px;
+	border-radius: 3px;
+	margin-right: 10px;
+	background: #2e6e4c;
+	box-shadow: 0 1px 0 #2c303c;
+	text-shadow: 1px 1px #225138;
+}
+
+.titulo {
+	float: left;
+	min-width: 167px;
+	max-width: 167px;
+	overflow: hidden;
+	padding: 4px 0 3px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	text-shadow: 1px 1px #2c303c;
+}
+
+.texto {
+	float: left;
+	color: #fff;
+	margin-top: 13px;
+	min-width: 240px;
+	max-width: 240px;
+	line-height: 16px;
+	padding: 8px 10px;
+	background: #c1bebe;
+	border-radius: 3px;
+}
+
+#trafico {
+	background: linear-gradient(90deg, rgba(31, 117, 12, 0.4) 0%, rgba(31, 117, 12, 0.9) 100%);
+}
+
+#corrida {
+	background: linear-gradient(90deg, rgba(12, 96, 117, 0.4) 0%, rgba(12, 96, 117, 0.9) 100%);
+}
+
+#carro {
+	background: linear-gradient(90deg, rgba(109, 103, 20, 0.4) 0%, rgba(109, 103, 20, 0.9) 100%);
+}
+
+#tiro {
+	background: linear-gradient(90deg, rgba(248, 99, 72, 0.4) 0%, rgba(248, 99, 72, 0.9) 100%);
+}
+
+#lokcpick {
+	background: linear-gradient(90deg, rgba(109, 109, 109, 0.4) 0%, rgba(109, 109, 109, 0.9) 100%);
+}
+
+#armored {
+	background: linear-gradient(90deg, rgba(5, 141, 85, 0.4) 0%, rgba(5, 141, 85, 0.9) 100%);
+}
+
+#pertences {
+	background: linear-gradient(90deg, rgba(207, 127, 7, 0.4) 0%, rgba(207, 127, 7, 0.9) 100%);
+}
+
+#roubo {
+	background: linear-gradient(90deg, rgba(13, 164, 175, 0.4) 0%, rgba(13, 164, 175, 0.9) 100%);
+}
+
+#ferido {
+	background: linear-gradient(90deg, rgba(238, 27, 27, 0.4) 0%, rgba(238, 27, 27, 0.9) 100%);
+}
+
+#confronto {
+	background: linear-gradient(90deg, rgba(125, 22, 134, 0.4) 0%, rgba(125, 22, 134, 0.9) 100%);
+}
+
+#reforco {
+	background: linear-gradient(90deg, rgba(134, 22, 87, 0.4) 0%, rgba(134, 22, 87, 0.9) 100%);
+}
+
+
+#locs {
+	background: linear-gradient(90deg, rgba(116, 113, 255, 0.4) 0%, rgba(116, 113, 255, 0.9) 100%);
+}
+
+#outros {
+	background: linear-gradient(90deg, rgba(15, 15, 15, 0.4) 0%, rgba(15, 15, 15, 0.9) 100%);
+}

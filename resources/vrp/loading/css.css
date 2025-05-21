@@ -1,0 +1,182 @@
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	font-family: Arial;
+	font-size: 17px;
+}
+
+video {
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	position: fixed;
+	object-fit: cover;
+}
+
+.alert {
+	width: 20%;
+	z-index: 9999999999;
+	position: absolute;
+	color: #FFF;
+	background-color: rgba(255, 255, 255, 0.2);
+	border-radius: 10px;
+	margin-top: 3%;
+	margin-left: 3%;
+	text-align: center;
+}
+
+.alert b{
+	color: aqua;
+}
+
+.Teclas{
+	z-index: 9999999999;
+	border-radius: 5px;
+	position: absolute;
+	top: 3%;
+	left: 2%;
+	width: 200px;
+	height: 100px;
+}
+
+.teladiv{
+	width: 100%;
+	margin-top: 2%;
+	height: 50px;
+}
+
+.tecla1{
+	width: 50px;
+	height: 50px;
+	background: #0f0f0f80;
+	color: #ccc;
+	text-align: center;
+	line-height: 50px;
+	font-size: 16px;
+	border-radius: 5px;
+}
+
+.tecla2{
+	font-size: 16px;
+	margin-top: -17.5%;
+	margin-left: 35%;
+	color: #fff;
+}
+
+.custom-loader {
+	z-index: 9999999999;
+	position: absolute;
+	right: 0;
+	bottom: 5%;
+	left: 0;
+	margin: auto;
+	width: 80px;
+	height: 80px;
+	border-radius: 50%;
+	background: 
+	  radial-gradient(farthest-side,#ccc 94%,#0000) top/8px 8px no-repeat,
+	  conic-gradient(#0000 30%,#ccc);
+	-webkit-mask: radial-gradient(farthest-side,#0000 calc(100% - 8px),#000 0);
+	animation:s3 1s infinite linear;
+  }
+  
+  @keyframes s3{ 
+	100%{transform: rotate(1turn)}
+  }
+
+  .textmeio{
+	z-index: 9999999999;
+	position: absolute;
+	width: 100%;
+	text-align: center;
+	position: absolute;
+	font-size: 32px;
+	bottom: 5%;
+  }
+
+  .animate-charcter
+{
+	z-index: 9999999999;
+	position: absolute;
+   text-transform: uppercase;
+  background-image: linear-gradient(
+    -225deg,
+    #231557 0%,
+    #44107a 29%,
+    #ff1361 67%,
+    #fff800 100%
+  );
+  background-size: auto auto;
+  background-clip: border-box;
+  background-size: 200% auto;
+  color: #fff;
+  background-clip: text;
+  text-fill-color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textclip 2s linear infinite;
+  display: inline-block;
+      font-size: 32px;
+	  text-align: center;
+	  bottom: 5%;
+	  width: 100%;
+	  font-family: Arial, Helvetica, sans-serif;
+}
+
+.fa-discord{
+	z-index: 9999999999;
+	position: absolute;
+	left: 3%;
+	font-size: 38px;
+	bottom: 5%;
+	color: #fff;
+	transition: all 1s;
+}
+
+.fa-discord:hover{
+	transform: scale(1.2);
+}
+
+.fa-instagram{
+	z-index: 9999999999;
+	position: absolute;
+	left: 6.5%;
+	font-size: 38px;
+	bottom: 5%;
+	color: #ffffff;
+		transition: all 1s;
+}
+
+.fa-instagram:hover{
+	transform: scale(1.2);
+}
+
+.fa-tiktok{
+	z-index: 9999999999;
+	position: absolute;
+	left: 9.5%;
+	font-size: 38px;
+	bottom: 5%;
+	color: #ffffff;
+	transition: all 1s;
+}
+
+#site{
+	z-index: 9999999999;
+	position: absolute;
+}
+
+
+.fa-tiktok:hover{
+	transform: scale(1.2);
+}
+
+@keyframes textclip {
+  to {
+    background-position: 200% center;
+  }
+}

@@ -1,0 +1,450 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Mukta:wght@700&display=swap');
+html {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+  body {
+    font-family: "Mukta", sans-serif;
+    width: 100%;
+    height: 100%;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    overflow-block: hidden;
+    overflow: hidden;
+    display: none;
+}
+
+body::after {
+    position: absolute;
+    content: '';
+    top: 0;
+    left: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    background: rgb(0,0,0);
+    background: radial-gradient(circle, rgba(0,0,0,0.4) 0%, rgba(35, 38, 53, 0.8) 100%);
+}  
+
+.container{
+    width: 1000px;
+    height: 650px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    margin: auto;
+    animation-name: zoomIn;
+    -webkit-animation-duration: 1s;
+    animation-duration: 1s;
+}
+
+.baixo{
+    width: 100%;
+    height: 95%;
+    margin-top: 1%;
+}
+
+.title{
+    font-size: 28px;
+    color: #fff;
+    margin-left: 1%;
+    font-family: "Mukta", sans-serif;
+}
+
+.title::before{
+    content: '';
+    position: absolute;
+    margin-left: -1%;
+    margin-top: 1.4%;
+    width: 0.2%;
+    height: 3%;
+    -webkit-box-shadow: -1px 0px 25px 0px white;
+    -moz-box-shadow: -1px 0px 25px 0px white;
+    box-shadow: -1px 0px 25px 0px white;
+    background: white;
+}
+
+.desc{
+    font-size: 15px;
+    color: #ccc;
+    margin-top: -1%;
+    font-family: "Mukta", sans-serif;
+}
+
+.lado{
+    width: 25%;
+    height: 100%;
+    
+}
+
+.lado .item{
+    width: 100%;
+    border: none;
+	outline: none;
+	display: block;
+    position: relative;
+    height: 27%;
+    border-radius: 5px;
+    margin-top: 2%;
+    background: rgba(15, 15, 15, 0.8);
+    transition: .5s;
+}
+
+.lado .item:hover{
+    background: rgba(15, 15, 15, 0.6);
+}
+
+.item::before{
+	top: 30%;
+	left: -2px;
+	width: 5px;
+	height: 40%;
+	bottom: 20%;
+	content: "";
+	position: absolute;
+	background: rgba(255, 255, 255, 0.8);
+	border-radius: 0px 10px 10px 0px;
+}
+
+.item:nth-child(1){
+    margin-top: 0%;
+}
+
+.overflow-carros{
+    width: 100%;
+    height: 85%;
+    margin-top: 2%;
+    overflow: auto;
+    border-radius: 5px;
+}
+
+.img-carro{
+    max-width: 60%;
+    min-width: 60%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    top: 10%;
+}
+
+.nome-carro{
+    text-align: center;
+    font-family: "Mukta", sans-serif;
+    color: #fff;
+    font-size: 16px;
+    border-radius: 5px;
+    position: relative;
+    top: 8%;
+}
+
+.search-bar{
+    width: 100%;
+    height: 40px;
+    line-height: 40px;
+    border-radius: 5px;
+    background: rgba(15, 15, 15, 0.8);
+}
+
+.fa-magnifying-glass {
+    line-height: 40px;
+    margin-top: 4.5%;
+    margin-left: 5%;
+    color: #fff;
+}
+
+.inputprocurar{
+    height: 100%;
+    background: transparent;
+    outline: 0;
+    border: 0;
+    height: 80%;
+    font-size: 16px;
+    font-family: "Mukta", sans-serif;
+    color: #919191;
+    margin-left: 5%;
+}
+
+::placeholder{
+    color: #919191;
+}
+::-webkit-scrollbar{
+    display: none;
+}
+
+
+.lado2{
+    position: absolute;
+    width: 80%;
+    margin-left: 26%;
+    height: 87.5%;
+    border-radius: 5px;
+    top: 11.1%;
+    background: rgba(15, 15, 15, 0.8);
+}
+
+.nome-carro-lado{
+    font-family: "Mukta", sans-serif;
+    color: #fff;
+    font-size: 32px;
+    margin-left: 5%;
+    margin-top: 3%;
+}
+
+.placa-carro-lado{
+    font-family: "Mukta", sans-serif;
+    color: #ccc;
+    font-size: 14px;
+    margin-left: 5%;
+    margin-top: -0.5%;
+}
+
+.nome-carro-lado2{
+    font-family: "Mukta", sans-serif;
+    color: #fff;
+    font-size: 32px;
+    margin-left: 5%;
+    margin-top: 3%;
+}
+
+.placa-carro-lado2{
+    font-family: "Mukta", sans-serif;
+    color: #ccc;
+    font-size: 14px;
+    margin-left: 5%;
+    margin-top: -0.5%;
+}
+
+.fa-pen-to-square{
+    color: #fff;
+    margin-right: 5px;
+    transition: .5s;
+}
+
+.fa-pen-to-square:hover{
+    color: #a8ff8d;
+}
+
+.img-carro-lado{
+    max-height: 17em;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    margin-top: 5%;
+}
+
+.fechar-div{
+    position: absolute;
+    width: 90px;
+    height: 35px;
+    line-height: 35px;
+    top: 6%;
+    left: 82%;
+}
+
+.text-estatiticas{
+    margin-left: 5%;
+    font-family: "Mukta", sans-serif;
+    color: #fff;
+    margin-top: 5%;
+    font-size: 24px;
+}
+
+
+
+.bloco-fechar{
+    height: 35px;
+    width: 35px;
+    background: rgba(255, 69, 69, 0.2);
+    border: 1px solid rgba(255, 69, 69);
+    border-radius: 5px;
+    margin-top: -38.5%;
+    margin-left: 65%;
+    line-height: 40px;
+    text-align: center;
+    color: #fff;
+    transition: all .5s;
+}
+
+.bloco-fechar:hover{
+    background: rgba(255, 69, 69, 0.4);
+}
+
+.fa-times{
+    margin-top: 25%;
+}
+
+.text-fechar{
+    font-family: "Mukta", sans-serif;
+    font-size: 16px;
+    color: #fff;
+}
+
+.bars_div{
+    width: 200px;
+    height: 50px;
+    margin-left: 1.2%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.bars{
+    width: 40px;
+    margin-left: 15%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+}
+
+.carBar{
+    stroke-width: 100%;
+    color: 0;
+}
+
+.ldBar-label{
+    opacity: 0;
+}
+
+.botoes-lado{
+    width: 300px;
+    height: 35px;
+    margin-top: -5.5%;
+    margin-left: 56.2%;
+}
+
+.verbau{
+    width: 35px;
+    height: 100%;
+    border-radius: 5px;
+    line-height: 35px;
+    margin-left: 3%;
+    text-align: center;
+    font-family: "Mukta", sans-serif;
+    background: rgb(255, 168, 69,0.2);
+    border: 1.5px solid rgb(255, 168, 69);
+    transition: all .5s;
+}
+
+.verbau:hover{
+    background: rgb(255, 168, 69,0.4);
+}
+
+.fa-treasure-chest{
+    margin-top: 28%;
+    color: #ccc;
+}
+
+
+.botao2{
+    height: 100%;
+    width: 120px;
+    text-align: center;
+    font-family: "Mukta", sans-serif;
+    border-radius: 5px;
+    margin-top: -12.2%;
+    margin-left: 17%;
+    color: #fff;
+    line-height: 35px;
+
+    background: rgba(255, 69, 69, 0.2);
+    border: 1px solid rgba(255, 69, 69);
+    transition: all .5s;
+}
+
+.botao2:hover{
+    background: rgba(255, 69, 69, 0.4);
+}
+
+.botao3{
+    height: 100%;
+    width: 120px;
+    text-align: center;
+    font-family: "Mukta", sans-serif;
+    border-radius: 5px;
+    margin-top: -12.6%;
+    margin-left: 59%;
+    color: #fff;
+    line-height: 35px;
+    display: inline-block;
+    background: rgba(69, 255, 78, 0.2);
+    border: 1px solid rgba(69, 255, 78);
+    transition: all .5s;
+}
+
+.botao3:hover{
+    background: rgba(69, 255, 78, 0.4);
+}
+
+.box-itens{
+    width: 90%;
+    margin-left: 5%;
+    margin-top: 2%;
+    height: 80%;
+    margin-top: 2%;
+    overflow: auto;
+}
+
+.item-inv{
+    width: 139.5px;
+    height: 145px;
+    display: inline-block;
+    border-radius: 5px;
+    background: rgba(15, 15, 15, 0.6);
+}
+
+.item-inv-nome{
+    font-family: "Mukta", sans-serif;
+    white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: center;
+    color: #ccc;
+    font-size: 16px;
+    position: relative;
+    top: 5%;
+}
+
+.item-img{
+    min-height: 50%;
+    max-width: 50%;
+    min-width: 50%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 5%;
+}
+
+.item-inv-qtd{
+    font-family: "Mukta", sans-serif;
+    white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: center;
+    color: #ccc;
+    font-size: 16px;
+
+}
+
+.durability{
+	width: 80%;
+    margin-left: 10%;
+	height: 3px;
+}
+
+.durability2{
+    width: 100%;
+	height: 100%;
+    border-radius: 10px;
+	background: #2e6e4c;
+}
