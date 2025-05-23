@@ -1,5 +1,5 @@
 
-shared_script "@vrp/lib/lib.lua"
+shared_script ""
 fx_version "adamant"
 game "gta5"
 ui_page_preload 'yes'

@@ -1,5 +1,5 @@
 
-shared_script "@vrp/lib/lib.lua" --Para remover esta pendencia de todos scripts, execute no console o comando "uninstall"
+shared_script "" --Para remover esta pendencia de todos scripts, execute no console o comando "uninstall"
 -- This resource is part of the default Cfx.re asset pack (cfx-server-data)
 -- Altering or recreating for local use only is strongly discouraged.
 version '1.0.0'

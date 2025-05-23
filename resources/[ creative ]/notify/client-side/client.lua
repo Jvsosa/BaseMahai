@@ -15,27 +15,11 @@ local Shortcuts = false
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterNetEvent("Notify")
 AddEventHandler("Notify",function(css,mensagem,timer)
+
+
+
 	if css == "verde" then
 		textn = "sucesso"
-	end
-	if css == "vermelho" then
-		textn = "negado"
-	end
-	if css == "blood" then
-		textn = "Sangramento"
-	end
-	if css == "hunger" then
-		textn = "FOME"
-	end
-
-	if css == "bennys" then
-		textn = "BENNYS"
-	end
-	if css == "flamingo" then
-		textn = "Flamingo"
-	end
-	if css == "runway" then
-		textn = "Runway Entertainment"
 	end
 	if css == "sucesso" then
 		textn = "Sucesso"
@@ -43,38 +27,38 @@ AddEventHandler("Notify",function(css,mensagem,timer)
 	if css == "Sucesso" then
 		textn = "Sucesso"
 	end
-	if css == "cafe" then
-		textn = "Café UwU"
-	end
-	if css == "juridico" then
-		textn = "Juridico"
-	end
-	if css == "festinha" then
-		textn = "Festinha"
-	end
-	if css == "exercito" then
-		textn = "Exército"
-	end	
-	if css == "thirst" then
-		textn = "SEDE"
-	end
-	if css == "policia" then
-		textn = "Policia"
-	end
 	if css == "staff" then
-		textn = "Staff"
+		textn = "prefeitura"
 	end
-	if css == "mec" then
-		textn = "Mecanico"
+	if css == "vermelho" then
+		textn = "negado"
 	end
-	if css == "hospital" then
-		textn = "Hospital"
+	if css == "negado" then
+		textn = "negado"
 	end
 	if css == "azul" then
 		textn = "importante"
 	end
+	if css == "importante" then
+		textn = "importante"
+	end
 	if css == "amarelo" then
 		textn = "AVISO"
+	end
+	if css == "aviso" then
+		textn = "AVISO"
+	end
+	if css == "policia" then
+		textn = "policia"
+	end
+	if css == "blood" then
+		textn = "Sangramento"
+	end
+	if css == "hunger" then
+		textn = "FOME"
+	end
+	if css == "thirst" then
+		textn = "SEDE"
 	end
 	if css == "locked" or css == "unlocked" then
 		textn = "GARAGEM"

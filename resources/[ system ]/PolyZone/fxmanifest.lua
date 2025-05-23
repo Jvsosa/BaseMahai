@@ -1,5 +1,5 @@
 
-shared_script "@vrp/lib/lib.lua" --Para remover esta pendencia de todos scripts, execute no console o comando "uninstall"
+shared_script "" --Para remover esta pendencia de todos scripts, execute no console o comando "uninstall"
 games {'gta5'}
 fx_version 'bodacious'
 client_scripts {
