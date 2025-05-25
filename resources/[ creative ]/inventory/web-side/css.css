@@ -109,11 +109,11 @@ body::after {
 .container::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(10, 10, 15, 0.3);
+    top: 0.01cm; /* Espaço menor no topo */
+    left: 0.01cm; /* Espaço menor à esquerda */
+    right: 0.01cm; /* Espaço menor à direita */
+    bottom: 0.01cm; /* Espaço menor na parte inferior */
+    background: rgba(10, 10, 15, 0);
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 10px;
     z-index: -10; /* Fica por baixo de todo o conteúdo */
@@ -181,9 +181,9 @@ body::after {
     top: 7.3%;
     left: 9vw;
     width: 40%;
-    height: 85%;
+    height: 85.5%;
     bottom: -1vw;
-    background: rgba(15, 15, 15, 0.3);
+    background: rgba(15, 15, 15, 0.133);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 8px;
     z-index: -1;
@@ -202,14 +202,16 @@ body::after {
 	grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
 }
 
-.item{
-	width: 7.07823310271421vw;
-	height: 7.07823310271421vw;
-	border-radius: 5px;
+.item {
+    width: 7.07823310271421vw;
+    height: 7.07823310271421vw;
+    border-radius: 5px;
     display: flex;
-	flex-direction: column;
-	text-shadow: 1px 1px #000;
-    background-color: rgba(15, 15, 15, 0.5);
+    flex-direction: column;
+    text-shadow: 1px 1px #000;
+    background: rgba(15, 15, 15, 0.133);
+    border: 1px solid rgba(255, 255, 255, 0.12); /* Adiciona a borda */
+    box-sizing: border-box; /* Inclui a borda no tamanho total */
 }
 
 .populated {
@@ -333,7 +335,6 @@ background: rgba(255, 255, 255, 0.4);
     display: none;
 }
 
-
 .invMiddle{
     width: 120px;
     height: 43px;
@@ -342,12 +343,13 @@ background: rgba(255, 255, 255, 0.4);
     left: 47%;
     margin: auto;
     
+    
 }
 
 .amount{
     width: 100%;
     height: 2.12879191059074vw;
-    background: rgba(15, 15, 15, 0.5);
+   background: rgba(15, 15, 15, 0.133);
     border: 1px solid rgba(255, 255, 255, 0.12); /* Deixe a borda sempre */
     border-radius: 8px;
     outline: 0;
@@ -361,7 +363,7 @@ background: rgba(255, 255, 255, 0.4);
 .but{
     width: 100%;
     height: 2.12879191059074vw;
-    background: rgba(15, 15, 15, 0.5);
+    background: rgba(15, 15, 15, 0.133);
     border: 1px solid rgba(255, 255, 255, 0.12); /* Deixe a borda sempre */
     border-radius: 8px;
     text-align: center;
@@ -669,7 +671,7 @@ input::-webkit-inner-spin-button { -webkit-appearance: none; }
 .hotbar-slot {
     width: 6vw;
     height: 6vw;
-    background: rgba(15, 15, 15, 0.5);
+   background: rgba(15, 15, 15, 0.133);
     border: 1px solid rgba(255, 255, 255, 0.12); /* Deixe a borda sempre */
     border-radius: 8px;
     display: flex;
@@ -701,7 +703,7 @@ input::-webkit-inner-spin-button { -webkit-appearance: none; }
     position: absolute;
     display: flex;
     align-items: center;
-    background: rgba(20, 20, 25, 0.7);
+    background: rgba(15, 15, 15, 0.133);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 7px;
     padding: 0.4vw 1vw;
@@ -710,7 +712,7 @@ input::-webkit-inner-spin-button { -webkit-appearance: none; }
     box-sizing: border-box;
     
     /* Posicionamento absoluto - agora você pode mover */
-    top: 42vw;    /* Mude este valor para cima/baixo */
+    top: 42.2vw;    /* Mude este valor para cima/baixo */
     left: 9vw;   /* Mude este valor para esquerda/direita */
     
     /* Remove as margens antigas */
