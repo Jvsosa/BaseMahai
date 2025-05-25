@@ -34,7 +34,7 @@ body {
     color: #fff;
     font-family: "Mukta", sans-serif;
     display: block;
-    background-image: url('assests/background.png'); /* Caminho relativo à pasta do CSS */
+    background-image: url('assests/background.png');
     background-size: cover;
     background-position: center;
 }
@@ -155,23 +155,23 @@ body::after {
 	width: 46%;
 	height: 90%;
 	margin-top: 1%;
-   margin-left: 10%;
+   margin-left: 9.8%;
 }
 
 .invLeft{
     width: 80%;
     height: 89%;
     margin-top: 7%;
-    overflow: auto;
+    /* overflow: auto; - REMOVER */
     row-gap: 3px;
     display: grid;
-    gap: 0.2vw;              /* Diminua o gap geral */
-    /* column-gap: 1px; */   /* Remova esta linha */
-    overflow-y: scroll;
+    gap: 0.2vw;
+    /* overflow-y: scroll; - REMOVER */
     padding-right: 3px;
     margin-bottom: 1vw;
     grid-template-columns: repeat(4, 1fr);
     z-index: 2;
+    overflow: hidden; /* ADICIONAR */
 }
 
 .invLeft::before {
@@ -190,15 +190,16 @@ body::after {
 
 .invRight {
     width: 100%;
-	height: 75%;
+    height: 75%;
     margin-top: 2%;
-	overflow: auto;
-	row-gap: 3px;
-	display: grid;
-	column-gap: 3px;
-	overflow-y: scroll;
-	padding-right: 3px;
-	grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    /* overflow: auto; - REMOVER */
+    row-gap: 3px;
+    display: grid;
+    column-gap: 3px;
+    /* overflow-y: scroll; - REMOVER */
+    padding-right: 3px;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    overflow: hidden; /* ADICIONAR */
 }
 
 .item {
@@ -298,40 +299,13 @@ body::after {
     text-overflow: ellipsis;
 }
 
-::-webkit-scrollbar{
-	width: 4px;
-	height: 1px;
-    border-radius: 3px;
-	background: rgb(15, 15, 15,0.5);
-}
-::-webkit-scrollbar-thumb{
-background: rgba(255, 255, 255, 0.4);
-  border-radius: 3px;
-  transition: all 1s;
-}
-::-webkit-scrollbar-thumb:hover{
-	background: rgba(255, 255, 255, 0.2);
-}
-::-webkit-scrollbar-track{
-	background: transparent;
+* {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
 }
 
-.invRight::-webkit-scrollbar{
-    display: none;
-}
-.invRight::-webkit-scrollbar-thumb{
-background: rgba(255, 255, 255, 0.4);
-  border-radius: 3px;
-  display: none;
-  transition: all 1s;
-}
-.invRight::-webkit-scrollbar-thumb:hover{
-	background: rgba(255, 255, 255, 0.2);
-    display: none;
-}
-.invRight::-webkit-scrollbar-track{
-	background: transparent;
-    display: none;
+*::-webkit-scrollbar {
+    display: none; /* WebKit */
 }
 
 .invMiddle{
