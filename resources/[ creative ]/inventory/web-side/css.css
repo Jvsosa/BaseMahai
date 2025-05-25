@@ -47,7 +47,7 @@ body {
 .barra-peso {
     position: absolute;
     bottom: 90%;
-    left: 13%;
+    left: 10.1%;
     width: 30%;
     height: 0.22vw;
     border-radius: 4px;
@@ -109,10 +109,9 @@ body::after {
 .container::before {
     content: '';
     position: absolute;
-    top: 0.01cm; /* Espaço menor no topo */
-    left: 0.01cm; /* Espaço menor à esquerda */
-    right: 0.01cm; /* Espaço menor à direita */
-    bottom: 0.01cm; /* Espaço menor na parte inferior */
+    width: 110%;
+    right: -7%;
+    height: 100%;
     background: rgba(10, 10, 15, 0);
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 10px;
@@ -156,7 +155,7 @@ body::after {
 	width: 46%;
 	height: 90%;
 	margin-top: 1%;
-   margin-left: 13%;
+   margin-left: 10%;
 }
 
 .invLeft{
@@ -179,7 +178,7 @@ body::after {
     content: '';
     position: absolute;
     top: 7.3%;
-    left: 9vw;
+    left: 6.4vw;
     width: 40%;
     height: 85.5%;
     bottom: -1vw;
@@ -340,7 +339,7 @@ background: rgba(255, 255, 255, 0.4);
     height: 43px;
     position: absolute;
     top: 13%;
-    left: 47%;
+    left: 50%;
     margin: auto;
     
     
@@ -520,7 +519,7 @@ input::-webkit-inner-spin-button { -webkit-appearance: none; }
 .identidade-baixo{
     width: 692px;
     height: 540px;
-    background: rgb(15, 15, 15,0.5);
+    background: rgba(15, 15, 15, 0.133);
     border-radius: 0.532197977647685vw;
     margin-top: 2%;
 }
@@ -661,7 +660,7 @@ input::-webkit-inner-spin-button { -webkit-appearance: none; }
     .hotbar {
     position: absolute;
     top: 18%;
-    left: 2%;
+    left: -1.3%;
     display: flex;
     flex-direction: column;
     gap: 0.4vw;
@@ -713,7 +712,7 @@ input::-webkit-inner-spin-button { -webkit-appearance: none; }
     
     /* Posicionamento absoluto - agora você pode mover */
     top: 42.2vw;    /* Mude este valor para cima/baixo */
-    left: 9vw;   /* Mude este valor para esquerda/direita */
+    left: 6.4vw;   /* Mude este valor para esquerda/direita */
     
     /* Remove as margens antigas */
     margin: 0;
