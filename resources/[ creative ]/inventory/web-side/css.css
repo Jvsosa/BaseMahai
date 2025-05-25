@@ -1,5 +1,24 @@
 @import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Nunito:wght@800&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Nunito:wght@800&family=Inter:wght@400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Nunito:wght@800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Nunito:wght@800&family=Inter:wght@400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Luxora+Grotesk:wght@400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Nunito:wght@800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Nunito:wght@800&family=Inter:wght@400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Nunito:wght@800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Nunito:wght@800&family=Inter:wght@400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Luxora+Grotesk:wght@400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Lunasima:wght@400&display=swap");
+
+
+@font-face {
+    font-family: 'Luxora Grotesk';
+    src: url('fonts/LuxoraGrotesk-Regular.woff2') format('woff2'),
+         url('fonts/LuxoraGrotesk-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+}
+
 
 body {
     -webkit-touch-callout: none;
@@ -679,23 +698,30 @@ input::-webkit-inner-spin-button { -webkit-appearance: none; }
 }
 
 .mochila-nivel {
+    position: absolute;
     display: flex;
     align-items: center;
     background: rgba(20, 20, 25, 0.7);
-    border: 1px solid #333;
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 7px;
     padding: 0.4vw 1vw;
-    width: 28vw;
-    margin: 1vw 0 1vw 1vw;
+    width: 32.1vw;
     height: 2.2vw;
     box-sizing: border-box;
+    
+    /* Posicionamento absoluto - agora você pode mover */
+    top: 42vw;    /* Mude este valor para cima/baixo */
+    left: 9vw;   /* Mude este valor para esquerda/direita */
+    
+    /* Remove as margens antigas */
+    margin: 0;
 }
 
 .mochila-label {
-    font-family: 'Inter', Arial, sans-serif;
-    font-size: 0.95vw;
-    color: #fff;
-    font-weight: 600;
+    font-family: 'Lunasima', 'Inter', Arial, sans-serif;
+    font-size: 0.5vw;
+    color: #ffffff;
+    font-weight: 400;
     margin-right: 1vw;
     white-space: nowrap;
 }
