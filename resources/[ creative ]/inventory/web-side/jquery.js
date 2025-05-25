@@ -409,9 +409,8 @@ const colorPicker2 = (percent) => {
 
 const updateMochila = () => {
 	$.post("http://inventory/requestInventory",JSON.stringify({}),(data) => {
-		$("#weightTextLeft").html(`${(data["invPeso"]).toFixed(2)} / ${(data["invMaxpeso"]).toFixed(2)}`);
+		$("#weightTextLeft").html(`${(data["invPeso"]).toFixed(2)} / ${(data["invMaxpeso"]).toFixed(2)}`);
 
-		$(".barra-peso2").css("height",data["invPeso"] / data["invMaxpeso"] * 100 + "%");
 		updateBarValue(data["invPeso"],data["invMaxpeso"])
 
 		$(".invLeft").html("");
@@ -496,6 +495,7 @@ const updateMochila = () => {
 	});
 }
 
+let mochilaNivel = 1; // Começa no nível 1
 /* ----------CRAFT---------- */
 $(document).on("click",".craft",function(e){
 	$.post("http://inventory/Craft");
@@ -514,24 +514,52 @@ const formatarNumero = n => {
 	return r.split("").reverse().join("");
 }
 
-function updateBarValue(peso_inv,peso_max){
-	let pesoInv = peso_inv
-	let maxPeso = peso_max
-	let transformInv = (pesoInv * 100) / maxPeso
-	updateColor(transformInv)
+function updateBarValue(peso_inv, peso_max){
+    let pesoInv = peso_inv
+    let maxPeso = peso_max
+    let transformInv = (pesoInv * 100) / maxPeso
+    
+    // Atualiza o texto do peso
+    $("#peso-texto").html(`${pesoInv.toFixed(1)} / ${maxPeso.toFixed(1)}`);
+    
+    updateColor(transformInv)
 }
 
 function updateColor(valor){
-	let value = valor;
-	if (value >= 100){
-		value = 100
-	}
-	if(value <= 30){
-		$('.barra-peso2').css({"background-color": "#12b42d"})
-	} else if(value > 30 && value < 70) {
-		$('.barra-peso2').css({"background-color": "#faad39"})
-	} else if(value > 70) {
-		$('.barra-peso2').css({"background-color": "#ff4e4e"})
-	}
-	$('.barra-peso2').css({"height": value + "%"})
+    let value = valor;
+    if (value >= 100){
+        value = 100
+    }
+    if(value <= 30){
+        $('.barra-peso2').css({"background-color": "#12b42d"})
+    } else if(value > 30 && value < 70) {
+        $('.barra-peso2').css({"background-color": "#faad39"})
+    } else if(value > 70) {
+        $('.barra-peso2').css({"background-color": "#ff4e4e"})
+    }
+    $('.barra-peso2').css({"width": value + "%"}) // Mude de "height" para "width"
+}
+
+// Exemplo para o evento de uso de item
+$(document).on("click", ".use, .populated", function(e) {
+    // Pegue o nome do item
+    const itemName = $(this).data("name-key") || $(this).data("item-key");
+
+    // Se for o backpack, aumenta o nível
+    if (itemName === "backpack") {
+        if (mochilaNivel < 4) { // Limite de 4 níveis
+            mochilaNivel++;
+            setMochilaNivel(mochilaNivel);
+        }
+    }
+});
+
+function setMochilaNivel(nivel) {
+    $('.mochila-bar').each(function(i){
+        if(i < nivel) {
+            $(this).addClass('active');
+        } else {
+            $(this).removeClass('active');
+        }
+    });
 }

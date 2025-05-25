@@ -11,9 +11,18 @@
 	<body>
 		<div class="container">
 
-			<div class="barra-peso" >
-				<div class="barra-peso2" ></div>
-			</div>
+<!-- Hotbar -->
+<div class="hotbar">
+    <div class="hotbar-slot">1</div>
+    <div class="hotbar-slot">2</div>
+    <div class="hotbar-slot">3</div>
+    <div class="hotbar-slot">4</div>
+</div>
+			
+			<div class="barra-peso">
+    <div class="barra-peso2"></div>
+    <div class="peso-texto" id="peso-texto">0 / 0</div>
+</div>
 
 			<div class="titleInv">Inventario <ss><small id="weightTextLeft"></small></ss></div>
 			<div class="desc">Você tem acesso a sua mochila e itens dentro</div>
@@ -24,10 +33,9 @@
 			</div>
 
 			<div class="invMiddle">
-				<input class="amount" placeholder="QTD" type="number" onKeyPress="if(this.value.length==9) return false;" maxlength="9" />
-				<div class="use but">USAR</div>
-				<div class="send but">ENVIAR</div>
-				<div class="lixo but">LIXEIRA</div>
+				<input class="amount" placeholder="Quantidade" type="number" onKeyPress="if(this.value.length==9) return false;" maxlength="9" />
+				<div class="use but">Usar</div>
+				<div class="send but">Enviar</div>
 			</div>
 
 			<div class="ladoEsquerdo">
@@ -86,6 +94,16 @@
 				<div class="desc">Ver itens perto de vocês jogados no chão. </div>
 				<div class="invRight"></div>
 			</div>
+
+			<div class="mochila-nivel">
+    <span class="mochila-label">Nível da mochila</span>
+    <div class="mochila-barras">
+        <div class="mochila-bar active"></div>
+        <div class="mochila-bar"></div>
+        <div class="mochila-bar"></div>
+        <div class="mochila-bar"></div>
+    </div>
+</div>
 
 		</div>
 		<script src="jquery.js"></script>

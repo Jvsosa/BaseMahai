@@ -1,7 +1,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Nunito:wght@800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Nunito:wght@800&family=Inter:wght@400&display=swap");
 
 body {
-	-webkit-touch-callout: none;
+    -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
@@ -9,36 +10,57 @@ body {
     user-select: none;
     overflow-block: hidden;
     overflow: hidden;
-	width: 100%;
-    height: 100%;
-	color: #fff;
-	font-family: "Mukta", sans-serif;
-    display: none;
-	/* background-image: url(https://cdn.discordapp.com/attachments/755933469955195015/968719318026190918/unknown.png);   */
-}
-
-
-
-
-.barra-peso{
-    position: absolute;
-    top: 0%;
-    left: -1%;
-    width: 0.4257583821181479vw;
-    height: 85.8%;
-    margin-top: 4.5%;
-    border-radius: 5px;
-    background: rgba(15, 15, 15, 0.6);
-}
-
-.barra-peso2{
-    position: absolute;
-    bottom: 0;
     width: 100%;
-    background-color: #ff4e4e;
-    transition: height .5s;
-    border-radius: 5px;
+    height: 100%;
+    color: #fff;
+    font-family: "Mukta", sans-serif;
+    display: block;
+    background-image: url('assests/background.png'); /* Caminho relativo à pasta do CSS */
+    background-size: cover;
+    background-position: center;
 }
+
+
+
+
+
+
+.barra-peso {
+    position: absolute;
+    bottom: 90%;
+    left: 13%;
+    width: 30%;
+    height: 0.22vw;
+    border-radius: 4px;
+    background: rgba(30, 33, 40, 0.7);
+    border: none;
+    overflow: visible; /* Mude para visible */
+}
+
+.barra-peso2 {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 0%; /* Controlado pelo JS */
+    background: #12b42d; /* Verde inicial */
+    border-radius: 4px;
+    transition: width .5s;
+}
+
+
+.peso-texto {
+    position: absolute;
+    right: -5vw; /* Posiciona à direita da barra */
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.7vw;
+    color: #ccc;
+    font-family: 'Inter', Arial, sans-serif;
+    white-space: nowrap;
+}
+
+
 
 body::after {
     position: absolute;
@@ -48,8 +70,6 @@ body::after {
     z-index: -1;
     width: 100%;
     height: 100%;
-    background: rgb(0,0,0);
-    background: radial-gradient(circle, rgba(35, 38, 53,0.8) 0%, rgba(35, 38, 53, 0.8) 100%);
 }  
 
 
@@ -57,7 +77,7 @@ body::after {
 	width: 79.82969664715274vw;
     height: 45.236828100053216vw;
 	position: absolute;
-    left: 0;
+    left: -3vw;
     top: 0;
     bottom: 0;
     right: 0;
@@ -65,9 +85,21 @@ body::after {
 	animation-name: zoomIn;
     -webkit-animation-duration: 1s;
     animation-duration: 1s;
-  
-
 }
+
+.container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(10, 10, 15, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    z-index: -10; /* Fica por baixo de todo o conteúdo */
+}
+
 
 
 .titleInv{
@@ -105,18 +137,37 @@ body::after {
 	width: 46%;
 	height: 90%;
 	margin-top: 1%;
+   margin-left: 13%;
 }
 
 .invLeft{
-	width: 100%;
-	height: 95%;
-	overflow: auto;
-	row-gap: 3px;
-	display: grid;
-	column-gap: 3px;
-	overflow-y: scroll;
-	padding-right: 3px;
-	grid-template-columns: 0.5fr 0.5fr 0.5fr 0.5fr 0.5fr;
+    width: 80%;
+    height: 89%;
+    margin-top: 7%;
+    overflow: auto;
+    row-gap: 3px;
+    display: grid;
+    gap: 0.2vw;              /* Diminua o gap geral */
+    /* column-gap: 1px; */   /* Remova esta linha */
+    overflow-y: scroll;
+    padding-right: 3px;
+    margin-bottom: 1vw;
+    grid-template-columns: repeat(4, 1fr);
+    z-index: 2;
+}
+
+.invLeft::before {
+    content: '';
+    position: absolute;
+    top: 7.3%;
+    left: 9vw;
+    width: 40%;
+    height: 85%;
+    bottom: -1vw;
+    background: rgba(15, 15, 15, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    z-index: -1;
 }
 
 .invRight {
@@ -172,10 +223,6 @@ body::after {
 
 .invLeft > .item:nth-child(4){
 	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='133px' width='133px'><text x='45' y='95' font-size='75' fill='gray' opacity='.5' font-family='Roboto, Arial, Helvetica, sans-serif'>4</text></svg>");
-}
-
-.invLeft > .item:nth-child(5){
-	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='133px' width='133px'><text x='45' y='95' font-size='75' fill='gray' opacity='.5' font-family='Roboto, Arial, Helvetica, sans-serif'>5</text></svg>");
 }
 
 
@@ -269,38 +316,41 @@ background: rgba(255, 255, 255, 0.4);
 
 
 .invMiddle{
-    width: 8%;
-    height: 30%;
+    width: 120px;
+    height: 43px;
     position: absolute;
     top: 13%;
     left: 47%;
     margin: auto;
+    
 }
 
 .amount{
     width: 100%;
     height: 2.12879191059074vw;
-    background: rgba(15, 15, 15, 0.6);
-    border-radius: 5px;
+    background: rgba(15, 15, 15, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.12); /* Deixe a borda sempre */
+    border-radius: 8px;
     outline: 0;
-    font-size: 0.9579563597658329vw;
+    font-size: 0.8vw;
     border: 0;
     color: #ccc;
-    font-family: "Mukta", sans-serif;
+    font-family: 'Inter', Arial, sans-serif;
     text-align: center;
 }
 
 .but{
     width: 100%;
     height: 2.12879191059074vw;
-    background: rgba(15, 15, 15, 0.6);
-    border-radius: 5px;
+    background: rgba(15, 15, 15, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.12); /* Deixe a borda sempre */
+    border-radius: 8px;
     text-align: center;
     margin-top: 10%;
-    font-size: 0.9579563597658329vw;
-    font-family: "Mukta", sans-serif;
+    font-size: 0.8vw;
+    font-family: 'Inter', Arial, sans-serif;
     line-height: 2.12879191059074vw;
-    color: #ccc;
+    color: #ccccccc2;
 }
 
 .but:hover{
@@ -384,7 +434,7 @@ input::-webkit-inner-spin-button { -webkit-appearance: none; }
     width: 45%;
     height: 69%;
     top: 0;
-    left: 56%;
+    left: 60%;
 }
 
 .ladoEsquerdo-baixo{
@@ -393,7 +443,7 @@ input::-webkit-inner-spin-button { -webkit-appearance: none; }
     width: 45%;
     height: 29%;
     margin-top: 1.8%;
-    left: 56%;
+    left: 60.3%;
 
 }
 
@@ -447,16 +497,16 @@ input::-webkit-inner-spin-button { -webkit-appearance: none; }
 }
 
 .identidade-baixo{
-    width: 100%;
-    height: 90%;
+    width: 692px;
+    height: 540px;
     background: rgb(15, 15, 15,0.5);
     border-radius: 0.532197977647685vw;
     margin-top: 2%;
 }
 
 .banner{
-    width: 80%;
-    height: 35%;
+    width: 580px;
+    height: 149px;
     margin-left: 10%;
     margin-top: 5%;
     border-radius: 0.532197977647685vw;
@@ -586,3 +636,84 @@ input::-webkit-inner-spin-button { -webkit-appearance: none; }
     0% {opacity: 0;}
     100% {opacity: 1;}
     } 
+
+    .hotbar {
+    position: absolute;
+    top: 18%;
+    left: 2%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4vw;
+    z-index: 10;
+}
+
+.hotbar-slot {
+    width: 6vw;
+    height: 6vw;
+    background: rgba(15, 15, 15, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.12); /* Deixe a borda sempre */
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Archivo Black', 'Nunito', Arial, sans-serif;
+    font-size: 2.5vw;
+    color: #88888878;
+    transition: border-color 0.2s, background 0.2s; /* Só anima a cor da borda */
+    box-shadow: 0 0 8px 0 rgba(0,0,0,0.3);
+    user-select: none;
+}
+
+.hotbar-slot.active,
+.hotbar-slot:hover {
+    border: 2px solid #fff;
+    background: rgba(40,40,60,0.7);
+    color: #fff;
+}
+
+.hotbar-slot.active,
+.hotbar-slot:hover {
+    border: 2px solid #fff;
+    background: rgba(40,40,60,0.7);
+    color: #fff;
+}
+
+.mochila-nivel {
+    display: flex;
+    align-items: center;
+    background: rgba(20, 20, 25, 0.7);
+    border: 1px solid #333;
+    border-radius: 7px;
+    padding: 0.4vw 1vw;
+    width: 28vw;
+    margin: 1vw 0 1vw 1vw;
+    height: 2.2vw;
+    box-sizing: border-box;
+}
+
+.mochila-label {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 0.95vw;
+    color: #fff;
+    font-weight: 600;
+    margin-right: 1vw;
+    white-space: nowrap;
+}
+
+.mochila-barras {
+    display: flex;
+    gap: 0.5vw;
+    margin-left: auto;
+}
+
+.mochila-bar {
+    width: 2.5vw;
+    height: 0.35vw;
+    border-radius: 6px;
+    background: #444;
+    transition: background 0.3s;
+}
+
+.mochila-bar.active {
+    background: #2196f3;
+}
