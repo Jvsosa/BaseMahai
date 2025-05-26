@@ -54,9 +54,9 @@ body {
 
 .barra-peso {
     position: absolute;
-    bottom: 88%;
-    left: 10.1%;
-    width: 30%;
+    bottom: 85%;
+    left: 11.3%;
+    width: 28%;
     height: 0.22vw;
     border-radius: 4px;
     background: rgba(30, 33, 40, 0.7);
@@ -173,17 +173,108 @@ body::after {
 }
 
 .inventory{
-	width: 46%;
-	height: 90%;
-	margin-top: -1.5%;
-   margin-left: 9.8%;
+	width: 44%;
+	height: 87%;
+	margin-top: 1.5%;
+   margin-left: 11%;
 }
+
+
+.identidade-container {
+    position: absolute;
+
+    background: rgba(15, 15, 15, 0.453); 
+    border-radius: 10px; /* Bordas arredondadas */
+
+    transform: translateX(-50%);
+    z-index: 1; 
+
+    top: 0.2%; /* Ajuste conforme necessário */
+    left: 80.8%; /* Ajuste conforme necessário */
+    width: 37.1%; /* Largura do container */
+    height: 5vw; /* Altura do container */
+}
+
+.identidade-container::before {
+    content: '';
+    background-image: url('assests/identidade.svg'); /* Caminho para o ícone */
+    background-repeat: no-repeat; /* Evita repetição */
+    background-size: 4vw 4vw; /* Define um tamanho fixo para o ícone */
+    background-position: center; /* Centraliza o ícone */
+    width: 3vw; /* Largura do ícone */
+    height: 3vw; /* Altura do ícone */
+    display: block;
+    position: absolute; /* Adiciona posicionamento absoluto */
+    top: 19%; /* Ajuste conforme necessário */
+    left: 3.5%; /* Ajuste conforme necessário */
+}
+
+.identidade-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 1vw; /* Ajuste o tamanho do texto conforme necessário */
+    color: #fff; /* Cor do texto */
+    font-weight: bold; /* Define o texto como bold */
+    white-space: nowrap; /* Impede quebra de linha */
+    position: absolute; /* Torna o texto posicionado sobre o container */
+    top: 36%; /* Ajuste a posição vertical */
+    left: 13%; /* Ajuste a posição horizontal */
+    z-index: 2; /* Certifique-se de que o texto está acima do container */
+}
+
+.identidade-subtext {
+    font-family: 'Jump Street', sans-serif;
+    font-size: 2vw; /* Ajuste o tamanho do texto conforme necessário */
+    color: #020DDB; /* Cor do texto */
+    font-weight: normal;
+    position: absolute; /* Torna o texto posicionado sobre o container */
+    top: 48%; /* Ajuste a posição vertical */
+    left: 14%; /* Ajuste a posição horizontal */
+    z-index: 2; /* Certifique-se de que o texto está acima do container */
+}
+
+.identidade-bar {
+    position: absolute;
+    top: 50%; /* Centraliza verticalmente */
+    left: 35%; /* Ajuste conforme necessário */
+    transform: translateY(-50%); /* Centraliza verticalmente */
+    width: 0.1vw; /* Largura da barra */
+    height: 3vw; /* Altura da barra */
+    background: rgba(255, 255, 255, 0.19); /* Cor da barra */
+    border-radius: 10px; /* Bordas arredondadas */
+    z-index: 2; /* Certifique-se de que está acima do container */
+}
+
+.identidade-bar-text {
+    position: absolute;
+    top: 45%; /* Centraliza verticalmente */
+    left: 40%; /* Ajuste conforme necessário */
+    transform: translateY(-50%); /* Centraliza verticalmente */
+    font-family: 'Inter', sans-serif; /* Define a fonte Inter */
+    font-size: 0.7vw; /* Ajuste o tamanho do texto conforme necessário */
+    color: #ffffff57; /* Cor do texto */
+    white-space: nowrap; /* Impede quebra de linha */
+    z-index: 2; /* Certifique-se de que o texto está acima do container */
+}
+
+.identidade-subtext1 {
+    font-family: 'Inter', sans-serif; /* Define a fonte Inter */
+
+    font-size: 0.7vw; /* Ajuste o tamanho do texto conforme necessário */
+    color: #ffffff57; /* Cor do texto */
+    font-weight: normal; /* Define o texto como regular */
+    position: absolute; /* Torna o texto posicionado sobre o container */
+    top: 54%; /* Ajuste a posição vertical */
+    left: 40%; /* Ajuste a posição horizontal */
+    z-index: 2; /* Certifique-se de que o texto está acima do container */
+    white-space: nowrap; /* Impede quebra de linha */
+}
+
 
 .backpack-container {
     position: relative; /* Mude para relative para que os textos sejam posicionados em relação a este container */
-    top: -3%; /* Ajuste conforme necessário */
-    left: 8%; /* Ajuste conforme necessário */
-    width: 31.1vw; /* Largura do container */
+    top: 0.2%; /* Ajuste conforme necessário */
+    left: 10%; /* Ajuste conforme necessário */
+    width: 36%; /* Largura do container */
     height: 5vw; /* Altura do container */
     background: rgba(15, 15, 15, 0.453); /* Fundo escuro */
     border-radius: 10px; /* Bordas arredondadas */
@@ -286,10 +377,10 @@ body::after {
 .invLeft::before {
     content: '';
     position: absolute;
-    top: 9.5%;
-    left: 6.4vw;
-    width: 40%;
-    height: 85.5%;
+    top: 13%;
+    left: 8vw;
+    width: 37%;
+    height: 82%;
     bottom: -1vw;
     background: rgba(15, 15, 15, 0.133);
     border: 1px solid rgba(255, 255, 255, 0.12);
@@ -298,7 +389,7 @@ body::after {
 }
 /* Remove o ::before do .invRight */
 .invRight {
-    width: 80%;
+    width: 77%;
     height: 75%;
     margin-left: 11.8%;
     margin-top: 11.3%;
@@ -326,8 +417,8 @@ body::after {
 } */
 
 .item {
-    width: 7.07823310271421vw;
-    height: 7.07823310271421vw;
+    width: 6.8vw;
+    height: 6.8vw;
     border-radius: 5px;
     display: flex;
     flex-direction: column;
@@ -614,17 +705,17 @@ input::-webkit-inner-spin-button { -webkit-appearance: none; }
 }
 
 .identidade-baixo{
-    width: 95%;
+    width: 82.5%;
     position: relative;
-    margin-top: 4vw;
+     margin-top: 5.9vw; 
     left: 5%;
-    height: 32.292vw;
+    height: 28.292vw;
     border-radius: 0.5208333333333333vw;
     background: rgba(15, 15, 15, 0.133);
 }
 
 .banner{
-    width: 580px;
+    width: 445px;
     height: 149px;
     margin-left: 10%;
     margin-top: 5%;
@@ -817,13 +908,13 @@ input::-webkit-inner-spin-button { -webkit-appearance: none; }
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 7px;
     padding: 0.4vw 1vw;
-    width: 32.1vw;
+    width: 29.6vw;
     height: 2.2vw;
     box-sizing: border-box;
     
     /* Posicionamento absoluto - agora você pode mover */
     top: 43.2vw;    /* Mude este valor para cima/baixo */
-    left: 6.4vw;   /* Mude este valor para esquerda/direita */
+    left: 8vw;   /* Mude este valor para esquerda/direita */
     
     /* Remove as margens antigas */
     margin: 0;
