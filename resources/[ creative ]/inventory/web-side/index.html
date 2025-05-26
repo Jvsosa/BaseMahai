@@ -37,11 +37,13 @@
 
 
 <!-- Hotbar -->
-<div class="hotbar">
-    <div class="hotbar-slot">1</div>
-    <div class="hotbar-slot">2</div>
-    <div class="hotbar-slot">3</div>
-    <div class="hotbar-slot">4</div>
+<div class="hotbar-container">
+    <div class="hotbar">
+        <div class="hotbar-slot">1</div>
+        <div class="hotbar-slot">2</div>
+        <div class="hotbar-slot">3</div>
+        <div class="hotbar-slot">4</div>
+    </div>
 </div>
 			
 			<div class="barra-peso">
@@ -49,8 +51,13 @@
     <div class="peso-texto" id="peso-texto">0 / 0</div>
 </div>
 
-			<div class="titleInv">Inventario <ss><small id="weightTextLeft"></small></ss></div>
-			<div class="desc">Você tem acesso a sua mochila e itens dentro</div>
+<div class="backpack-container">
+    <span class="backpack-text">INVENTARIO</span>
+    <span class="backpack-subtext">System</span>
+	<div class="backpack-bar"></div>
+	<span class="backpack-bar-text">Aqui estao todos os seus itens.</span>
+	<span class="backpack-subtext1">Cuidado ao gerencia-lo</span>
+</div>
 
 			<div class="inventory">
 				<div class="invLeft">
@@ -65,8 +72,6 @@
 			</div>
 
 			<div class="ladoEsquerdo">
-				<div class="titleInv2">Identidade</div>
-				<div class="desc">Caso você tenha o item passaporte consegue acessar</div>
 
 				<div class="identidade-baixo">
 					<div class="identidadeBlock" style="display: none;"></div>

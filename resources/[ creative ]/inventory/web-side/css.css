@@ -19,6 +19,14 @@
     font-style: normal;
 }
 
+@font-face {
+    font-family: 'Jump Street';
+    src: url('fonts/jumpstreets.woff2') format('woff2'),
+         url('fonts/jumpstreets.woff') format('woff'),
+         url('fonts/jumpstreets.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
 
 body {
     -webkit-touch-callout: none;
@@ -167,8 +175,96 @@ body::after {
 .inventory{
 	width: 46%;
 	height: 90%;
-	margin-top: 4%;
+	margin-top: -1.5%;
    margin-left: 9.8%;
+}
+
+.backpack-container {
+    position: relative; /* Mude para relative para que os textos sejam posicionados em relação a este container */
+    top: -3%; /* Ajuste conforme necessário */
+    left: 8%; /* Ajuste conforme necessário */
+    width: 31.1vw; /* Largura do container */
+    height: 5vw; /* Altura do container */
+    background: rgba(15, 15, 15, 0.453); /* Fundo escuro */
+    border-radius: 10px; /* Bordas arredondadas */
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Alinha os itens no início do container */
+    padding-left: 1vw; /* Espaçamento interno à esquerda */
+    box-shadow: none;
+    z-index: 1; /* Certifique-se de que o container está abaixo dos textos */
+    gap: 1vw; /* Espaçamento entre o ícone e o texto */
+}
+
+.backpack-bar {
+    position: absolute;
+    top: 50%; /* Centraliza verticalmente */
+    left: 35%; /* Ajuste conforme necessário */
+    transform: translateY(-50%); /* Centraliza verticalmente */
+    width: 0.1vw; /* Largura da barra */
+    height: 3vw; /* Altura da barra */
+    background: rgba(255, 255, 255, 0.19); /* Cor da barra */
+    border-radius: 10px; /* Bordas arredondadas */
+    z-index: 2; /* Certifique-se de que está acima do container */
+}
+
+.backpack-container::before {
+    content: '';
+    background-image: url('assests/backpack.svg'); /* Caminho para o ícone */
+    background-repeat: no-repeat; /* Evita repetição */
+    background-size: 4vw 4vw; /* Define um tamanho fixo para o ícone */
+    background-position: center; /* Centraliza o ícone */
+    width: 3vw; /* Largura do ícone */
+    height: 3vw; /* Altura do ícone */
+    display: block;
+}
+
+.backpack-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 1vw; /* Ajuste o tamanho do texto conforme necessário */
+    color: #fff; /* Cor do texto */
+    font-weight: bold; /* Define o texto como bold */
+    white-space: nowrap; /* Impede quebra de linha */
+    position: absolute; /* Torna o texto posicionado sobre o container */
+    top: 36%; /* Ajuste a posição vertical */
+    left: 13%; /* Ajuste a posição horizontal */
+    z-index: 2; /* Certifique-se de que o texto está acima do container */
+}
+
+.backpack-subtext {
+    font-family: 'Jump Street', sans-serif;
+    font-size: 2vw; /* Ajuste o tamanho do texto conforme necessário */
+    color: #020DDB; /* Cor do texto */
+    font-weight: normal;
+    position: absolute; /* Torna o texto posicionado sobre o container */
+    top: 48%; /* Ajuste a posição vertical */
+    left: 14%; /* Ajuste a posição horizontal */
+    z-index: 2; /* Certifique-se de que o texto está acima do container */
+}
+
+.backpack-bar-text {
+    position: absolute;
+    top: 45%; /* Centraliza verticalmente */
+    left: 40%; /* Ajuste conforme necessário */
+    transform: translateY(-50%); /* Centraliza verticalmente */
+    font-family: 'Inter', sans-serif; /* Define a fonte Inter */
+    font-size: 0.7vw; /* Ajuste o tamanho do texto conforme necessário */
+    color: #ffffff57; /* Cor do texto */
+    white-space: nowrap; /* Impede quebra de linha */
+    z-index: 2; /* Certifique-se de que o texto está acima do container */
+}
+
+.backpack-subtext1 {
+    font-family: 'Inter', sans-serif; /* Define a fonte Inter */
+
+    font-size: 0.7vw; /* Ajuste o tamanho do texto conforme necessário */
+    color: #ffffff57; /* Cor do texto */
+    font-weight: normal; /* Define o texto como regular */
+    position: absolute; /* Torna o texto posicionado sobre o container */
+    top: 54%; /* Ajuste a posição vertical */
+    left: 40%; /* Ajuste a posição horizontal */
+    z-index: 2; /* Certifique-se de que o texto está acima do container */
+    white-space: nowrap; /* Impede quebra de linha */
 }
 
 .invLeft{
@@ -520,7 +616,7 @@ input::-webkit-inner-spin-button { -webkit-appearance: none; }
 .identidade-baixo{
     width: 95%;
     position: relative;
-    margin-top: 1.54vw;
+    margin-top: 4vw;
     left: 5%;
     height: 32.292vw;
     border-radius: 0.5208333333333333vw;
@@ -660,14 +756,25 @@ input::-webkit-inner-spin-button { -webkit-appearance: none; }
     100% {opacity: 1;}
     } 
 
-    .hotbar {
+.hotbar-container {
     position: absolute;
-    top: 18%;
-    left: -1.3%;
+    top: 15%; /* Ajuste conforme necessário */
+    left: -5%; /* Ajuste conforme necessário */
+    width: 8vw; /* Largura do contêiner */
+    height: 27.5vw; /* Altura do contêiner */
+    background: rgba(255, 255, 255, 0); /* Fundo escuro */
+    border: 2px solid rgba(255, 255, 255, 0.2); /* Borda branca translúcida */
+    border-radius: 10px; /* Bordas arredondadas */
+    z-index: 9; /* Certifique-se de que está abaixo da hotbar */
+}
+
+.hotbar {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: 0.4vw;
-    z-index: 10;
+    z-index: 10; /* Certifique-se de que está acima do contêiner */
+    padding: 1vw; /* Espaçamento interno */
 }
 
 .hotbar-slot {
@@ -686,6 +793,7 @@ input::-webkit-inner-spin-button { -webkit-appearance: none; }
     box-shadow: 0 0 8px 0 rgba(0,0,0,0.3);
     user-select: none;
 }
+
 
 .hotbar-slot.active,
 .hotbar-slot:hover {
