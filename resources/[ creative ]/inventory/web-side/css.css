@@ -46,7 +46,7 @@ body {
 
 .barra-peso {
     position: absolute;
-    bottom: 90%;
+    bottom: 88%;
     left: 10.1%;
     width: 30%;
     height: 0.22vw;
@@ -106,7 +106,7 @@ body::after {
     animation-duration: 1s;
 }
 
-.container::before {
+ /* .container::before {
     content: '';
     position: absolute;
     width: 110%;
@@ -115,7 +115,20 @@ body::after {
     background: rgba(10, 10, 15, 0);
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 10px;
-    z-index: -10; /* Fica por baixo de todo o conteúdo */
+    z-index: -10; 
+}  */
+
+.background-nuis{
+    box-sizing: border-box;
+    position: absolute;
+    width: 122%;
+    height: 118%;
+    top: -9%;
+    left: -9%;
+    border: 0.052083333333333336vw solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0vw 0vw 0.26041666666666663vw 0vw rgba(255, 255, 255, 0.5);
+    border-radius: 0.2680965147453083vw;
+    z-index: -10;
 }
 
 
@@ -154,7 +167,7 @@ body::after {
 .inventory{
 	width: 46%;
 	height: 90%;
-	margin-top: 1%;
+	margin-top: 4%;
    margin-left: 9.8%;
 }
 
@@ -177,7 +190,7 @@ body::after {
 .invLeft::before {
     content: '';
     position: absolute;
-    top: 7.3%;
+    top: 9.5%;
     left: 6.4vw;
     width: 40%;
     height: 85.5%;
@@ -187,20 +200,34 @@ body::after {
     border-radius: 8px;
     z-index: -1;
 }
-
+/* Remove o ::before do .invRight */
 .invRight {
-    width: 100%;
+    width: 80%;
     height: 75%;
-    margin-top: 2%;
-    /* overflow: auto; - REMOVER */
+    margin-left: 11.8%;
+    margin-top: 11.3%;
     row-gap: 3px;
     display: grid;
     column-gap: 3px;
-    /* overflow-y: scroll; - REMOVER */
     padding-right: 3px;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-    overflow: hidden; /* ADICIONAR */
+    overflow: hidden;
+    position: relative;
+    z-index: 2;
 }
+
+
+/* .invRight-background {
+    position: absolute;
+    top: 62.2%;
+    left: 4.3%;
+    width: 95%;
+    height: 60%;
+    background: rgba(15, 15, 15, 0);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    z-index: 1; 
+} */
 
 .item {
     width: 7.07823310271421vw;
@@ -323,7 +350,7 @@ body::after {
     width: 100%;
     height: 2.12879191059074vw;
    background: rgba(15, 15, 15, 0.133);
-    border: 1px solid rgba(255, 255, 255, 0.12); /* Deixe a borda sempre */
+   border: 0.10416666666666667vw solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     outline: 0;
     font-size: 0.8vw;
@@ -344,7 +371,7 @@ body::after {
     font-size: 0.8vw;
     font-family: 'Inter', Arial, sans-serif;
     line-height: 2.12879191059074vw;
-    color: #ccccccc2;
+    color: #cccccce1;
 }
 
 .but:hover{
@@ -491,11 +518,13 @@ input::-webkit-inner-spin-button { -webkit-appearance: none; }
 }
 
 .identidade-baixo{
-    width: 692px;
-    height: 540px;
+    width: 95%;
+    position: relative;
+    margin-top: 1.54vw;
+    left: 5%;
+    height: 32.292vw;
+    border-radius: 0.5208333333333333vw;
     background: rgba(15, 15, 15, 0.133);
-    border-radius: 0.532197977647685vw;
-    margin-top: 2%;
 }
 
 .banner{
@@ -685,7 +714,7 @@ input::-webkit-inner-spin-button { -webkit-appearance: none; }
     box-sizing: border-box;
     
     /* Posicionamento absoluto - agora você pode mover */
-    top: 42.2vw;    /* Mude este valor para cima/baixo */
+    top: 43.2vw;    /* Mude este valor para cima/baixo */
     left: 6.4vw;   /* Mude este valor para esquerda/direita */
     
     /* Remove as margens antigas */
