@@ -22,37 +22,72 @@ local weaponActive = false
 local putWeaponHands = false
 local storeWeaponHands = false
 local timeReload = GetGameTimer()
+local playerPed = PlayerPedId() -- Cache do ped
+local lastPedUpdate = 0 -- Para atualizar o cache periodicamente
 LocalPlayer["state"]["Buttons"] = false
+
+-- Cache de animações já carregadas
+local loadedAnims = {}
+
+-- Cache de coordenadas do jogador
+local cachedCoords = nil
+local lastCoordsUpdate = 0
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- OTIMIZAÇÃO: Cache do PlayerPed
+-----------------------------------------------------------------------------------------------------------------------------------------
+Citizen.CreateThread(function()
+    while true do
+        local gameTime = GetGameTimer()
+        if gameTime - lastPedUpdate > 1000 then -- Atualiza a cada 1 segundo
+            playerPed = PlayerPedId()
+            lastPedUpdate = gameTime
+        end
+        Citizen.Wait(1000)
+    end
+end)
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- OTIMIZAÇÃO: Cache de coordenadas
+-----------------------------------------------------------------------------------------------------------------------------------------
+function GetCachedPlayerCoords()
+    local gameTime = GetGameTimer()
+    if not cachedCoords or gameTime - lastCoordsUpdate > 500 then -- Atualiza a cada 500ms
+        cachedCoords = GetEntityCoords(playerPed, true)
+        lastCoordsUpdate = gameTime
+    end
+    return cachedCoords
+end
+
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- INVENTORY:BUTTONS
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterNetEvent("inventory:Buttons")
 AddEventHandler("inventory:Buttons",function(status)
-	LocalPlayer["state"]["Buttons"] = status
+    LocalPlayer["state"]["Buttons"] = status
 end)
 
 function cRP.getPosition()
-	local x,y,z = table.unpack(GetEntityCoords(PlayerPedId(),true))
-	return x,y,z
+    local coords = GetCachedPlayerCoords()
+    return coords.x, coords.y, coords.z
 end
 
-
 -----------------------------------------------------------------------------------------------------------------------------------------
--- THREADBLOCKBUTTONS
+-- THREADBLOCKBUTTONS - OTIMIZADO
 -----------------------------------------------------------------------------------------------------------------------------------------
 Citizen.CreateThread(function()
-	while true do
-		local timeDistance = 999
-		if LocalPlayer["state"]["Buttons"] then
-			timeDistance = 1
-			DisableControlAction(1,75,true)
-			DisableControlAction(1,47,true)
-			DisableControlAction(1,257,true)
-			DisablePlayerFiring(PlayerPedId(),true)
-		end
+    while true do
+        local timeDistance = 1000 -- Aumentado para 1 segundo quando inativo
+        if LocalPlayer["state"]["Buttons"] then
+            timeDistance = 1
+            DisableControlAction(1,75,true)
+            DisableControlAction(1,47,true)
+            DisableControlAction(1,257,true)
+            DisablePlayerFiring(playerPed,true)
+        end
 
-		Citizen.Wait(timeDistance)
-	end
+        Citizen.Wait(timeDistance)
+    end
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- throwableWeapons
@@ -60,21 +95,20 @@ end)
 local currentWeapon = ""
 RegisterNetEvent("inventory:throwableWeapons")
 AddEventHandler("inventory:throwableWeapons",function(weaponName)
-	currentWeapon = weaponName
+    currentWeapon = weaponName
 
-	local ped = PlayerPedId()
-	if GetSelectedPedWeapon(ped) == GetHashKey(currentWeapon) then
-		while GetSelectedPedWeapon(ped) == GetHashKey(currentWeapon) do
-			if IsPedShooting(ped) then
-				vSERVER.removeThrowable(currentWeapon)
-			end
-			Wait(0)
-		end
-		currentWeapon = ""
-	else
-		cRP.storeWeaponHands()
-		currentWeapon = ""
-	end
+    if GetSelectedPedWeapon(playerPed) == GetHashKey(currentWeapon) then
+        while GetSelectedPedWeapon(playerPed) == GetHashKey(currentWeapon) do
+            if IsPedShooting(playerPed) then
+                vSERVER.removeThrowable(currentWeapon)
+            end
+            Wait(0)
+        end
+        currentWeapon = ""
+    else
+        cRP.storeWeaponHands()
+        currentWeapon = ""
+    end
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- INVENTORY:CLOSE
@@ -162,7 +196,7 @@ AddEventHandler("inventory:clearWeapons",function()
 	if Weapon ~= "" then
 		Weapon = ""
 		weaponActive = false
-		RemoveAllPedWeapons(PlayerPedId(),true)
+		RemoveAllPedWeapons(playerPed,true)
 	end
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
@@ -171,10 +205,9 @@ end)
 RegisterNetEvent("inventory:verifyWeapon")
 AddEventHandler("inventory:verifyWeapon",function(splitName)
 	if Weapon == splitName then
-		local ped = PlayerPedId()
-		local weaponAmmo = GetAmmoInPedWeapon(ped,Weapon)
+		local weaponAmmo = GetAmmoInPedWeapon(playerPed,Weapon)
 		if not vSERVER.verifyWeapon(Weapon,weaponAmmo) then
-			RemoveAllPedWeapons(ped,true)
+			RemoveAllPedWeapons(playerPed,true)
 			weaponActive = false
 			Weapon = ""
 		end
@@ -190,8 +223,7 @@ end)
 RegisterNetEvent("inventory:preventWeapon")
 AddEventHandler("inventory:preventWeapon",function(storeWeapons)
 	if Weapon ~= "" then
-		local ped = PlayerPedId()
-		local weaponAmmo = GetAmmoInPedWeapon(ped,Weapon)
+		local weaponAmmo = GetAmmoInPedWeapon(playerPed,Weapon)
 
 		vSERVER.preventWeapon(Weapon,weaponAmmo)
 
@@ -199,7 +231,7 @@ AddEventHandler("inventory:preventWeapon",function(storeWeapons)
 		Weapon = ""
 
 		if storeWeapons then
-			RemoveAllPedWeapons(ped,true)
+			RemoveAllPedWeapons(playerPed,true)
 		end
 	end
 end)
@@ -207,7 +239,7 @@ end)
 -- OPENBACKPACK
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand("openBackpack",function(source,args,rawCommand)
-	if GetEntityHealth(PlayerPedId()) > 101 and not LocalPlayer["state"]["Buttons"] then
+	if GetEntityHealth(playerPed) > 101 and not LocalPlayer["state"]["Buttons"] then
 		if not LocalPlayer["state"]["Commands"] and not LocalPlayer["state"]["Handcuff"] and not IsPlayerFreeAiming(PlayerId()) then
 			Backpack = true
 			SetNuiFocus(true,true)
@@ -257,55 +289,6 @@ AddEventHandler("inventory:repairVehicle",function(vehIndex,vehPlate)
 	end
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
--- INVENTORY:REPAIRTYRE
------------------------------------------------------------------------------------------------------------------------------------------
-RegisterNetEvent("inventory:repairTyre")
-AddEventHandler("inventory:repairTyre",function(Vehicle,Tyres,vehPlate)
-	if NetworkDoesNetworkIdExist(Vehicle) then
-		local Vehicle = NetToEnt(Vehicle)
-		if DoesEntityExist(Vehicle) then
-			if GetVehicleNumberPlateText(Vehicle) == vehPlate then
-				local vehTyres = {}
-
-				for i = 0,7 do
-					local Status = false
-
-					if i ~= Tyres then
-						if GetTyreHealth(Vehicle,i) ~= 1000.0 then
-							Status = true
-						end
-					end
-
-					SetVehicleTyreFixed(Vehicle,i)
-
-					vehTyres[i] = Status
-				end
-
-				for Tyre,Burst in pairs(vehTyres) do
-					if Burst then
-						SetVehicleTyreBurst(Vehicle,Tyre,true,1000.0)
-					end
-				end
-			end
-		end
-	end
-end)
------------------------------------------------------------------------------------------------------------------------------------------
--- REPAIRPLAYER
------------------------------------------------------------------------------------------------------------------------------------------
-RegisterNetEvent("inventory:repairPlayer")
-AddEventHandler("inventory:repairPlayer",function(vehIndex,vehPlate)
-	if NetworkDoesNetworkIdExist(vehIndex) then
-		local Vehicle = NetToEnt(vehIndex)
-		if DoesEntityExist(Vehicle) then
-			if GetVehicleNumberPlateText(Vehicle) == vehPlate then
-				SetVehicleEngineHealth(Vehicle,1000.0)
-				SetVehicleBodyHealth(Vehicle,1000.0)
-			end
-		end
-	end
-end)
------------------------------------------------------------------------------------------------------------------------------------------
 -- REPAIRADMIN
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterNetEvent("inventory:repairAdmin")
@@ -339,9 +322,8 @@ end)
 -- PARACHUTECOLORS
 -----------------------------------------------------------------------------------------------------------------------------------------
 function cRP.parachuteColors()
-	local ped = PlayerPedId()
-	GiveWeaponToPed(ped,"GADGET_PARACHUTE",1,false,true)
-	SetPedParachuteTintIndex(ped,math.random(7))
+	GiveWeaponToPed(playerPed,"GADGET_PARACHUTE",1,false,true)
+	SetPedParachuteTintIndex(playerPed,math.random(7))
 end
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- FISHCOORDS
@@ -421,27 +403,33 @@ local fishCoords = PolyZone:Create({
 	vector2(2383.05,4046.07)
 },{ name = "Pescaria" })
 -----------------------------------------------------------------------------------------------------------------------------------------
--- FISHINGCOORDS
+-- FISHINGCOORDS - OTIMIZADO
 -----------------------------------------------------------------------------------------------------------------------------------------
-function cRP.fishingCoords()
-	local ped = PlayerPedId()
-	local coords = GetEntityCoords(ped)
-	if fishCoords:isPointInside(coords) and IsEntityInWater(ped) then
-		return true
-	end
+local lastFishCheck = 0
+local lastFishResult = false
 
-	return false
+function cRP.fishingCoords()
+    local gameTime = GetGameTimer()
+    if gameTime - lastFishCheck > 1000 then -- Cache por 1 segundo
+        local coords = GetCachedPlayerCoords()
+        lastFishResult = fishCoords:isPointInside(coords) and IsEntityInWater(playerPed)
+        lastFishCheck = gameTime
+    end
+    return lastFishResult
 end
 -----------------------------------------------------------------------------------------------------------------------------------------
--- FISHINGANIM
+-- FISHINGANIM - OTIMIZADO
 -----------------------------------------------------------------------------------------------------------------------------------------
-function cRP.fishingAnim()
-	local ped = PlayerPedId()
-	if IsEntityPlayingAnim(ped,"amb@world_human_stand_fishing@idle_a","idle_c",3) then
-		return true
-	end
+local lastAnimCheck = 0
+local lastAnimResult = false
 
-	return false
+function cRP.fishingAnim()
+    local gameTime = GetGameTimer()
+    if gameTime - lastAnimCheck > 500 then -- Cache por 500ms
+        lastAnimResult = IsEntityPlayingAnim(playerPed,"amb@world_human_stand_fishing@idle_a","idle_c",3)
+        lastAnimCheck = gameTime
+    end
+    return lastAnimResult
 end
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- RETURNWEAPON
@@ -471,8 +459,7 @@ AddEventHandler("inventory:stealTrunk",function(entity)
 	if Weapon == "WEAPON_CROWBAR" then
 		local trunk = GetEntityBoneIndexByName(entity[3],"boot")
 		if trunk ~= -1 then
-			local ped = PlayerPedId()
-			local coords = GetOffsetFromEntityInWorldCoords(ped,0.0,0.5,0.0)
+			local coords = GetOffsetFromEntityInWorldCoords(playerPed,0.0,0.5,0.0)
 			local coordsEnt = GetWorldPositionOfEntityBone(entity[3],trunk)
 			local distance = #(coords - coordsEnt)
 			if distance <= 2.0 then
@@ -556,104 +543,94 @@ function cRP.checkAttachs(nameItem,nameWeapon)
 	return weaponAttachs[nameItem][nameWeapon]
 end
 -----------------------------------------------------------------------------------------------------------------------------------------
--- PUTATTACHS
+-- PUTATTACHS - LINHA 612 - CORREÇÃO CRÍTICA
 -----------------------------------------------------------------------------------------------------------------------------------------
 function cRP.putAttachs(nameItem,nameWeapon)
-	GiveWeaponComponentToPed(PlayerPedId(),nameWeapon,weaponAttachs[nameItem][nameWeapon])
+    GiveWeaponComponentToPed(playerPed,nameWeapon,weaponAttachs[nameItem][nameWeapon]) -- USA CACHE
 end
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- PUTWEAPONHANDS
 -----------------------------------------------------------------------------------------------------------------------------------------
 function cRP.putWeaponHands(weaponName,weaponAmmo,attachs)
-	if not putWeaponHands then
-		if weaponAmmo == nil then
-			weaponAmmo = 0
-		end
+    if putWeaponHands then
+        return false
+    end
 
-		if weaponAmmo > 0 then
-			weaponActive = true
-		end
+    if weaponAmmo == nil then
+        weaponAmmo = 0
+    end
 
-		putWeaponHands = true
-		LocalPlayer["state"]["Cancel"] = true
+    if weaponAmmo > 0 then
+        weaponActive = true
+    end
 
-		local ped = PlayerPedId()
-		if HasPedGotWeapon(ped,GetHashKey("GADGET_PARACHUTE"),false) then
-			RemoveAllPedWeapons(ped,true)
-			cRP.parachuteColors()
-		else
-			RemoveAllPedWeapons(ped,true)
-		end
+    putWeaponHands = true
+    LocalPlayer["state"]["Cancel"] = true
 
-		if not IsPedInAnyVehicle(ped) then
-			loadAnimDict("rcmjosh4")
+    if HasPedGotWeapon(playerPed,GetHashKey("GADGET_PARACHUTE"),false) then
+        RemoveAllPedWeapons(playerPed,true)
+        cRP.parachuteColors()
+    else
+        RemoveAllPedWeapons(playerPed,true)
+    end
 
-			TaskPlayAnim(ped,"rcmjosh4","josh_leadout_cop2",3.0,2.0,-1,48,10,0,0,0)
+    if not IsPedInAnyVehicle(playerPed) then
+        loadAnimDict("rcmjosh4")
+        TaskPlayAnim(playerPed,"rcmjosh4","josh_leadout_cop2",3.0,2.0,-1,48,10,0,0,0)
+        Citizen.Wait(200)
+        GiveWeaponToPed(playerPed,weaponName,weaponAmmo,false,true)
+        Citizen.Wait(300)
+        ClearPedTasks(playerPed)
+    else
+        GiveWeaponToPed(playerPed,weaponName,weaponAmmo,true,true)
+    end
 
-			Citizen.Wait(200)
+    if attachs then
+        for nameItem,_ in pairs(attachs) do
+            cRP.putAttachs(nameItem,weaponName)
+        end
+    end
 
-			GiveWeaponToPed(ped,weaponName,weaponAmmo,false,true)
+    LocalPlayer["state"]["Cancel"] = false
+    putWeaponHands = false
+    Weapon = weaponName
 
-			Citizen.Wait(300)
+    if vSERVER.dropWeapons(Weapon) then
+        RemoveAllPedWeapons(playerPed,true)
+        weaponActive = false
+        Weapon = ""
+    end
 
-			ClearPedTasks(ped)
-		else
-			GiveWeaponToPed(ped,weaponName,weaponAmmo,true,true)
-		end
-
-		if attachs ~= nil then
-			for nameItem,_ in pairs(attachs) do
-				cRP.putAttachs(nameItem,weaponName)
-			end
-		end
-
-		LocalPlayer["state"]["Cancel"] = false
-		putWeaponHands = false
-		Weapon = weaponName
-
-		if vSERVER.dropWeapons(Weapon) then
-			RemoveAllPedWeapons(ped,true)
-			weaponActive = false
-			Weapon = ""
-		end
-
-		return true
-	end
-
-	return false
+    return true
 end
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- STOREWEAPONHANDS
 -----------------------------------------------------------------------------------------------------------------------------------------
 function cRP.storeWeaponHands()
-	if not storeWeaponHands then
-		storeWeaponHands = true
-		local ped = PlayerPedId()
-		local lastWeapon = Weapon
-		LocalPlayer["state"]["Cancel"] = true
-		local weaponAmmo = GetAmmoInPedWeapon(ped,Weapon)
+    if storeWeaponHands then
+        return false
+    end
 
-		if not IsPedInAnyVehicle(ped) then
-			loadAnimDict("weapons@pistol@")
+    storeWeaponHands = true
+    local lastWeapon = Weapon
+    LocalPlayer["state"]["Cancel"] = true
+    local weaponAmmo = GetAmmoInPedWeapon(playerPed,Weapon)
 
-			TaskPlayAnim(ped,"weapons@pistol@","aim_2_holster",3.0,2.0,-1,48,10,0,0,0)
+    if not IsPedInAnyVehicle(playerPed) then
+        loadAnimDict("weapons@pistol@")
+        TaskPlayAnim(playerPed,"weapons@pistol@","aim_2_holster",3.0,2.0,-1,48,10,0,0,0)
+        Citizen.Wait(450)
+        ClearPedTasks(playerPed)
+    end
 
-			Citizen.Wait(450)
+    LocalPlayer["state"]["Cancel"] = false
+    RemoveAllPedWeapons(playerPed,true)
 
-			ClearPedTasks(ped)
-		end
+    storeWeaponHands = false
+    weaponActive = false
+    Weapon = ""
 
-		LocalPlayer["state"]["Cancel"] = false
-		RemoveAllPedWeapons(ped,true)
-
-		storeWeaponHands = false
-		weaponActive = false
-		Weapon = ""
-
-		return true,weaponAmmo,lastWeapon
-	end
-
-	return false
+    return true,weaponAmmo,lastWeapon
 end
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- WEAPONAMMOS
@@ -713,33 +690,33 @@ local weaponAmmos = {
 	}
 }
 -----------------------------------------------------------------------------------------------------------------------------------------
--- RECHARGECHECK
+-- RECHARGECHECK - LINHA 747 - CORREÇÃO CRÍTICA
 -----------------------------------------------------------------------------------------------------------------------------------------
 function cRP.rechargeCheck(ammoType)
-	local weaponHash = nil
-	local ped = PlayerPedId()
-	local weaponStatus = false
+    local weaponHash = nil
+    local weaponStatus = false
 
-	if weaponAmmos[ammoType] then
-		local weaponAmmo = GetAmmoInPedWeapon(ped,Weapon)
+    if weaponAmmos[ammoType] then
+        local weaponAmmo = GetAmmoInPedWeapon(playerPed,Weapon) -- USA CACHE
 
-		for k,v in pairs(weaponAmmos[ammoType]) do
-			if Weapon == v then
-				weaponHash = Weapon
-				weaponStatus = true
-				break
-			end
-		end
-	end
+        for k,v in pairs(weaponAmmos[ammoType]) do
+            if Weapon == v then
+                weaponHash = Weapon
+                weaponStatus = true
+                break
+            end
+        end
+    end
 
-	return weaponStatus,weaponHash,weaponAmmo
+    return weaponStatus,weaponHash,weaponAmmo
 end
+
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- RECHARGEWEAPON
 -----------------------------------------------------------------------------------------------------------------------------------------
 function cRP.rechargeWeapon(weaponHash,ammoAmount)
-	AddAmmoToPed(PlayerPedId(),weaponHash,ammoAmount)
-	weaponActive = true
+    AddAmmoToPed(playerPed,weaponHash,ammoAmount) -- USA CACHE
+    weaponActive = true
 end
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- THREADSTOREWEAPON
@@ -748,20 +725,19 @@ Citizen.CreateThread(function()
 	SetNuiFocus(false,false)
 
 	while true do
-		local timeDistance = 999
+		local timeDistance = 2000 -- Aumentado para 2 segundos quando inativo
 		if weaponActive and Weapon ~= "" then
-			timeDistance = 100
-			local ped = PlayerPedId()
-			local weaponAmmo = GetAmmoInPedWeapon(ped,Weapon)
+			timeDistance = 250 -- Reduzido de 100ms para 250ms
+			local weaponAmmo = GetAmmoInPedWeapon(playerPed,Weapon)
 
-			if GetGameTimer() >= timeReload and IsPedReloading(ped) then
+			if GetGameTimer() >= timeReload and IsPedReloading(playerPed) then
 				vSERVER.preventWeapon(Weapon,weaponAmmo)
 				timeReload = GetGameTimer() + 1000
 			end
 
-			if weaponAmmo <= 0 or (Weapon == "WEAPON_PETROLCAN" and weaponAmmo <= 135 and IsPedShooting(ped)) or IsPedSwimming(ped) then
+			if weaponAmmo <= 0 or (Weapon == "WEAPON_PETROLCAN" and weaponAmmo <= 135 and IsPedShooting(playerPed)) or IsPedSwimming(playerPed) then
 				vSERVER.preventWeapon(Weapon,weaponAmmo)
-				RemoveAllPedWeapons(ped,true)
+				RemoveAllPedWeapons(playerPed,true)
 				weaponActive = false
 				Weapon = ""
 			end
@@ -797,9 +773,8 @@ AddEventHandler("inventory:Firecracker",function()
 	end
 
 	local explosives = 25
-	local ped = PlayerPedId()
 	fireTimers = GetGameTimer() + (5 * 60000)
-	local coords = GetOffsetFromEntityInWorldCoords(ped,0.0,0.6,0.0)
+	local coords = GetOffsetFromEntityInWorldCoords(playerPed,0.0,0.6,0.0)
 	local myObject,objNet = vRPS.CreateObject("ind_prop_firework_03",coords["x"],coords["y"],coords["z"])
 	if myObject then
 		local spawnObjects = 0
@@ -840,28 +815,32 @@ end)
 -- CHECKWATER
 -----------------------------------------------------------------------------------------------------------------------------------------
 function cRP.checkWater()
-	return IsPedSwimming(PlayerPedId())
+	return IsPedSwimming(playerPed)
 end
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- LOADANIMDIC
 -----------------------------------------------------------------------------------------------------------------------------------------
 function loadAnimDict(dict)
-	RequestAnimDict(dict)
-	while not HasAnimDictLoaded(dict) do
-		Citizen.Wait(1)
-	end
+    if loadedAnims[dict] then
+        return -- Já está carregado
+    end
+    
+    RequestAnimDict(dict)
+    while not HasAnimDictLoaded(dict) do
+        Citizen.Wait(1)
+    end
+    loadedAnims[dict] = true
 end
 -----------------------------------------------------------------------------------------------------------------------------------------
--- DROPITEM
+-- DROPITEM - OTIMIZADO
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterNUICallback("dropItem",function(data)
-	if MumbleIsConnected() then
-		local ped = PlayerPedId()
-		local coords = GetEntityCoords(ped)
-		local _,cdz = GetGroundZFor_3dCoord(coords["x"],coords["y"],coords["z"])
+    if MumbleIsConnected() then
+        local coords = GetCachedPlayerCoords() -- Usa cache
+        local _,cdz = GetGroundZFor_3dCoord(coords.x, coords.y, coords.z)
 
-		TriggerServerEvent("inventory:Drops",data["item"],data["slot"],data["amount"],coords["x"],coords["y"],cdz)
-	end
+        TriggerServerEvent("inventory:Drops",data["item"],data["slot"],data["amount"],coords.x, coords.y, cdz)
+    end
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- DROPS:TABLE
@@ -895,49 +874,69 @@ AddEventHandler("drops:Atualizar",function(Number,Amount)
 		Drops[Number]["amount"] = Amount
 	end
 end)
+
 -----------------------------------------------------------------------------------------------------------------------------------------
--- THREADDROPBLIPS
+-- THREADDROPBLIPS - VERSÃO ULTRA ESTÁVEL
 -----------------------------------------------------------------------------------------------------------------------------------------
+local visibleDrops = {}
+local lastDropCheck = 0
+
+-- Atualiza lista de drops visíveis
 Citizen.CreateThread(function()
-	while true do
-		local timeDistance = 999
-		local ped = PlayerPedId()
-		local coords = GetEntityCoords(ped)
+    while true do
+        local coords = GetCachedPlayerCoords()
+        local newVisible = {}
+        
+        for k,v in pairs(Drops) do
+            local distance = #(coords - vector3(v["coords"][1], v["coords"][2], v["coords"][3]))
+            if distance <= 50 then
+                newVisible[#newVisible + 1] = {
+                    x = v["coords"][1],
+                    y = v["coords"][2], 
+                    z = v["coords"][3] + 0.3
+                }
+            end
+        end
+        
+        visibleDrops = newVisible
+        Citizen.Wait(1000)
+    end
+end)
 
-		for _,v in pairs(Drops) do
-			local distance = #(coords - vector3(v["coords"][1],v["coords"][2],v["coords"][3]))
-			if distance <= 50 then
-				timeDistance = 1
-				DrawMarker(21,v["coords"][1],v["coords"][2],v["coords"][3] + 0.25,0.0,0.0,0.0,0.0,180.0,0.0,0.25,0.35,0.25,46,110,76,100,0,0,0,1)
-			end
-		end
-
-		Citizen.Wait(timeDistance)
-	end
+-- Renderiza drops de forma contínua
+Citizen.CreateThread(function()
+    while true do
+        if #visibleDrops > 0 then
+            for i = 1, #visibleDrops do
+                local drop = visibleDrops[i]
+                DrawMarker(21, drop.x, drop.y, drop.z, 0.0, 0.0, 0.0, 0.0, 180.0, 0.0, 0.4, 0.5, 0.4, 46, 110, 76, 255, false, false, 2, false, false, false)
+            end
+        end
+        Citizen.Wait(0)
+    end
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- REQUESTINVENTORY
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterNUICallback("requestInventory",function(data,cb)
-	local Items = {}
-	local ped = PlayerPedId()
-	local coords = GetEntityCoords(ped)
-	local _,cdz = GetGroundZFor_3dCoord(coords["x"],coords["y"],coords["z"])
+    local Items = {}
+    local coords = GetCachedPlayerCoords() -- Usa cache
+    local _,cdz = GetGroundZFor_3dCoord(coords.x, coords.y, coords.z)
 
-	for k,v in pairs(Drops) do
-		local distance = #(vector3(coords["x"],coords["y"],cdz) - vector3(v["coords"][1],v["coords"][2],v["coords"][3]))
-		if distance <= 0.9 then
-			local Number = #Items + 1
+    -- Pré-filtro por distância
+    for k,v in pairs(Drops) do
+        local distance = #(vector3(coords.x, coords.y, cdz) - vector3(v["coords"][1],v["coords"][2],v["coords"][3]))
+        if distance <= 0.9 then
+            local Number = #Items + 1
+            Items[Number] = v
+            Items[Number]["id"] = k
+        end
+    end
 
-			Items[Number] = v
-			Items[Number]["id"] = k
-		end
-	end
-
-	local inventario,invPeso,invMaxpeso = vSERVER.requestInventory()
-	if inventario then
-		cb({ inventario = inventario, drop = Items, invPeso = invPeso, invMaxpeso = invMaxpeso })
-	end
+    local inventario,invPeso,invMaxpeso = vSERVER.requestInventory()
+    if inventario then
+        cb({ inventario = inventario, drop = Items, invPeso = invPeso, invMaxpeso = invMaxpeso })
+    end
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- PICKUPITEM
@@ -951,9 +950,8 @@ end)
 -- WHEELCHAIR
 -----------------------------------------------------------------------------------------------------------------------------------------
 function cRP.wheelChair(vehPlate)
-	local ped = PlayerPedId()
-	local heading = GetEntityHeading(ped)
-	local coords = GetOffsetFromEntityInWorldCoords(ped,0.0,0.75,0.0)
+	local heading = GetEntityHeading(playerPed)
+	local coords = GetOffsetFromEntityInWorldCoords(playerPed,0.0,0.75,0.0)
 	local myVehicle = vGARAGE.serverVehicle("wheelchair",coords["x"],coords["y"],coords["z"],heading,vehPlate,0,nil,1000)
 
 	if NetworkDoesNetworkIdExist(myVehicle) then
@@ -969,14 +967,18 @@ end
 local wheelChair = false
 Citizen.CreateThread(function()
 	while true do
-		local ped = PlayerPedId()
-		if IsPedInAnyVehicle(ped) then
-			local vehicle = GetVehiclePedIsUsing(ped)
+		if IsPedInAnyVehicle(playerPed) then
+			local vehicle = GetVehiclePedIsUsing(playerPed)
 			local model = GetEntityModel(vehicle)
 			if model == -1178021069 then
-				if not IsEntityPlayingAnim(ped,"missfinale_c2leadinoutfin_c_int","_leadin_loop2_lester",3) then
+				if not IsEntityPlayingAnim(playerPed,"missfinale_c2leadinoutfin_c_int","_leadin_loop2_lester",3) then
 					vRP.playAnim(true,{"missfinale_c2leadinoutfin_c_int","_leadin_loop2_lester"},true)
 					wheelChair = true
+				end
+			else
+				if wheelChair then
+					vRP.removeObjects("one")
+					wheelChair = false
 				end
 			end
 		else
@@ -986,7 +988,7 @@ Citizen.CreateThread(function()
 			end
 		end
 
-		Citizen.Wait(1000)
+		Citizen.Wait(2000) -- Aumentado para 2 segundos
 	end
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
@@ -1149,40 +1151,48 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 Citizen.CreateThread(function()
 	while true do
-		local timeDistance = 999
+		local timeDistance = 2000 -- Aumentado para 2 segundos quando inativo
 		if userScanner then
-			local ped = PlayerPedId()
-			if not IsPedInAnyVehicle(ped) then
-				local coords = GetEntityCoords(ped)
+			if not IsPedInAnyVehicle(playerPed) then
+				local coords = GetCachedPlayerCoords()
+				local hasNearScanner = false
 
 				for k,v in pairs(scanTable) do
 					local distance = #(coords - vector3(v[1],v[2],v[3]))
-					if distance <= 7.25 then
-						soundScanner = 1000
+					if distance <= 10 then -- Pré-filtro para reduzir processamento
+						hasNearScanner = true
+						if distance <= 7.25 then
+							soundScanner = 1000
+							timeDistance = 500 -- Reduzido quando próximo
 
-						if initSounds[k] == nil then
-							initSounds[k] = true
-						end
+							if initSounds[k] == nil then
+								initSounds[k] = true
+							end
 
-						if distance <= 1.25 then
-							timeDistance = 1
-							soundScanner = 250
+							if distance <= 1.25 then
+								timeDistance = 1
+								soundScanner = 250
 
-							if IsControlJustPressed(1,38) and MumbleIsConnected() then
-								TriggerServerEvent("inventory:makeProducts",{},"scanner")
+								if IsControlJustPressed(1,38) and MumbleIsConnected() then
+									TriggerServerEvent("inventory:makeProducts",{},"scanner")
 
-								local rand = math.random(#scanCoords)
-								scanTable[k] = scanCoords[rand]
+									local rand = math.random(#scanCoords)
+									scanTable[k] = scanCoords[rand]
+									initSounds[k] = nil
+									soundScanner = 999
+								end
+							end
+						else
+							if initSounds[k] then
 								initSounds[k] = nil
 								soundScanner = 999
 							end
 						end
-					else
-						if initSounds[k] then
-							initSounds[k] = nil
-							soundScanner = 999
-						end
 					end
+				end
+
+				if not hasNearScanner then
+					timeDistance = 2000 -- 2 segundos quando não há scanners próximos
 				end
 			end
 		end
@@ -1272,25 +1282,29 @@ local boxList = {
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- THREADBOXES
 -----------------------------------------------------------------------------------------------------------------------------------------
+local boxZonesCreated = false
 Citizen.CreateThread(function()
-	for k,v in pairs(boxList) do
-		exports["target"]:AddCircleZone("Boxes:"..k,vector3(v[1],v[2],v[3]),1.0,{
-			name = "Boxes:"..k,
-			heading = 3374176,
-			useZ = true
-		},{
-			shop = k,
-			distance = 1.5,
-			options = {
-				{
-					event = "inventory:lootSystem",
-					label = "Abrir",
-					tunnel = "boxes",
-					service = v[4]
-				}
-			}
-		})
-	end
+    if not boxZonesCreated then
+        for k,v in pairs(boxList) do
+            exports["target"]:AddCircleZone("Boxes:"..k,vector3(v[1],v[2],v[3]),1.0,{
+                name = "Boxes:"..k,
+                heading = 3374176,
+                useZ = true
+            },{
+                shop = k,
+                distance = 1.5,
+                options = {
+                    {
+                        event = "inventory:lootSystem",
+                        label = "Abrir",
+                        tunnel = "boxes",
+                        service = v[4]
+                    }
+                }
+            })
+        end
+        boxZonesCreated = true
+    end
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- ONRESOURCESTOP
@@ -1314,25 +1328,25 @@ local tyreList = {
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterNetEvent("inventory:removeTyres")
 AddEventHandler("inventory:removeTyres",function(Entity)
-	if GetVehicleDoorLockStatus(Entity[3]) == 1 then
-		if Weapon == "WEAPON_WRENCH" then
-			local ped = PlayerPedId()
-			local coords = GetEntityCoords(ped)
+    if GetVehicleDoorLockStatus(Entity[3]) == 1 then
+        if Weapon == "WEAPON_WRENCH" then
+            local coords = GetCachedPlayerCoords()
 
-			for k,Tyre in pairs(tyreList) do
-				local Selected = GetEntityBoneIndexByName(Entity[3],k)
-				if Selected ~= -1 then
-					local coordsWheel = GetWorldPositionOfEntityBone(Entity[3],Selected)
-					local distance = #(coords - coordsWheel)
-					if distance <= 1.0 then
-						TriggerServerEvent("inventory:removeTyres",Entity,Tyre)
-					end
-				end
-			end
-		else
-			TriggerEvent("Notify","amarelo","<b>Chave Inglesa</b> não encontrada.",5000)
-		end
-	end
+            for k,Tyre in pairs(tyreList) do
+                local Selected = GetEntityBoneIndexByName(Entity[3],k)
+                if Selected ~= -1 then
+                    local coordsWheel = GetWorldPositionOfEntityBone(Entity[3],Selected)
+                    local distance = #(coords - coordsWheel)
+                    if distance <= 1.0 then
+                        TriggerServerEvent("inventory:removeTyres",Entity,Tyre)
+                        break -- ⚡ Para após primeira interação
+                    end
+                end
+            end
+        else
+            TriggerEvent("Notify","amarelo","<b>Chave Inglesa</b> não encontrada.",5000)
+        end
+    end
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- INVENTORY:EXPLODETYRES
@@ -1352,10 +1366,9 @@ end)
 -- TYRESTATUS
 -----------------------------------------------------------------------------------------------------------------------------------------
 function cRP.tyreStatus()
-	local ped = PlayerPedId()
-	if not IsPedInAnyVehicle(ped) then
+	if not IsPedInAnyVehicle(playerPed) then
 		local Vehicle = vRP.nearVehicle(5)
-		local coords = GetEntityCoords(ped)
+		local coords = GetCachedPlayerCoords()
 
 		for k,Tyre in pairs(tyreList) do
 			local Selected = GetEntityBoneIndexByName(Vehicle,k)
@@ -1364,6 +1377,7 @@ function cRP.tyreStatus()
 				local distance = #(coords - coordsWheel)
 				if distance <= 1.0 then
 					return true,Tyre,VehToNet(Vehicle),GetVehicleNumberPlateText(Vehicle)
+					-- ⚡ Já tem return, perfeito!
 				end
 			end
 		end
@@ -1371,19 +1385,3 @@ function cRP.tyreStatus()
 
 	return false
 end
------------------------------------------------------------------------------------------------------------------------------------------
--- TYREHEALTH
------------------------------------------------------------------------------------------------------------------------------------------
-function cRP.tyreHealth(vehNet,Tyre)
-	if NetworkDoesNetworkIdExist(vehNet) then
-		local Vehicle = NetToEnt(vehNet)
-		if DoesEntityExist(Vehicle) then
-			return GetTyreHealth(Vehicle,Tyre)
-		end
-	end
-end
------------------------------------------------------------------------------------------------------------------------------------------
--- VARIABLES
------------------------------------------------------------------------------------------------------------------------------------------
-local StealPeds = {}
-local StealTimer = GetGameTimer()
