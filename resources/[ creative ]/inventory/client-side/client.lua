@@ -72,20 +72,22 @@ function cRP.getPosition()
     return coords.x, coords.y, coords.z
 end
 
+
 -----------------------------------------------------------------------------------------------------------------------------------------
--- THREADBLOCKBUTTONS - OTIMIZADO
+-- THREADBLOCKBUTTONS - ULTRA OTIMIZADO PARA RESMON
 -----------------------------------------------------------------------------------------------------------------------------------------
 Citizen.CreateThread(function()
     while true do
-        local timeDistance = 1000 -- Aumentado para 1 segundo quando inativo
+        local timeDistance = 2000 -- 2 segundos quando inativo
+        
         if LocalPlayer["state"]["Buttons"] then
-            timeDistance = 1
+            timeDistance = 50 -- Reduzido de 1ms para 50ms
             DisableControlAction(1,75,true)
             DisableControlAction(1,47,true)
             DisableControlAction(1,257,true)
             DisablePlayerFiring(playerPed,true)
         end
-
+        
         Citizen.Wait(timeDistance)
     end
 end)
@@ -722,29 +724,41 @@ end
 -- THREADSTOREWEAPON
 -----------------------------------------------------------------------------------------------------------------------------------------
 Citizen.CreateThread(function()
-	SetNuiFocus(false,false)
-
-	while true do
-		local timeDistance = 2000 -- Aumentado para 2 segundos quando inativo
-		if weaponActive and Weapon ~= "" then
-			timeDistance = 250 -- Reduzido de 100ms para 250ms
-			local weaponAmmo = GetAmmoInPedWeapon(playerPed,Weapon)
-
-			if GetGameTimer() >= timeReload and IsPedReloading(playerPed) then
-				vSERVER.preventWeapon(Weapon,weaponAmmo)
-				timeReload = GetGameTimer() + 1000
-			end
-
-			if weaponAmmo <= 0 or (Weapon == "WEAPON_PETROLCAN" and weaponAmmo <= 135 and IsPedShooting(playerPed)) or IsPedSwimming(playerPed) then
-				vSERVER.preventWeapon(Weapon,weaponAmmo)
-				RemoveAllPedWeapons(playerPed,true)
-				weaponActive = false
-				Weapon = ""
-			end
-		end
-
-		Citizen.Wait(timeDistance)
-	end
+    SetNuiFocus(false,false)
+    local lastAmmoCheck = 0
+    
+    while true do
+        local timeDistance = 3000 -- Aumentado para 3 segundos quando inativo
+        
+        if weaponActive and Weapon ~= "" then
+            local currentTime = GetGameTimer()
+            
+            -- Verifica munição apenas a cada 500ms
+            if currentTime - lastAmmoCheck > 500 then
+                local weaponAmmo = GetAmmoInPedWeapon(playerPed,Weapon)
+                lastAmmoCheck = currentTime
+                
+                timeDistance = 500 -- 500ms quando ativo
+                
+                if currentTime >= timeReload and IsPedReloading(playerPed) then
+                    vSERVER.preventWeapon(Weapon,weaponAmmo)
+                    timeReload = currentTime + 1000
+                end
+                
+                if weaponAmmo <= 0 or (Weapon == "WEAPON_PETROLCAN" and weaponAmmo <= 135 and IsPedShooting(playerPed)) or IsPedSwimming(playerPed) then
+                    vSERVER.preventWeapon(Weapon,weaponAmmo)
+                    RemoveAllPedWeapons(playerPed,true)
+                    weaponActive = false
+                    Weapon = ""
+                    timeDistance = 3000 -- Reset após desativar
+                end
+            else
+                timeDistance = 200 -- Reduzido apenas quando necessário verificar
+            end
+        end
+        
+        Citizen.Wait(timeDistance)
+    end
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- FIRECRACKER
@@ -1146,59 +1160,73 @@ AddEventHandler("inventory:updateScanner",function(status)
 	userScanner = status
 	soundScanner = 999
 end)
+
 -----------------------------------------------------------------------------------------------------------------------------------------
--- THREADSCANNER
+-- THREADSCANNER - VERSÃO ULTRA OTIMIZADA PARA RESMON
 -----------------------------------------------------------------------------------------------------------------------------------------
 Citizen.CreateThread(function()
-	while true do
-		local timeDistance = 2000 -- Aumentado para 2 segundos quando inativo
-		if userScanner then
-			if not IsPedInAnyVehicle(playerPed) then
-				local coords = GetCachedPlayerCoords()
-				local hasNearScanner = false
-
-				for k,v in pairs(scanTable) do
-					local distance = #(coords - vector3(v[1],v[2],v[3]))
-					if distance <= 10 then -- Pré-filtro para reduzir processamento
-						hasNearScanner = true
-						if distance <= 7.25 then
-							soundScanner = 1000
-							timeDistance = 500 -- Reduzido quando próximo
-
-							if initSounds[k] == nil then
-								initSounds[k] = true
-							end
-
-							if distance <= 1.25 then
-								timeDistance = 1
-								soundScanner = 250
-
-								if IsControlJustPressed(1,38) and MumbleIsConnected() then
-									TriggerServerEvent("inventory:makeProducts",{},"scanner")
-
-									local rand = math.random(#scanCoords)
-									scanTable[k] = scanCoords[rand]
-									initSounds[k] = nil
-									soundScanner = 999
-								end
-							end
-						else
-							if initSounds[k] then
-								initSounds[k] = nil
-								soundScanner = 999
-							end
-						end
-					end
-				end
-
-				if not hasNearScanner then
-					timeDistance = 2000 -- 2 segundos quando não há scanners próximos
-				end
-			end
-		end
-
-		Citizen.Wait(timeDistance)
-	end
+    while true do
+        local timeDistance = 5000 -- Aumentado para 5 segundos quando inativo
+        
+        if userScanner then
+            if not IsPedInAnyVehicle(playerPed) then
+                local coords = GetCachedPlayerCoords()
+                local nearestDistance = 999.0
+                local nearestIndex = nil
+                
+                -- OTIMIZAÇÃO: Encontra apenas o scanner mais próximo
+                for k,v in pairs(scanTable) do
+                    local distance = #(coords - vector3(v[1],v[2],v[3]))
+                    if distance < nearestDistance and distance <= 10.0 then
+                        nearestDistance = distance
+                        nearestIndex = k
+                    end
+                end
+                
+                -- Processa apenas o scanner mais próximo
+                if nearestIndex then
+                    local v = scanTable[nearestIndex]
+                    timeDistance = 1000 -- 1 segundo quando próximo de scanner
+                    
+                    if nearestDistance <= 7.25 then
+                        soundScanner = 1000
+                        timeDistance = 500
+                        
+                        if initSounds[nearestIndex] == nil then
+                            initSounds[nearestIndex] = true
+                        end
+                        
+                        if nearestDistance <= 1.25 then
+                            timeDistance = 100 -- Reduzido apenas quando muito próximo
+                            soundScanner = 250
+                            
+                            if IsControlJustPressed(1,38) and MumbleIsConnected() then
+                                TriggerServerEvent("inventory:makeProducts",{},"scanner")
+                                
+                                local rand = math.random(#scanCoords)
+                                scanTable[nearestIndex] = scanCoords[rand]
+                                initSounds[nearestIndex] = nil
+                                soundScanner = 999
+                                timeDistance = 2000 -- Reset após interação
+                            end
+                        end
+                    else
+                        if initSounds[nearestIndex] then
+                            initSounds[nearestIndex] = nil
+                            soundScanner = 999
+                        end
+                    end
+                else
+                    timeDistance = 5000 -- 5 segundos quando longe de todos
+                    soundScanner = 999
+                end
+            else
+                timeDistance = 3000 -- 3 segundos quando em veículo
+            end
+        end
+        
+        Citizen.Wait(timeDistance)
+    end
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- THREADSCANNERSOUND
