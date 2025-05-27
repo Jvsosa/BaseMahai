@@ -1,81 +1,175 @@
-::-webkit-scrollbar { display: none; }
-input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; }
+/* Remove a barra de rolagem do WebKit */
+::-webkit-scrollbar { 
+	display: none; 
+}
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { 
+	-webkit-appearance: none; 
+}
 
+/* Estilo base do corpo */
 body {
 	margin: 0;
 	padding: 0;
 	color: #fff;
-	font-family: "Roboto",Arial,Helvetica,sans-serif;
+	overflow: hidden; /* Pode ajudar a evitar problemas de overflow */
 }
 
+/* Estilo base para todos os elementos */
 * {
-	overflow: hidden;
 	user-select: none;
 	box-sizing: border-box;
+	text-rendering: auto;
+	font-family: 'Montserrat', sans-serif;
 }
 
-#notifyitens {
-	width: 100%;
-	height: 95%;
-	display: flex;
-	align-items: flex-end;
-	justify-content: center;
-}
-
-.item {
-	width: 115px;
-	height: 145px;
-	display: flex;
-	border-radius: 3px;
-	margin-right: 10px;
-	flex-direction: column;
-	text-shadow: 1px 1px #000;
-	background: rgba(15,15,15,.75);
-	background-size: 86% !important;
-	background-position: center !important;
-	background-repeat: no-repeat !important;
-}
-
-.item .top {
-	display: flex;
-	color: #8c8c8c;
-	font-size: .65rem;
-	justify-content: space-between;
-}
-
-.item .nameItem {
-	width: 100%;
-	color: #CCC;
-	margin-top: 87px;
-	font-size: .68rem;
-	padding: 8px 10px;
-	text-align: center;
-	align-self: center;
-	white-space: nowrap;
-	letter-spacing: 1px;
-	text-overflow: ellipsis;
-	text-transform: uppercase;
-	background: #111;
-}
-
-.itemWeight {
-	color: #333;
-	padding: 8px;
-	font-size: .60rem;
+/* Estilo do container das notificações */
+#notifyitens {  
 	position: absolute;
-	letter-spacing: 1px;
-	text-shadow: 0 0 #000;
-	text-transform: uppercase;
-	border-top-left-radius: 3px;
-	border-bottom-right-radius: 3px;
-	background: rgba(255,255,255,0.75);
-	font-family: "Roboto",Arial,Helvetica,sans-serif;
+	top: 90%;
+	right: 50%; /* Ajuste para alinhar as notificações no lado direito */
+	display: flex;
+	flex-direction: row; /* Alinha as notificações lado a lado */
+	transform: translate(0, -50%);
+	z-index: 1000; /* Garantir que fique acima do fundo do chat */
 }
 
-.itemAmount {
-	color: #999;
-	width: 115px;
-	font-size: .70rem;
-	text-align: right;
-	padding: 15px 15px 0 0;
+
+/* Estilo base para cada item */
+.item {
+    position: relative;
+    width: 100px;
+    height: 120px;
+    color: #fff;
+    border-radius: 5px;
+    margin-right: 5px;
+    border: 2px solid rgba(0, 0, 0, 0.301);
+    animation: slide-in-bottom 0.5s ease-out;
+    overflow: hidden;
+    z-index: 1001;
+}
+
+/* Adiciona um fundo usando o pseudo-elemento ::before */
+.item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0); /* Cor de fundo com opacidade */
+    z-index: -1; /* Coloca o fundo atrás do conteúdo */
+}
+
+/* Remove a margem direita do último item */
+.item:last-child {
+    margin-right: 0; 
+}
+
+/* Linha ou risco acima do item */
+.item::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 70%;
+    height: 3px;
+    border-radius: 30px;
+    transform: translateX(-50%);
+    transition: background-color 0.3s;
+}
+
+/* Cor para a ação 'guardou' */
+.item.guardou::after {
+    background-color: #ff0000d5; /* Vermelho claro fluorescente */
+}
+
+/* Cor para a ação 'equipou' */
+.item.equipou::after {
+    background-color: #00ff66d5; /* Verde fluorescente */
+}
+
+
+/* Estilo da imagem dentro do item */
+.item img {   
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	max-width: 80px;
+	transform: translate(-50%, -50%);
+	z-index: 0; /* Garante que a imagem não sobreponha o fundo */
+}
+
+/* Estilo da barra de informação do item */
+.item .info-item { 
+	position: absolute;
+	display: flex;
+	bottom: 0;
+	width: 100%;
+	height: 20px;
+	align-items: center;
+}
+
+/* Estilo base para itemRecive */
+.itemRecive { 
+	color: #fff;
+	display: flex;
+	height: 100%;
+	padding: 0 4px;
+	font-size: 10px;
+	align-items: center;
+	text-transform: uppercase;
+	justify-content: center;
+	transition: background-color 0.3s; /* Transição suave para a mudança de cor */
+}
+
+/* Cor de fundo para a ação 'guardou' */
+.item.guardou .itemRecive {
+	background-color: #ff0000d5; /* Vermelho claro fluorescente */
+}
+
+/* Cor de fundo para a ação 'equipou' */
+.item.equipou .itemRecive {
+	background-color: #00ff66d5; /* Verde fluorescente */
+}
+
+/* Nome do item */
+.nameItem { 
+	bottom: 10px;
+	width: 100%;
+	font-size: 7px;
+	text-align: center;
+	height: 100%;
+	display: flex;
+	padding: 0 2px;
+	font-weight: 500;
+	align-items: center;
+	letter-spacing: .5px;
+	justify-content: center;
+	text-transform: uppercase;
+	border-bottom-left-radius: 2px;
+	background-color: rgba(42, 42, 42, 0.405); /* Fundo com leve opacidade */
+}
+
+/* Escrita 'guardou' e 'equipou' */
+.item-mode { 
+	position: absolute; 
+	left: 50%;
+	top: 10px;
+	color: #fff;
+	font-size: 7px;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	transform: translate(-50%, 0);
+}
+
+/* Animação para a entrada dos itens */
+@keyframes slide-in-bottom { 
+	0% {
+		transform: translateY(1000px);
+		opacity: 0;
+	}
+	100% {
+		transform: translateY(0);
+		opacity: 1;
+	}
 }
