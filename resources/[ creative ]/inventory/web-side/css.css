@@ -527,7 +527,7 @@ body::after {
     height: 43px;
     position: absolute;
     top: 13%;
-    left: 50%;
+    left: 50.6%;
     margin: auto;
     
     
@@ -846,17 +846,35 @@ input::-webkit-inner-spin-button { -webkit-appearance: none; }
     0% {opacity: 0;}
     100% {opacity: 1;}
     } 
-
+/* Contêiner principal da hotbar */
 .hotbar-container {
     position: absolute;
-    top: 15%; /* Ajuste conforme necessário */
-    left: -5%; /* Ajuste conforme necessário */
+    top: 23%; /* Ajuste conforme necessário */
+    left: -2%; /* Ajuste conforme necessário */
     width: 8vw; /* Largura do contêiner */
     height: 27.5vw; /* Altura do contêiner */
-    background: rgba(255, 255, 255, 0); /* Fundo escuro */
-    border: 2px solid rgba(255, 255, 255, 0.2); /* Borda branca translúcida */
+    background: rgba(255, 255, 255, 0); /* Fundo transparente */
+    border-width: 2px; /* Espessura da borda */
+    border-style: solid; /* Define o estilo da borda */
+    border-image: linear-gradient(to left, rgba(255, 255, 255, 0.12) 95%, rgba(255, 255, 255, 0.038) 10%) 1; /* Gradiente mais longo */
     border-radius: 10px; /* Bordas arredondadas */
     z-index: 9; /* Certifique-se de que está abaixo da hotbar */
+    overflow: visible; /* Permite que o texto ultrapasse os limites */
+}
+
+/* Contêiner para o texto "QUICK SLOTS" */
+.hotbar-text {
+    position: absolute;
+    top: 50%; /* Centraliza verticalmente */
+    left: -3.3vw; /* Ajuste para posicionar o texto fora da borda */
+    transform: translateY(-50%) rotate(-90deg); /* Rotaciona o texto */
+    font-family: 'Inter', sans-serif; /* Ajuste a fonte */
+    font-size: 1vw; /* Ajuste o tamanho do texto */
+    font-weight: bold;
+    color: white; /* Cor do texto */
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5); /* Adiciona um leve brilho */
+    z-index: 10; /* Certifique-se de que o texto está acima da borda */
+    pointer-events: none; /* Garante que o texto não interfira em cliques */
 }
 
 .hotbar {
