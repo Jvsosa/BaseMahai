@@ -13,27 +13,27 @@ Config.NotifyMessagem = "Uma nova mensagem foi enviada na empresa" -- [ Menssage
 Config.CheckItem = false -- [ Pedir item ou nao ]
 Config.Item = "tablet" -- [ Item necessario para abrir o tablet ]
 
-Config.wnInventory = false -- [ Caso use o inventario da warn coloque "true" caso nao use coloque "false" ]
+Config.wnInventory = true -- [ Caso use o inventario da warn coloque "true" caso nao use coloque "false" ]
 Config.Imagens = "nui://wnInventory/nui/imgs" -- [ Local dos itens do inventario ]
 
-Config.PermAdmin = "admin.perm" -- [ Permissao do Admin para acessar os comandos ]
+Config.PermAdmin = "admin" -- [ Permissao do Admin para acessar os comandos ]
 Config.DiasBlacklist = 3
 
 Config.Empresas = {
 
 
 
-	["Desmanche"] = {
-		Permissao = "Desmanche",
+	["Staff"] = {
+		Permissao = "Staff",
 		Limite_Membros = 60,
-		Cargo_Default = "Desmanche",
+		Cargo_Default = "Staff",
 		PaginaUpgrades = false,
 		Cargo_Discord = "1119178173758840963",
 	
 		cargos = {
-			[3] = { Set = "Desmanche", Acesso = "Membro" },
-			[2] = { Set = "Desmanche", Acesso = "Gerente" },
-			[1] = { Set = "Desmanche", Acesso = "Lider" },
+			[3] = { Set = "Staff", Acesso = "Membro" },
+			[2] = { Set = "Staff", Acesso = "Gerente" },
+			[1] = { Set = "Staff", Acesso = "Lider" },
 		}
 	},
 
