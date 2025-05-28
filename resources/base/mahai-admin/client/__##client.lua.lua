@@ -1,4 +1,4 @@
- _RegisterCommand = RegisterCommand
+_RegisterCommand = RegisterCommand
 function RegisterCommand(command, callback)
     _RegisterCommand(command, function(...)
         if not LocalPlayer.state.inLateGame and not LocalPlayer.state.inPvp then
@@ -92,6 +92,24 @@ cRP.derrubar = function()
     SetPedToRagdollWithFall(PlayerPedId(),10000,10000,0,coords[1],coords[2],coords[3],10.0,0.0,0.0,0.0,0.0,0.0,0.0)
 end
 
+
+-- RegisterCommand("reinventory",function(source,args,rawCommand)
+	
+--         LocalPlayer["state"]["Buttons"] = false
+-- 		LocalPlayer["state"]["Cancel"] = false
+-- 	    LocalPlayer["state"]["Commands"] = false
+--         LocalPlayer["state"]["Handcuff"] = false
+-- end)
+
+RegisterCommand("rs",function(source,args,rawCommand)
+    local ped = PlayerPedId()
+    if IsPedInAnyVehicle(ped) then
+        local vehicle = GetVehiclePedIsUsing(ped)
+        local vehClass = GetVehicleClass(vehicle)
+        print(vehClass)
+    
+    end
+end)
 
 
 -----------------------------------------------------------------------------------------------------------------------------------------
@@ -261,7 +279,77 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- NOCLIP
 -----------------------------------------------------------------------------------------------------------------------------------------
+local noclip = false
+local noclip_speed = 2.0
 
+function noClip()
+    if not noclip then
+        noclip = true
+        local ped = PlayerPedId()
+        FreezeEntityPosition(ped, true)
+        SetEntityInvincible(ped, true)
+        SetEntityVisible(ped, false, false)
+        SetEntityCollision(ped, false, false)
+        Citizen.CreateThread(function()
+            while noclip do
+                Citizen.Wait(5) 
+            
+                local ped = PlayerPedId()
+                local x, y, z = table.unpack(GetEntityCoords(ped))
+                local heading = GetGameplayCamRelativeHeading() + GetEntityHeading(ped)
+                local pitch = GetGameplayCamRelativePitch()
+                local dx = -math.sin(math.rad(heading))
+                local dy = math.cos(math.rad(heading))
+                local dz = math.sin(math.rad(pitch))
+                local speed = noclip_speed
+
+                if IsControlPressed(0, 21) then speed = speed * 2 end -- SHIFT
+                if IsControlPressed(0, 19) then speed = speed * 0.5 end -- ALT
+                
+                if IsControlPressed(0, 32) then -- W
+                    x = x + dx * speed
+                    y = y + dy * speed
+                    z = z + dz * speed
+                end
+                if IsControlPressed(0, 8) then -- S
+                    x = x - dx * speed
+                    y = y - dy * speed
+                    z = z - dz * speed
+                end
+                if IsControlPressed(0, 34) then -- A
+                    x = x + dy * speed
+                    y = y - dx * speed
+                end
+                if IsControlPressed(0, 9) then -- D
+                    x = x - dy * speed
+                    y = y + dx * speed
+                end
+                if IsControlPressed(0, 22) then z = z + speed end -- SPACE
+                if IsControlPressed(0, 36) then z = z - speed end -- CTRL
+                
+                -- Invisibilidade
+                if IsControlJustPressed(0, 168) then
+                    local visible = IsEntityVisible(ped)
+                    SetEntityVisible(ped, not visible, false)
+                end
+                
+                SetEntityCoordsNoOffset(ped, x, y, z, true, true, true)
+            end
+        end)
+    else
+        noclip = false
+        local ped = PlayerPedId()
+        
+        FreezeEntityPosition(ped, false)
+        SetEntityInvincible(ped, false)
+        SetEntityVisible(ped, true, false)
+        SetEntityCollision(ped, true, true)
+    end
+end
+
+function cRP.noClip()
+    noClip()
+end
 
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- [ DEBUG ]  WolfZeraWZR
@@ -517,7 +605,21 @@ function DrawText3Ds(x,y,z, text)
     local factor = (string.len(text)) / 370
     DrawRect(_x,_y+0.0125, 0.015+ factor, 0.03, 41, 11, 41, 68)
 end
-
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- COLOCAR FOGO - COMANDO OWNER
+-----------------------------------------------------------------------------------------------------------------------------------------
+RegisterNetEvent('FOGO')
+AddEventHandler('FOGO',function(source)
+    local ped = PlayerPedId(-1)
+    if not kravinho then
+        kravinho = true
+        Citizen.Wait(100)
+        StartEntityFire(ped);
+    else
+        kravinho = false
+        StopEntityFire(ped);
+    end
+end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- BUTTONCOORDS
 -----------------------------------------------------------------------------------------------------------------------------------------

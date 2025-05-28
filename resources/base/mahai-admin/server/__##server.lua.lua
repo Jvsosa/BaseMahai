@@ -1689,57 +1689,32 @@ end)
 -- NC			/nc
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand("nc",function(source,args,rawCommand)
-	local user_id = vRP.getUserId(source)
-	local identity = vRP.userIdentity(user_id)
-	if user_id then
-		if vRP.hasGroup(user_id,"Admin") or vRP.hasGroup(user_id,"StreamerVip") then
-			vRPC.noClip(source)
-			local identity = vRP.userIdentity(user_id)
-			local x,y,z = vCLIENT.getPosition(source)
-			if user_id ~= 884 then
-				PerformHttpRequest("https://discord.com/api/webhooks/1121071424673693826/bUZ1JFZB3u8ZPDPI8KMJPAUh9Kf8DMyrnBOuKd58S4PKi-Hr6JzqVELJQlm_yVjradtp", function(err, text, headers) end, 'POST', json.encode({
-					embeds = {
-						{     
-							title = "**/noclip**",
-							fields = {
-								{ 
-									name = "📝 Author:", 
-									value = "" ..identity.name.." "..identity.name2.." **#"..user_id.."** ",
-								},
-								{ 
-									name = "🌐 Coordenada do Staff:", 
-									value = ""..x..","..y..","..z.." \n \n " 
-								},
-							}, 
-							footer = { 
-								text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S'),
-								icon_url = "https://media.discordapp.net/attachments/1094973674437750834/1101630131610591323/512.png"
-							},
-							thumbnail = { 
-								url = "https://media.discordapp.net/attachments/1094973674437750834/1101630131610591323/512.png"
-							},
-							color = 3092790
-						}
-					}
-				}), { ['Content-Type'] = 'application/json' })
-			end
-
-		end
-	end
+    local user_id = vRP.getUserId(source)
+    local identity = vRP.userIdentity(user_id)
+    if user_id then
+        if vRP.hasGroup(user_id,"Admin") or vRP.hasGroup(user_id,"StreamerVip") then
+            vCLIENT.noClip(source)  -- ✅ USAR vCLIENT ao invés de vRPC
+            local identity = vRP.userIdentity(user_id)
+            local x,y,z = vCLIENT.getPosition(source)
+            if user_id ~= 884 then
+                PerformHttpRequest("https://discord.com/api/webhooks/1121071424673693826/bUZ1JFZB3u8ZPDPI8KMJPAUh9Kf8DMyrnBOuKd58S4PKi-Hr6JzqVELJQlm_yVjradtp", function(err, text, headers) end, 'POST', json.encode({
+                }), { ['Content-Type'] = 'application/json' })
+            end
+        end
+    end
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- NC2			APERTE LETRA O PARA FICAR INVISIVEL
 -----------------------------------------------------------------------------------------------------------------------------------------
 function cRP.enablaNoclip()
-	local source = source
-	local user_id = vRP.getUserId(source)
-	local identity = vRP.userIdentity(user_id)
-	if user_id then
-		if vRP.hasGroup(user_id,"Admin")  then
-			vRPC.noClip(source)
-			logs(webhooknc,"```[NOME]: "..identity.name.." "..identity.name2.." \n[ID]: "..user_id.." \n[UTILIZOU O NOCLIP] "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
-		end
-	end
+    local source = source
+    local user_id = vRP.getUserId(source)
+    local identity = vRP.userIdentity(user_id)
+    if user_id then
+        if vRP.hasGroup(user_id,"Admin") then
+            vCLIENT.noClip(source)
+        end
+    end
 end
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- KICK			/kick ID
