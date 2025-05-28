@@ -4,9 +4,9 @@ local config = {}
 local configLoaded = false
 
 Citizen.CreateThread(function()
-    Citizen.Wait(1000) -- Reduzido para carregar mais rápido
+    Citizen.Wait(1000)
     
-    print('^7[^3BASE^7] Iniciando carregamento de cargos...')
+    print('^7[^3BASE^7] Iniciando carregamento de configurações...')
     
     local attempts = 0
     local maxAttempts = 15
@@ -24,10 +24,13 @@ Citizen.CreateThread(function()
                 return count
             end
             
-            print('^7[^2BASE^7] ✅ Cargos carregados! Total: ^2'..countTable(Config.Cargos)..'^7')
+            print('^7[^2BASE^7] ✅ Configurações carregadas!')
+            if Config.StarterItems then
+            end
+            if Config.StarterBank then
+            end
             
-            -- ✅ NOTIFICAR O VRP
-            TriggerEvent('base:cargosReady', config.Cargos)
+            TriggerEvent('base:configReady', config)
             
             break
         else
@@ -36,11 +39,11 @@ Citizen.CreateThread(function()
             end
         end
         
-        Citizen.Wait(500) -- Mais rápido
+        Citizen.Wait(500)
     end
     
     if not configLoaded then
-        print('^7[^1BASE^7] 🚨 TIMEOUT! Ativando modo emergência...')
+        print('^7[^1BASE^7] 🚨 TIMEOUT! Ativando modo emergência APENAS para cargos...')
         
         config = {
             Cargos = {
@@ -49,19 +52,21 @@ Citizen.CreateThread(function()
                 ["Paramedic"] = { ["Paramedic"] = true },
                 ["Mechanic"] = { ["Mechanic"] = true }
             }
+            -- ❌ REMOVIDO: StarterItems, StarterBank, ServerInfo
         }
         
         configLoaded = true
-        TriggerEvent('base:cargosReady', config.Cargos)
+        TriggerEvent('base:configReady', config)
     end
 end)
 
+-- Exports existentes
 exports('GetConfigAll', function()
-    return configLoaded and config or { Cargos = {} }
+    return configLoaded and config or {}
 end)
 
 exports('GetConfig', function()
-    return configLoaded and config or { Cargos = {} }
+    return configLoaded and config or {}
 end)
 
 exports('GetCargos', function()
@@ -72,7 +77,19 @@ exports('GetGroups', function()
     return {}
 end)
 
--- ✅ STATUS CHECK
+-- ✅ EXPORTS SEM FALLBACK (falha se config não carregar)
+exports('GetStarterItems', function()
+    return configLoaded and (config.StarterItems or {}) or {}
+end)
+
+exports('GetStarterBank', function()
+    return configLoaded and (config.StarterBank or 0) or 0
+end)
+
+exports('GetServerInfo', function()
+    return configLoaded and (config.ServerInfo or {}) or {}
+end)
+
 exports('IsReady', function()
     return configLoaded
 end)

@@ -304,15 +304,28 @@ function vRP.characterChosen(source,user_id,model)
 
 	if model ~= nil then
 		vRP.userTables[user_id]["inventory"] = {}
-		vRP.generateItem(user_id,"sandwich",3,false)
-		vRP.generateItem(user_id,"soda",3,false)
-		vRP.generateItem(user_id,"cellphone",1,false)
-		vRP.generateItem(user_id,"dollars",5000,false)
+		
+		-- ✅ PEGAR CONFIGURAÇÕES DA BASE
+		local starterItems = exports.base:GetStarterItems()
+		local starterBank = exports.base:GetStarterBank()
+		
+		-- ✅ GERAR ITENS BASEADOS NA CONFIGURAÇÃO
+		for item, quantidade in pairs(starterItems) do
+			vRP.generateItem(user_id, item, quantidade, false)
+		end
+		
+		-- ✅ ITENS ESPECIAIS AUTOMÁTICOS
+		vRP.generateItem(user_id, "identity-"..user_id, 1, false)
+		
 		vRP.userTables[user_id]["skin"] = GetHashKey(model)
-		vRP.generateItem(user_id,"identity-"..user_id,1,false)
-		-- vRP.userTables[user_id]["position"] = { x = -28.08, y = -145.96, z = 56.99 }
-		vRP.execute("bank/newAccount",{ user_id = user_id, value = 10000, mode = "Private", owner = 1 })
-
+		
+		-- ✅ BANCO INICIAL CONFIGURÁVEL
+		vRP.execute("bank/newAccount", { 
+			user_id = user_id, 
+			value = starterBank, 
+			mode = "Private", 
+			owner = 1 
+		})
 	end
 
 	local userBank = vRP.userBank(user_id,"Private")
@@ -325,9 +338,15 @@ function vRP.characterChosen(source,user_id,model)
 		vRP.userInfos[user_id]["premium"] = infoAccount["premium"]
 		vRP.userInfos[user_id]["chars"] = infoAccount["chars"]
 
-		PerformHttpRequest(webHook,function(err,text,headers) end,"POST",json.encode({
-			content = infoAccount["discord"].." #"..user_id.." "..identity["name"]
-		}),{ ["Content-Type"] = "application/json" })
+		-- ✅ WEBHOOK CONFIGURÁVEL
+		local serverInfo = exports.base:GetServerInfo()
+		local webhook = serverInfo.webhook or ""
+		
+		if webhook ~= "" then
+			PerformHttpRequest(webhook,function(err,text,headers) end,"POST",json.encode({
+				content = infoAccount["discord"].." #"..user_id.." "..identity["name"]
+			}),{ ["Content-Type"] = "application/json" })
+		end
 	end
 
 	local Identities = vRP.getIdentities(source)
