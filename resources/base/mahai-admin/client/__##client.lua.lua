@@ -1,3 +1,19 @@
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- VRP TUNNELS - CORREÇÃO PARA INICIALIZAÇÃO
+-----------------------------------------------------------------------------------------------------------------------------------------
+local Tunnel = module("vrp","lib/Tunnel")
+local Proxy = module("vrp","lib/Proxy")
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- CONNECTION - INICIALIZAR PRIMEIRO
+-----------------------------------------------------------------------------------------------------------------------------------------
+local cRP = {}
+Tunnel.bindInterface("admin",cRP)  -- ✅ Client se registra como "admin"
+local vSERVER = Tunnel.getInterface("admin")  -- ✅ Client acessa server
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- OVERRIDES DE COMANDO
+-----------------------------------------------------------------------------------------------------------------------------------------
 _RegisterCommand = RegisterCommand
 function RegisterCommand(command, callback)
     _RegisterCommand(command, function(...)
@@ -16,70 +32,68 @@ function IsControlJustPressed(...)
     end
 end
 
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- LOCATIONS
+-----------------------------------------------------------------------------------------------------------------------------------------
 local initLocates = {
-	{ 2578.11,-294.98,93.4,263.63 }
+    { 2578.11,-294.98,93.4,263.63 }
 }
 
-
-
 Citizen.CreateThread(function()
-	for k,v in pairs(initLocates) do
-		exports["target"]:AddCircleZone("TowDriver:"..k,vector3(v[1],v[2],v[3]),1.0,{
-			name = "TowDriver:"..k,
-			heading = 3374176
-		},{
-			shop = k,
-			distance = 1.5,
-			options = {
-
-				{
-					event = "garages:Impound",
-					label = "Apreendidos",
-					tunnel = "shop"
-				}
-			}
-		})
-	end
+    for k,v in pairs(initLocates) do
+        exports["target"]:AddCircleZone("TowDriver:"..k,vector3(v[1],v[2],v[3]),1.0,{
+            name = "TowDriver:"..k,
+            heading = 3374176
+        },{
+            shop = k,
+            distance = 1.5,
+            options = {
+                {
+                    event = "garages:Impound",
+                    label = "Apreendidos",
+                    tunnel = "shop"
+                }
+            }
+        })
+    end
 end)
 
-
-
 -----------------------------------------------------------------------------------------------------------------------------------------
--- VRP TUNNELS - CORREÇÃO PARA NOCLIP
+-- INICIALIZAÇÃO
 -----------------------------------------------------------------------------------------------------------------------------------------
-local Tunnel = module("vrp","lib/Tunnel")
-local Proxy = module("vrp","lib/Proxy")
-
------------------------------------------------------------------------------------------------------------------------------------------
--- CONNECTION - CORRIGIR INTERFACE
------------------------------------------------------------------------------------------------------------------------------------------
-cRP = {}
-Tunnel.bindInterface("admin",cRP)  -- ✅ Client se registra como "admin"
-vSERVER = Tunnel.getInterface("admin")  -- ✅ Client acessa server
-
 Citizen.CreateThread(function()
     Citizen.Wait(2000)  
     print("^2[ADMIN-CLIENT]^7 Sistema inicializado!")
 end)
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- POSIÇÃO
+-----------------------------------------------------------------------------------------------------------------------------------------
 function cRP.getPosition()
-	local x,y,z = table.unpack(GetEntityCoords(PlayerPedId(),true))
-	return x,y,z
+    local x,y,z = table.unpack(GetEntityCoords(PlayerPedId(),true))
+    return x,y,z
 end
 
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- CARRY PLAYER
+-----------------------------------------------------------------------------------------------------------------------------------------
 Citizen.CreateThread(function()
-	while true do
-		Citizen.Wait(1)
-		if not IsPedInAnyVehicle(PlayerPedId()) then
-			if IsControlJustPressed(0,47) then
-				TriggerServerEvent("player:carryPlayeradm")
-			end
-			if IsControlJustPressed(0,74) then
-				TriggerServerEvent("player:carryPlayeradm")
-			end
-		end
-	end
+    while true do
+        Citizen.Wait(1)
+        if not IsPedInAnyVehicle(PlayerPedId()) then
+            if IsControlJustPressed(0,47) then
+                TriggerServerEvent("player:carryPlayeradm")
+            end
+            if IsControlJustPressed(0,74) then
+                TriggerServerEvent("player:carryPlayeradm")
+            end
+        end
+    end
 end)
 
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- FUNÇÕES ADMIN
+-----------------------------------------------------------------------------------------------------------------------------------------
 local batata = false
 
 cRP.bololo = function()
@@ -92,265 +106,149 @@ cRP.bololo = function()
 end
 
 cRP.derrubar = function()
-
     local coords = GetEntityForwardVector(PlayerPedId())
     SetPedToRagdollWithFall(PlayerPedId(),10000,10000,0,coords[1],coords[2],coords[3],10.0,0.0,0.0,0.0,0.0,0.0,0.0)
 end
 
-
--- RegisterCommand("reinventory",function(source,args,rawCommand)
-	
---         LocalPlayer["state"]["Buttons"] = false
--- 		LocalPlayer["state"]["Cancel"] = false
--- 	    LocalPlayer["state"]["Commands"] = false
---         LocalPlayer["state"]["Handcuff"] = false
--- end)
-
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- COMANDO RS
+-----------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand("rs",function(source,args,rawCommand)
     local ped = PlayerPedId()
     if IsPedInAnyVehicle(ped) then
         local vehicle = GetVehiclePedIsUsing(ped)
         local vehClass = GetVehicleClass(vehicle)
         print(vehClass)
-    
     end
 end)
 
-
------------------------------------------------------------------------------------------------------------------------------------------
--- PLAYER:PLAYERCARRY
------------------------------------------------------------------------------------------------------------------------------------------
-local playerCarry = false
-RegisterNetEvent("player:playerCarrypm2")
-AddEventHandler("player:playerCarrypm2",function(entity,mode)
-	if playerCarry then
-		DetachEntity(PlayerPedId(),false,false)
-		playerCarry = false
-	else
-		if mode == "handcuff" then
-			AttachEntityToEntity(PlayerPedId(),GetPlayerPed(GetPlayerFromServerId(entity)),11816,0.0,0.5,0.0,0.0,0.0,0.0,false,false,false,false,2,true)
-		else
-			AttachEntityToEntity(PlayerPedId(),GetPlayerPed(GetPlayerFromServerId(entity)),11816,0.6,0.0,0.0,0.0,0.0,0.0,false,false,false,false,2,true)
-		end
-
-		playerCarry = true
-	end
-end)
-
-local playerCarry = false
-RegisterNetEvent("player:playerCarryadm2")
-AddEventHandler("player:playerCarryadm2",function(entity,mode)
-	if playerCarry then
-		DetachEntity(PlayerPedId(),false,false)
-		playerCarry = false
-	else
-		if mode == "handcuff" then
-			AttachEntityToEntity(PlayerPedId(),GetPlayerPed(GetPlayerFromServerId(entity)),4103,11816,0.48,0.0,0.0,0.0,0.0,0.0,false,false,false,false,2,true)
-		else
-			AttachEntityToEntity(PlayerPedId(),GetPlayerPed(GetPlayerFromServerId(entity)),4103,11816,0.48,0.0,0.0,0.0,0.0,0.0,false,false,false,false,2,true)
-		end
-
-		playerCarry = true
-	end
-end)
-
-
--- local cooldownEntrar_praca = 0
-
--- Citizen.CreateThread(function()
--- 	while true do
--- 		if cooldownEntrar_praca > 0 then
--- 			cooldownEntrar_praca = cooldownEntrar_praca - 1
--- 		end
--- 		Citizen.Wait(1000)
--- 	end
--- end)
-
--- Citizen.CreateThread(function()
--- 	while true do
--- 		local timeDistance = 999
--- 		timeDistance = 1
--- 		local ped = PlayerPedId()
---         if IsPedShooting(ped) and cooldownEntrar_praca <= 0 then
---             timeDistance = 1
---             cooldownEntrar_praca = 120
---         end
--- 		Citizen.Wait(timeDistance)
--- 	end
--- end)
-
-
-
--- Citizen.CreateThread(function()
--- 	while true do
--- 		local msec = 400
--- 		if cooldownEntrar_praca then
---             local ped = PlayerPedId()
---             local x,y,z = table.unpack(GetEntityCoords(ped))
---             local bowz,cdz = GetGroundZFor_3dCoord(175.32,-974.82,46.37)
---             local distance = GetDistanceBetweenCoords(176.52,-970.49,cdz,x,y,z,true)
---             if distance <= 70 then
---                 msec = 3
---                 DrawMarker(27, 181.86,-967.29,31.36-0.6,0,0,0,0,0,0,0.2,0.2,0.3,  255, 255,255,100 ,false,0,0,1)
---                 SetEntityCoordsNoOffset(ped,151.28,-1003.78,29.281,1,0,0)
---             end
--- 		end
--- 		Wait(msec)
--- 	end
--- end)
-
-
-
-RegisterNetEvent("vcolorv")
-AddEventHandler("vcolorv",function(veh,r,g,b)
-    if IsEntityAVehicle(veh) then
-        SetVehicleCustomPrimaryColour(veh,r,g,b)
-    end
-end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- TELEPORTWAY
 -----------------------------------------------------------------------------------------------------------------------------------------
 function cRP.teleportWay()
-	local ped = PlayerPedId()
-	if IsPedInAnyVehicle(ped) then
-		ped = GetVehiclePedIsUsing(ped)
+    local ped = PlayerPedId()
+    if IsPedInAnyVehicle(ped) then
+        ped = GetVehiclePedIsUsing(ped)
     end
 
-	local waypointBlip = GetFirstBlipInfoId(8)
-	local x,y,z = table.unpack(Citizen.InvokeNative(0xFA7C7F0AADF25D09,waypointBlip,Citizen.ResultAsVector()))
+    local waypointBlip = GetFirstBlipInfoId(8)
+    local x,y,z = table.unpack(Citizen.InvokeNative(0xFA7C7F0AADF25D09,waypointBlip,Citizen.ResultAsVector()))
 
-	local ground
-	local groundFound = false
-	local groundCheckHeights = { 0.0,50.0,100.0,150.0,200.0,250.0,300.0,350.0,400.0,450.0,500.0,550.0,600.0,650.0,700.0,750.0,800.0,850.0,900.0,950.0,1000.0,1050.0,1100.0 }
+    local ground
+    local groundFound = false
+    local groundCheckHeights = { 0.0,50.0,100.0,150.0,200.0,250.0,300.0,350.0,400.0,450.0,500.0,550.0,600.0,650.0,700.0,750.0,800.0,850.0,900.0,950.0,1000.0,1050.0,1100.0 }
 
-	for i,height in ipairs(groundCheckHeights) do
-		SetEntityCoordsNoOffset(ped,x,y,height,1,0,0)
+    for i,height in ipairs(groundCheckHeights) do
+        SetEntityCoordsNoOffset(ped,x,y,height,1,0,0)
 
-		RequestCollisionAtCoord(x,y,z)
-		while not HasCollisionLoadedAroundEntity(ped) do
-			Citizen.Wait(1)
-		end
+        RequestCollisionAtCoord(x,y,z)
+        while not HasCollisionLoadedAroundEntity(ped) do
+            Citizen.Wait(1)
+        end
 
-		Citizen.Wait(20)
+        Citizen.Wait(20)
 
-		ground,z = GetGroundZFor_3dCoord(x,y,height)
-		if ground then
-			z = z + 1.0
-			groundFound = true
-			break;
-		end
-	end
+        ground,z = GetGroundZFor_3dCoord(x,y,height)
+        if ground then
+            z = z + 1.0
+            groundFound = true
+            break;
+        end
+    end
 
-	if not groundFound then
-		z = 1200
-		GiveDelayedWeaponToPed(ped,0xFBAB5776,1,0)
-	end
+    if not groundFound then
+        z = 1200
+        GiveDelayedWeaponToPed(ped,0xFBAB5776,1,0)
+    end
 
-	RequestCollisionAtCoord(x,y,z)
-	while not HasCollisionLoadedAroundEntity(ped) do
-		Citizen.Wait(1)
-	end
+    RequestCollisionAtCoord(x,y,z)
+    while not HasCollisionLoadedAroundEntity(ped) do
+        Citizen.Wait(1)
+    end
 
-	SetEntityCoordsNoOffset(ped,x,y,z,1,0,0)
+    SetEntityCoordsNoOffset(ped,x,y,z,1,0,0)
 end
------------------------------------------------------------------------------------------------------------------------------------------
--- TELEPORTWAY
------------------------------------------------------------------------------------------------------------------------------------------
-function cRP.teleportLimbo()
-	local ped = PlayerPedId()
-	local coords = GetEntityCoords(ped)
-	local _,xCoords = GetNthClosestVehicleNode(coords["x"],coords["y"],coords["z"],1,0,0,0)
 
-	SetEntityCoordsNoOffset(ped,xCoords["x"],xCoords["y"],xCoords["z"] + 1,1,0,0)
-end
 -----------------------------------------------------------------------------------------------------------------------------------------
--- VEHICLETUNING
+-- NOCLIP - VERSÃO ALTERNATIVA MAIS SIMPLES
 -----------------------------------------------------------------------------------------------------------------------------------------
-RegisterNetEvent("admin:vehicleTuning")
-AddEventHandler("admin:vehicleTuning",function()
-	local ped = PlayerPedId()
-	if IsPedInAnyVehicle(ped) then
-		local vehicle = GetVehiclePedIsUsing(ped)
+local noclip = false
+local noclip_speed = 1.0
 
-		SetVehicleModKit(vehicle,0)
-		SetVehicleMod(vehicle,11,GetNumVehicleMods(vehicle,11)-1,false)
-		SetVehicleMod(vehicle,12,GetNumVehicleMods(vehicle,12)-1,false)
-		SetVehicleMod(vehicle,13,GetNumVehicleMods(vehicle,13)-1,false)
-		SetVehicleMod(vehicle,15,GetNumVehicleMods(vehicle,15)-1,false)
-        SetVehicleModColor_1(vehicle,0,0,2)
-		ToggleVehicleMod(vehicle,18,true)
-	end
-end)
------------------------------------------------------------------------------------------------------------------------------------------
--- NOCLIP
------------------------------------------------------------------------------------------------------------------------------------------
-function noClip()
-    if not noclip then
-        noclip = true
-        local ped = PlayerPedId()
+function cRP.noClip()
+    noclip = not noclip
+    local ped = PlayerPedId()
+    
+    if noclip then
+        -- 🔥 ATIVAR NOCLIP
         FreezeEntityPosition(ped, true)
         SetEntityInvincible(ped, true)
         SetEntityVisible(ped, false, false)
         SetEntityCollision(ped, false, false)
         
+        -- 🔥 THREAD DE MOVIMENTO
         Citizen.CreateThread(function()
             while noclip do
-                Citizen.Wait(5) 
+                Citizen.Wait(1)
                 
                 local ped = PlayerPedId()
-                local x, y, z = table.unpack(GetEntityCoords(ped))
-                local heading = GetGameplayCamRelativeHeading() + GetEntityHeading(ped)
-                local pitch = GetGameplayCamRelativePitch()
-                local dx = -math.sin(math.rad(heading))
-                local dy = math.cos(math.rad(heading))
-                local dz = math.sin(math.rad(pitch))
+                local coords = GetEntityCoords(ped)
+                local x, y, z = coords.x, coords.y, coords.z
+                
+                -- 🔥 VELOCIDADE
                 local speed = noclip_speed
-
                 if IsControlPressed(0, 21) then speed = speed * 2 end -- SHIFT
                 if IsControlPressed(0, 19) then speed = speed * 0.5 end -- ALT
                 
+                -- 🔥 MOVIMENTO BASEADO NA CÂMERA
+                local cam_rot = GetGameplayCamRot(0)
+                local cam_heading = math.rad(cam_rot.z)
+                local cam_pitch = math.rad(cam_rot.x)
+                
+                local forward_x = -math.sin(cam_heading) * math.cos(cam_pitch)
+                local forward_y = math.cos(cam_heading) * math.cos(cam_pitch)
+                local forward_z = math.sin(cam_pitch)
+                
+                local right_x = math.cos(cam_heading)
+                local right_y = math.sin(cam_heading)
+                
+                -- 🔥 CONTROLES
                 if IsControlPressed(0, 32) then -- W
-                    x = x + dx * speed
-                    y = y + dy * speed
-                    z = z + dz * speed
+                    x = x + forward_x * speed
+                    y = y + forward_y * speed
+                    z = z + forward_z * speed
                 end
                 if IsControlPressed(0, 8) then -- S
-                    x = x - dx * speed
-                    y = y - dy * speed
-                    z = z - dz * speed
+                    x = x - forward_x * speed
+                    y = y - forward_y * speed
+                    z = z - forward_z * speed
                 end
                 if IsControlPressed(0, 34) then -- A
-                    x = x + dy * speed
-                    y = y - dx * speed
+                    x = x - right_x * speed
+                    y = y - right_y * speed
                 end
                 if IsControlPressed(0, 9) then -- D
-                    x = x - dy * speed
-                    y = y + dx * speed
+                    x = x + right_x * speed
+                    y = y + right_y * speed
                 end
-                if IsControlPressed(0, 22) then z = z + speed end -- SPACE
-                if IsControlPressed(0, 36) then z = z - speed end -- CTRL
-                
-                if IsControlJustPressed(0, 168) then
-                    local visible = IsEntityVisible(ped)
-                    SetEntityVisible(ped, not visible, false)
+                if IsControlPressed(0, 22) then -- SPACE
+                    z = z + speed
+                end
+                if IsControlPressed(0, 36) then -- CTRL
+                    z = z - speed
                 end
                 
+                -- 🔥 APLICAR POSIÇÃO
                 SetEntityCoordsNoOffset(ped, x, y, z, true, true, true)
             end
         end)
     else
-        noclip = false
-        local ped = PlayerPedId()
-        
+        -- 🔥 DESATIVAR NOCLIP
         FreezeEntityPosition(ped, false)
         SetEntityInvincible(ped, false)
         SetEntityVisible(ped, true, false)
         SetEntityCollision(ped, true, true)
     end
-end
-
-function cRP.noClip()
-    noClip()
 end
 
 -----------------------------------------------------------------------------------------------------------------------------------------
@@ -854,9 +752,6 @@ CreateThread(function()
 		Wait(TimeDistance)
 	end
 end)
-
-
-
 
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- VARIABLES

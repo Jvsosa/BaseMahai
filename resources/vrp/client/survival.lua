@@ -330,3 +330,10 @@ Citizen.CreateThread(function()
 		Citizen.Wait(timeDistance)
 	end
 end)
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- EVENTO ADMIN PARA REVIVER (ADICIONAR NO FINAL DO ARQUIVO)
+-----------------------------------------------------------------------------------------------------------------------------------------
+RegisterNetEvent("admin:revivePlayer")
+AddEventHandler("admin:revivePlayer", function(health)
+    tvRP.revivePlayer(health)
+end)

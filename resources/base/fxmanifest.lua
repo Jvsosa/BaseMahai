@@ -2,9 +2,14 @@ fx_version "bodacious"
 game "gta5"
 ui_page "web-side/index.html"
 
+-- ADICIONAR DEPENDÊNCIA DO VRP (IMPORTANTE!)
+dependencies {
+    'vrp'
+}
+
 shared_scripts {
     "config/cargos.lua",
-    "config/geral.lua",        -- ✅ ADICIONAR ESTA LINHA
+    "config/geral.lua",
     "@vrp/lib/itemlist.lua",
     "@vrp/lib/vehicles.lua"
 }
@@ -43,6 +48,6 @@ server_exports {
     'GetConfig',
     'GetCargos',
     'GetGroups',
-    'GetStarterItems',      -- ✅ NOVO EXPORT
-    'GetServerInfo'         -- ✅ NOVO EXPORT
+    'GetStarterItems',
+    'GetServerInfo'
 }
