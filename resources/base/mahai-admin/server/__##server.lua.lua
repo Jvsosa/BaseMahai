@@ -15,16 +15,6 @@ local Empresas_Pontos = {
 }
 
 -----------------------------------------------------------------------------------------------------------------------------------------
--- FUNÇÃO WEBHOOK
------------------------------------------------------------------------------------------------------------------------------------------
-local function SendWebhook(type, data)
-    local webhook = Config.Webhooks[type]
-    if webhook and webhook ~= "" then
-        PerformHttpRequest(webhook, function(err, text, headers) end, 'POST', json.encode(data), { ['Content-Type'] = 'application/json' })
-    end
-end
-
------------------------------------------------------------------------------------------------------------------------------------------
 -- VRP TUNNELS - AGUARDAR CARREGAR
 -----------------------------------------------------------------------------------------------------------------------------------------
 Citizen.CreateThread(function()
@@ -316,10 +306,11 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand("kick",function(source,args,rawCommand)
     local user_id = vRP.getUserId(source)
-    local identity = vRP.getUserIdentity(user_id)
     if user_id and vRP.hasGroup(user_id,"Admin") and parseInt(args[1]) > 0 then
+        local identity = vRP.userIdentity(user_id)
         local nuser_id = parseInt(args[1])
         local target_identity = vRP.userIdentity(nuser_id)
+        
         TriggerClientEvent("Notify",source,"amarelo","Passaporte <b>"..args[1].."</b> expulso.",5000)
         vRP.kick(args[1],"Você foi expulso da cidade.")
         
@@ -342,11 +333,11 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand("tpway",function(source,args,rawCommand)
     local user_id = vRP.getUserId(source)
-    local identity = vRP.getUserIdentity(user_id)
     if user_id and (vRP.hasGroup(user_id,"Admin") or user_id == 1813 or user_id == 1807 or user_id == 1848 or user_id == 1808) then
+        local identity = vRP.userIdentity(user_id)
         vCLIENT.teleportWay(source)
         
-        SendWebhook("teleport", {
+        SendWebhook("tpway", {
             embeds = {{
                 title = "🌀 Teleport Waypoint",
                 fields = {{ name = "👤 Admin:", value = identity.name.." "..identity.name2.." #"..user_id }},
@@ -354,6 +345,85 @@ RegisterCommand("tpway",function(source,args,rawCommand)
                 footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
             }}
         })
+    end
+end)
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- COMANDO TPTOME - TELEPORTAR JOGADOR PARA ADMIN
+-----------------------------------------------------------------------------------------------------------------------------------------
+RegisterCommand("tptome",function(source,args,rawCommand)
+    local user_id = vRP.getUserId(source)
+    if user_id and vRP.hasGroup(user_id,"Admin") and parseInt(args[1]) > 0 then
+        local otherPlayer = vRP.userSource(args[1])
+        if otherPlayer then
+            local ped = GetPlayerPed(source)
+            local coords = GetEntityCoords(ped)
+            vRP.teleport(otherPlayer,coords["x"],coords["y"],coords["z"])
+
+            local identity = vRP.userIdentity(user_id)
+            local identity2 = vRP.userIdentity(args[1])
+            local x,y,z = vCLIENT.getPosition(source)
+            local x2,y2,z2 = vCLIENT.getPosition(otherPlayer)
+            
+            -- WEBHOOK USANDO SISTEMA CENTRALIZADO
+            SendWebhook("tptome", {
+                embeds = {{     
+                    title = "🔄 Teleport Player para Admin",
+                    fields = {
+                        { name = "👤 Admin:", value = identity.name.." "..identity.name2.." #"..user_id },
+                        { name = "🎯 Player Puxado:", value = identity2.name.." "..identity2.name2.." #"..args[1] },
+                        { name = "📍 Coordenada Admin:", value = "X: "..math.floor(x).." | Y: "..math.floor(y).." | Z: "..math.floor(z) },
+                        { name = "📍 Coordenada Player:", value = "X: "..math.floor(x2).." | Y: "..math.floor(y2).." | Z: "..math.floor(z2) }
+                    }, 
+                    color = 3092790,
+                    footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
+                }}
+            })
+            
+            TriggerClientEvent("Notify", source, "verde", "Você puxou <b>"..identity2.name.." "..identity2.name2.." #"..args[1].."</b> para sua localização.", 5000)
+            TriggerClientEvent("Notify", otherPlayer, "azul", "Você foi teleportado por um administrador.", 5000)
+        else
+            TriggerClientEvent("Notify", source, "vermelho", "Jogador não está online.", 5000)
+        end
+    end
+end)
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- COMANDO TPTO - TELEPORT PARA JOGADOR
+-----------------------------------------------------------------------------------------------------------------------------------------
+RegisterCommand("tpto",function(source,args,rawCommand)
+    local user_id = vRP.getUserId(source)
+    if user_id and vRP.hasGroup(user_id,"Admin") and parseInt(args[1]) > 0 then
+        local otherPlayer = vRP.userSource(args[1])
+        if otherPlayer then
+            local ped = GetPlayerPed(otherPlayer)
+            local coords = GetEntityCoords(ped)
+            vRP.teleport(source,coords["x"],coords["y"],coords["z"])
+
+            local identity = vRP.userIdentity(user_id)
+            local identity2 = vRP.userIdentity(args[1])
+            local x,y,z = vCLIENT.getPosition(source)
+            local x2,y2,z2 = vCLIENT.getPosition(otherPlayer)
+            
+            -- WEBHOOK CORRIGIDO PARA USAR 'tpto'
+            SendWebhook("tpto", {
+                embeds = {{     
+                    title = "🌀 Teleport para Jogador",
+                    fields = {
+                        { name = "👤 Admin:", value = identity.name.." "..identity.name2.." #"..user_id },
+                        { name = "🎯 Player:", value = identity2.name.." "..identity2.name2.." #"..args[1] },
+                        { name = "📍 Coordenada Admin:", value = "X: "..math.floor(x).." | Y: "..math.floor(y).." | Z: "..math.floor(z) },
+                        { name = "📍 Coordenada Player:", value = "X: "..math.floor(x2).." | Y: "..math.floor(y2).." | Z: "..math.floor(z2) }
+                    }, 
+                    color = 3092790,
+                    footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
+                }}
+            })
+            
+            TriggerClientEvent("Notify", source, "verde", "Teleportado para <b>"..identity2.name.." "..identity2.name2.." #"..args[1].."</b>", 5000)
+        else
+            TriggerClientEvent("Notify", source, "vermelho", "Jogador não está online.", 5000)
+        end
     end
 end)
 
@@ -432,5 +502,66 @@ RegisterCommand("ungroup",function(source,args,rawCommand)
                 footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
             }}
         })
+    end
+end)
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- TUNING
+-----------------------------------------------------------------------------------------------------------------------------------------
+RegisterCommand("tuning",function(source,args,rawCommand)
+    local user_id = vRP.getUserId(source)
+    local identity = vRP.getUserIdentity(user_id)
+    if user_id then
+        if vRP.hasGroup(user_id,"Admin") then
+            TriggerClientEvent("admin:vehicleTuning",source)
+            
+            SendWebhook("tuning", {
+                embeds = {{
+                    title = "🔧 Tuning Ativado",
+                    fields = {
+                        { name = "👤 Admin:", value = identity.name.." "..identity.name2.." #"..user_id },
+                        { name = "🚗 Ação:", value = "Ativou tuning no veículo" }
+                    },
+                    color = 16776960,
+                    footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
+                }}
+            })
+        end
+    end
+end)
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- COMANDO FIX - REPARAR VEÍCULO
+-----------------------------------------------------------------------------------------------------------------------------------------
+RegisterCommand("fix",function(source,args,rawCommand)
+    local user_id = vRP.getUserId(source)
+    if user_id and vRP.hasGroup(user_id,"Admin") then
+        TriggerClientEvent("admin:fixVehicle", source)
+        
+        local x,y,z = vCLIENT.getPosition(source)
+        
+        -- Tentar obter identity com fallback
+        local identity = vRP.userIdentity(user_id)
+        local admin_name = "Admin #"..user_id
+        
+        if identity and identity.name and identity.name2 then
+            admin_name = identity.name.." "..identity.name2.." #"..user_id
+        end
+        
+        -- USAR A FUNÇÃO GLOBAL DO GERAL.LUA
+        SendWebhook("fix", {
+            embeds = {{
+                title = "🔧 Comando Fix Executado",
+                fields = {
+                    { name = "👤 Admin:", value = admin_name },
+                    { name = "📍 Coordenadas:", value = "X: "..math.floor(x).." | Y: "..math.floor(y).." | Z: "..math.floor(z) },
+                    { name = "🚗 Ação:", value = "Comando /fix executado" }
+                },
+                color = 3092790,
+                footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
+            }}
+        })
+        
+        TriggerClientEvent("Notify", source, "verde", "Comando fix executado!", 5000)
     end
 end)

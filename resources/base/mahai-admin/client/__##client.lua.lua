@@ -871,3 +871,56 @@ CreateThread(function()
 		Wait(1000)
 	end
 end)
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- VEHICLETUNING
+-----------------------------------------------------------------------------------------------------------------------------------------
+RegisterNetEvent("admin:vehicleTuning")
+AddEventHandler("admin:vehicleTuning",function()
+	local ped = PlayerPedId()
+	if IsPedInAnyVehicle(ped) then
+		local vehicle = GetVehiclePedIsUsing(ped)
+
+		SetVehicleModKit(vehicle,0)
+		SetVehicleMod(vehicle,11,GetNumVehicleMods(vehicle,11)-1,false)
+		SetVehicleMod(vehicle,12,GetNumVehicleMods(vehicle,12)-1,false)
+		SetVehicleMod(vehicle,13,GetNumVehicleMods(vehicle,13)-1,false)
+		SetVehicleMod(vehicle,15,GetNumVehicleMods(vehicle,15)-1,false)
+        SetVehicleModColor_1(vehicle,0,0,2)
+		ToggleVehicleMod(vehicle,18,true)
+	end
+end)
+
+RegisterNetEvent("admin:fixVehicle")
+AddEventHandler("admin:fixVehicle", function()
+    local ped = PlayerPedId()
+    local vehicle = GetVehiclePedIsIn(ped, false)
+    
+    if vehicle and vehicle ~= 0 then
+        -- Reparar o veículo
+        SetVehicleFixed(vehicle)
+        SetVehicleDeformationFixed(vehicle)
+        SetVehicleUndriveable(vehicle, false)
+        SetVehicleEngineOn(vehicle, true, true)
+        SetVehicleDirtLevel(vehicle, 0.0)
+        
+        -- Notificar sucesso
+        TriggerEvent("Notify", "verde", "Veículo reparado com sucesso!", 5000)
+    else
+        -- Tentar reparar veículo próximo
+        local coords = GetEntityCoords(ped)
+        local vehicle = GetClosestVehicle(coords.x, coords.y, coords.z, 5.0, 0, 71)
+        
+        if vehicle and vehicle ~= 0 then
+            SetVehicleFixed(vehicle)
+            SetVehicleDeformationFixed(vehicle)
+            SetVehicleUndriveable(vehicle, false)
+            SetVehicleEngineOn(vehicle, true, true)
+            SetVehicleDirtLevel(vehicle, 0.0)
+            
+            TriggerEvent("Notify", "verde", "Veículo próximo reparado!", 5000)
+        else
+            TriggerEvent("Notify", "vermelho", "Nenhum veículo encontrado por perto.", 5000)
+        end
+    end
+end)
