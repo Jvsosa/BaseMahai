@@ -45,17 +45,22 @@ end)
 
 
 -----------------------------------------------------------------------------------------------------------------------------------------
--- VRP
+-- VRP TUNNELS - CORREÇÃO PARA NOCLIP
 -----------------------------------------------------------------------------------------------------------------------------------------
 local Tunnel = module("vrp","lib/Tunnel")
+local Proxy = module("vrp","lib/Proxy")
+
 -----------------------------------------------------------------------------------------------------------------------------------------
--- CONNECTION
+-- CONNECTION - CORRIGIR INTERFACE
 -----------------------------------------------------------------------------------------------------------------------------------------
 cRP = {}
-Tunnel.bindInterface("admin",cRP)
-vSERVER = Tunnel.getInterface("admin")
+Tunnel.bindInterface("admin",cRP)  -- ✅ Client se registra como "admin"
+vSERVER = Tunnel.getInterface("admin")  -- ✅ Client acessa server
 
-
+Citizen.CreateThread(function()
+    Citizen.Wait(2000)  
+    print("^2[ADMIN-CLIENT]^7 Sistema inicializado!")
+end)
 function cRP.getPosition()
 	local x,y,z = table.unpack(GetEntityCoords(PlayerPedId(),true))
 	return x,y,z
@@ -279,9 +284,6 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- NOCLIP
 -----------------------------------------------------------------------------------------------------------------------------------------
-local noclip = false
-local noclip_speed = 2.0
-
 function noClip()
     if not noclip then
         noclip = true
@@ -290,10 +292,11 @@ function noClip()
         SetEntityInvincible(ped, true)
         SetEntityVisible(ped, false, false)
         SetEntityCollision(ped, false, false)
+        
         Citizen.CreateThread(function()
             while noclip do
                 Citizen.Wait(5) 
-            
+                
                 local ped = PlayerPedId()
                 local x, y, z = table.unpack(GetEntityCoords(ped))
                 local heading = GetGameplayCamRelativeHeading() + GetEntityHeading(ped)
@@ -327,7 +330,6 @@ function noClip()
                 if IsControlPressed(0, 22) then z = z + speed end -- SPACE
                 if IsControlPressed(0, 36) then z = z - speed end -- CTRL
                 
-                -- Invisibilidade
                 if IsControlJustPressed(0, 168) then
                     local visible = IsEntityVisible(ped)
                     SetEntityVisible(ped, not visible, false)
@@ -649,11 +651,6 @@ end)
 -- 		Citizen.Wait(1)
 -- 	end
 -- end)
-
-function cRP.getPosition()
-	local x,y,z = table.unpack(GetEntityCoords(PlayerPedId(),true))
-	return x,y,z
-end
 
 local blips = {}
 RegisterNetEvent('notificacaoavisopd')
