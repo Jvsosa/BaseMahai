@@ -1,3 +1,32 @@
 \[ addon \]/
+# 🚀 MAHAI CREATIVE - .gitignore
+
+# ❌ REMOVER AS BARRAS \ QUE ESTÃO QUEBRANDO:
+[ addon ]/
 cache/
 artifacts/
+
+# Logs e crashes
+*.log
+*.dmp
+logs/
+crashes/
+
+# Configurações sensíveis
+config.json
+database.json
+*.env
+
+# Temporários
+temp/
+tmp/
+*.tmp
+
+# Backups
+*.backup
+*.bak
+backup/
+
+# Sistema
+.DS_Store
+Thumbs.db
