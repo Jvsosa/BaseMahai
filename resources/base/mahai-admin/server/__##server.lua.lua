@@ -58,7 +58,106 @@ Citizen.CreateThread(function()
     vRP._prepare("admin/addponto", "UPDATE groups_empresas SET pontos = pontos + @pontos WHERE empresa = @empresa")
     vRP._prepare("admin/verEmpresas", "SELECT * FROM groups_empresas")
     
+    -- PREPARAR QUERIES PARA WHITELIST
+    vRP.prepare("base/wl", "SELECT * FROM accounts WHERE steam = @steam")
+    vRP.prepare("base/wlUpdate", "UPDATE accounts SET whitelist = @whitelist WHERE steam = @steam")
+    
+    -- PREPARAR QUERIES PARA QUEUE
+    vRP.prepare("warn/selectCharacters", "SELECT * FROM characters WHERE steam = @steam")
+    
+    print("^2[ADMIN-SERVER]^7 Todas as queries preparadas com sucesso!")
     print("^2[ADMIN-SERVER]^7 Todos os comandos registrados com sucesso!")
+end)
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- COMANDOS WL E UNWL - VERSÃO CORRIGIDA (REMOVER vRP.prepare DAQUI)
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+RegisterCommand('wl', function(source,args,rawCommand)
+    local user_id = vRP.getUserId(source)
+    if user_id and vRP.hasGroup(user_id,"Admin") then
+        local identity = vRP.userIdentity(user_id)
+        
+        -- Verificação de segurança para identity
+        if not identity or not identity.name or not identity.name2 then
+            TriggerClientEvent("Notify", source, "vermelho", "Erro ao obter dados do admin. Tente novamente.", 5000)
+            return
+        end
+        
+        if args[1] then
+            local getUser = vRP.query("base/wl", {steam = args[1]})
+            if getUser[1] then
+                vRP.execute("base/wlUpdate",{ steam = args[1], whitelist = 1 })
+                TriggerClientEvent("Notify",source,"verde","Hex <b>"..args[1].."</b> liberada na whitelist.",5000)
+                
+                local x,y,z = vCLIENT.getPosition(source)
+                
+                -- WEBHOOK USANDO SISTEMA CENTRALIZADO
+                SendWebhook("wl", {
+                    embeds = {{
+                        title = "✅ Whitelist Liberada",
+                        fields = {
+                            { name = "👤 Admin:", value = identity.name.." "..identity.name2.." #"..user_id },
+                            { name = "🔑 Hex Liberada:", value = args[1] },
+                            { name = "📍 Coordenadas:", value = "X: "..math.floor(x).." | Y: "..math.floor(y).." | Z: "..math.floor(z) }
+                        },
+                        color = 65280,
+                        footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
+                    }}
+                })
+            else
+                TriggerClientEvent("Notify",source,"vermelho","Essa hex não existe no banco de dados.",5000)
+            end
+        else
+            TriggerClientEvent("Notify",source,"amarelo","Use: <b>/wl [HEX]</b>",5000)
+        end
+    else
+        TriggerClientEvent("Notify", source, "vermelho", "Você não tem permissão para usar este comando.", 5000)
+    end
+end)
+
+RegisterCommand('unwl', function(source,args,rawCommand)
+    local user_id = vRP.getUserId(source)
+    if user_id and vRP.hasGroup(user_id,"Admin") then
+        local identity = vRP.userIdentity(user_id)
+        
+        -- Verificação de segurança para identity
+        if not identity or not identity.name or not identity.name2 then
+            TriggerClientEvent("Notify", source, "vermelho", "Erro ao obter dados do admin. Tente novamente.", 5000)
+            return
+        end
+        
+        if args[1] then
+            local getUser = vRP.query("base/wl", {steam = args[1]})
+            if getUser[1] then
+                vRP.execute("base/wlUpdate",{ steam = args[1], whitelist = 0 })
+                TriggerClientEvent("Notify",source,"verde","Whitelist removida da hex <b>"..args[1].."</b>.",5000)
+                
+                local x,y,z = vCLIENT.getPosition(source)
+                
+                -- WEBHOOK USANDO SISTEMA CENTRALIZADO
+                SendWebhook("unwl", {
+                    embeds = {{
+                        title = "❌ Whitelist Removida",
+                        fields = {
+                            { name = "👤 Admin:", value = identity.name.." "..identity.name2.." #"..user_id },
+                            { name = "🔑 Hex Removida:", value = args[1] },
+                            { name = "📍 Coordenadas:", value = "X: "..math.floor(x).." | Y: "..math.floor(y).." | Z: "..math.floor(z) }
+                        },
+                        color = 16711680,
+                        footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
+                    }}
+                })
+            else
+                TriggerClientEvent("Notify",source,"vermelho","Essa hex não existe no banco de dados.",5000)
+            end
+        else
+            TriggerClientEvent("Notify",source,"amarelo","Use: <b>/unwl [HEX]</b>",5000)
+        end
+    else
+        TriggerClientEvent("Notify", source, "vermelho", "Você não tem permissão para usar este comando.", 5000)
+    end
 end)
 
 -----------------------------------------------------------------------------------------------------------------------------------------
@@ -1289,3 +1388,445 @@ RegisterCommand("limparea",function(source,args,rawCommand)
         TriggerClientEvent("Notify", source, "vermelho", "Você não tem permissão para usar este comando.", 5000)
     end
 end)
+
+
+
+------------------------------------------
+-- [ COMANDO DE ANUNCIO - VERSÃO CORRIGIDA ]
+------------------------------------------
+
+RegisterCommand("anuncio",function(source,args,rawCommand)
+    local user_id = vRP.getUserId(source)
+    if user_id and vRP.hasGroup(user_id,"Admin") then
+        local identity = vRP.userIdentity(user_id)
+        
+        -- Verificação de segurança para identity
+        if not identity or not identity.name or not identity.name2 then
+            TriggerClientEvent("Notify", source, "vermelho", "Erro ao obter dados do admin. Tente novamente.", 5000)
+            return
+        end
+        
+        if args[1] then
+            local tipoAnuncio = args[1]:upper()
+            local tiposPermitidos = {
+                ["POLICIA"] = { cor = "azul", perm = "Admin" },
+                ["HOSPITAL"] = { cor = "verde", perm = "Admin" },
+                ["MECANICA"] = { cor = "amarelo", perm = "Admin" },
+                ["PREFEITURA"] = { cor = "roxo", perm = "Admin" },
+                ["EVENTO"] = { cor = "laranja", perm = "Admin" },
+                ["IMPORTANTE"] = { cor = "vermelho", perm = "Admin" },
+                ["GERAL"] = { cor = "azul", perm = "Admin" }
+            }
+            
+            if tiposPermitidos[tipoAnuncio] then
+                if vRP.hasGroup(user_id, tiposPermitidos[tipoAnuncio].perm) then
+                    local message = vRP.prompt(source, "Mensagem do anúncio:", "")
+                    if message and message ~= "" then
+                        -- Enviar anúncio para todos os jogadores
+                        local playerList = vRP.userList()
+                        local playersNotified = 0
+                        
+                        for user_id_loop, source_loop in pairs(playerList) do
+                            if source_loop then
+                                TriggerClientEvent("Notify", source_loop, tiposPermitidos[tipoAnuncio].cor, 
+                                    "📢 <b>ANÚNCIO "..tipoAnuncio.."</b><br>"..message.."<br><b>"..identity.name.." "..identity.name2.."</b>", 10000)
+                                playersNotified = playersNotified + 1
+                            end
+                        end
+                        
+                        TriggerClientEvent("Notify", source, "verde", "Anúncio enviado para "..playersNotified.." jogadores!", 5000)
+                        
+                        local x,y,z = vCLIENT.getPosition(source)
+                        
+                        -- WEBHOOK USANDO SISTEMA CENTRALIZADO
+                        SendWebhook("anuncio", {
+                            embeds = {{
+                                title = "📢 Anúncio "..tipoAnuncio,
+                                fields = {
+                                    { name = "👤 Admin:", value = identity.name.." "..identity.name2.." #"..user_id },
+                                    { name = "📝 Tipo:", value = tipoAnuncio },
+                                    { name = "💬 Mensagem:", value = message },
+                                    { name = "👥 Jogadores Notificados:", value = playersNotified.." players" },
+                                    { name = "📍 Coordenadas:", value = "X: "..math.floor(x).." | Y: "..math.floor(y).." | Z: "..math.floor(z) }
+                                },
+                                color = 2829875,
+                                footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
+                            }}
+                        })
+                    else
+                        TriggerClientEvent("Notify", source, "vermelho", "Mensagem não pode estar vazia!", 5000)
+                    end
+                else
+                    TriggerClientEvent("Notify", source, "vermelho", "Você não tem permissão para este tipo de anúncio!", 5000)
+                end
+            else
+                TriggerClientEvent("Notify", source, "amarelo", "Tipos disponíveis: <b>policia, hospital, mecanica, prefeitura, evento, importante, geral</b>", 8000)
+            end
+        else
+            TriggerClientEvent("Notify", source, "amarelo", "Use: <b>/anuncio [TIPO]</b><br>Tipos: policia, hospital, mecanica, prefeitura, evento, importante, geral", 8000)
+        end
+    else
+        TriggerClientEvent("Notify", source, "vermelho", "Você não tem permissão para usar este comando.", 5000)
+    end
+end)
+
+------------------------------------------
+-- [ COMANDO DE GEM - VERSÃO CORRIGIDA ]
+------------------------------------------
+
+RegisterCommand("gem",function(source,args,rawCommand)
+    local user_id = vRP.getUserId(source)
+    if user_id and vRP.hasGroup(user_id,"Admin") then
+        local identity = vRP.userIdentity(user_id)
+        
+        -- Verificação de segurança para identity
+        if not identity or not identity.name or not identity.name2 then
+            TriggerClientEvent("Notify", source, "vermelho", "Erro ao obter dados do admin. Tente novamente.", 5000)
+            return
+        end
+        
+        if args[1] and args[2] then
+            local target_id = parseInt(args[1])
+            local amount = parseInt(args[2])
+            
+            if target_id > 0 and amount > 0 then
+                local target_identity = vRP.userIdentity(target_id)
+                
+                if target_identity then
+                    -- Tentar adicionar gemas (usando diferentes métodos possíveis)
+                    if vRP.execute then
+                        vRP.execute("accounts/infosUpdategems", { steam = target_identity["steam"], gems = amount })
+                    elseif vRP.addGems then
+                        vRP.addGems(target_id, amount)
+                    elseif vRP.giveMoney then
+                        -- Fallback: usar sistema de dinheiro se não houver sistema de gemas
+                        vRP.giveMoney(target_id, amount)
+                    end
+                    
+                    TriggerClientEvent("Notify", source, "verde", "ID <b>"..target_id.."</b> recebeu <b>"..amount.." Gemas</b>.", 5000)
+                    
+                    local target_source = vRP.userSource(target_id)
+                    if target_source then
+                        TriggerClientEvent("Notify", target_source, "azul", "Você recebeu <b>"..amount.." gemas</b> de um administrador.", 5000)
+                    end
+                    
+                    -- WEBHOOK USANDO SISTEMA CENTRALIZADO
+                    SendWebhook("gem", {
+                        embeds = {{
+                            title = "💎 Gemas Adicionadas",
+                            fields = {
+                                { name = "👤 Admin:", value = identity.name.." "..identity.name2.." #"..user_id },
+                                { name = "🎯 Jogador:", value = target_identity.name.." "..target_identity.name2.." #"..target_id },
+                                { name = "💎 Quantidade:", value = amount.." gemas" }
+                            },
+                            color = 16776960,
+                            footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
+                        }}
+                    })
+                else
+                    TriggerClientEvent("Notify", source, "vermelho", "Jogador ID <b>"..target_id.."</b> não encontrado.", 5000)
+                end
+            else
+                TriggerClientEvent("Notify", source, "amarelo", "IDs e quantidades devem ser maiores que 0.", 5000)
+            end
+        else
+            TriggerClientEvent("Notify", source, "amarelo", "Use: <b>/gem [ID] [QUANTIDADE]</b>", 5000)
+        end
+    else
+        TriggerClientEvent("Notify", source, "vermelho", "Você não tem permissão para usar este comando.", 5000)
+    end
+end)
+
+------------------------------------------
+-- [ COMANDO DE REMGEM - VERSÃO CORRIGIDA ]
+------------------------------------------
+
+RegisterCommand("remgem",function(source,args,rawCommand)
+    local user_id = vRP.getUserId(source)
+    if user_id and vRP.hasGroup(user_id,"Admin") then
+        local identity = vRP.userIdentity(user_id)
+        
+        -- Verificação de segurança para identity
+        if not identity or not identity.name or not identity.name2 then
+            TriggerClientEvent("Notify", source, "vermelho", "Erro ao obter dados do admin. Tente novamente.", 5000)
+            return
+        end
+        
+        if args[1] and args[2] then
+            local target_id = parseInt(args[1])
+            local amount = parseInt(args[2])
+            
+            if target_id > 0 and amount > 0 then
+                local target_identity = vRP.userIdentity(target_id)
+                
+                if target_identity then
+                    -- Tentar remover gemas (usando diferentes métodos possíveis)
+                    if vRP.paymentGems then
+                        vRP.paymentGems(target_id, amount)
+                    elseif vRP.removeGems then
+                        vRP.removeGems(target_id, amount)
+                    elseif vRP.tryPayment then
+                        -- Fallback: usar sistema de dinheiro se não houver sistema de gemas
+                        vRP.tryPayment(target_id, amount)
+                    end
+                    
+                    TriggerClientEvent("Notify", source, "verde", "ID <b>"..target_id.."</b> perdeu <b>"..amount.." Gemas</b>.", 5000)
+                    
+                    local target_source = vRP.userSource(target_id)
+                    if target_source then
+                        TriggerClientEvent("Notify", target_source, "amarelo", "Você perdeu <b>"..amount.." gemas</b> por ação administrativa.", 5000)
+                    end
+                    
+                    -- WEBHOOK USANDO SISTEMA CENTRALIZADO
+                    SendWebhook("remgem", {
+                        embeds = {{
+                            title = "💎 Gemas Removidas",
+                            fields = {
+                                { name = "👤 Admin:", value = identity.name.." "..identity.name2.." #"..user_id },
+                                { name = "🎯 Jogador:", value = target_identity.name.." "..target_identity.name2.." #"..target_id },
+                                { name = "💎 Quantidade:", value = amount.." gemas removidas" }
+                            },
+                            color = 16711680,
+                            footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
+                        }}
+                    })
+                else
+                    TriggerClientEvent("Notify", source, "vermelho", "Jogador ID <b>"..target_id.."</b> não encontrado.", 5000)
+                end
+            else
+                TriggerClientEvent("Notify", source, "amarelo", "IDs e quantidades devem ser maiores que 0.", 5000)
+            end
+        else
+            TriggerClientEvent("Notify", source, "amarelo", "Use: <b>/remgem [ID] [QUANTIDADE]</b>", 5000)
+        end
+    else
+        TriggerClientEvent("Notify", source, "vermelho", "Você não tem permissão para usar este comando.", 5000)
+    end
+end)
+
+
+------------------------------------------
+-- [ DAR DINHEIRO ]
+------------------------------------------
+
+RegisterCommand("money",function(source,args,rawCommand)
+    if source == 0 then
+        -- COMANDO DO CONSOLE
+        if args[1] and args[2] then
+            local target_id = parseInt(args[1])
+            local amount = parseInt(args[2])
+            
+            if target_id > 0 and amount > 0 then
+                local identity = vRP.userIdentity(target_id)
+                if identity then
+                    vRP.generateItem(target_id,"dollars",amount,true)
+                    print('^7[^4'..GetCurrentResourceName()..'^7] Você deu dinheiro ^2 '..identity.name..' '..identity.name2..' #'..target_id..' '..amount..' $ ^7')
+                else
+                    print('^7[^4'..GetCurrentResourceName()..'^7] ^1Jogador ID '..target_id..' não encontrado^7')
+                end
+            else
+                print('^7[^4'..GetCurrentResourceName()..'^7] ^1Use: money [ID] [QUANTIDADE]^7')
+            end
+        else
+            print('^7[^4'..GetCurrentResourceName()..'^7] ^1Use: money [ID] [QUANTIDADE]^7')
+        end
+    else
+        -- COMANDO NO JOGO
+        local user_id = vRP.getUserId(source)
+        if user_id and vRP.hasGroup(user_id,"Admin") then
+            local identity = vRP.userIdentity(user_id)
+            
+            -- Verificação de segurança para identity
+            if not identity or not identity.name or not identity.name2 then
+                TriggerClientEvent("Notify", source, "vermelho", "Erro ao obter dados do admin. Tente novamente.", 5000)
+                return
+            end
+            
+            if args[1] and args[2] then
+                -- DAR DINHEIRO PARA OUTRO JOGADOR
+                local target_id = parseInt(args[1])
+                local amount = parseInt(args[2])
+                
+                if target_id > 0 and amount > 0 then
+                    local target_identity = vRP.userIdentity(target_id)
+                    if target_identity then
+                        vRP.generateItem(target_id,"dollars",amount,true)
+                        
+                        TriggerClientEvent("Notify", source, "verde", "ID <b>"..target_id.."</b> recebeu <b>$"..amount.."</b>.", 5000)
+                        
+                        local target_source = vRP.userSource(target_id)
+                        if target_source then
+                            TriggerClientEvent("Notify", target_source, "azul", "Você recebeu <b>$"..amount.."</b> de um administrador.", 5000)
+                        end
+                        
+                        local x,y,z = vCLIENT.getPosition(source)
+                        
+                        -- WEBHOOK USANDO SISTEMA CENTRALIZADO
+                        SendWebhook("money", {
+                            embeds = {{
+                                title = "💰 Dinheiro Dado",
+                                fields = {
+                                    { name = "👤 Admin:", value = identity.name.." "..identity.name2.." #"..user_id },
+                                    { name = "🎯 Recebeu:", value = target_identity.name.." "..target_identity.name2.." #"..target_id },
+                                    { name = "💵 Quantidade:", value = "$"..amount },
+                                    { name = "📍 Coordenadas:", value = "X: "..math.floor(x).." | Y: "..math.floor(y).." | Z: "..math.floor(z) }
+                                },
+                                color = 65280,
+                                footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
+                            }}
+                        })
+                    else
+                        TriggerClientEvent("Notify", source, "vermelho", "Jogador ID <b>"..target_id.."</b> não encontrado.", 5000)
+                    end
+                else
+                    TriggerClientEvent("Notify", source, "amarelo", "IDs e quantidades devem ser maiores que 0.", 5000)
+                end
+            elseif args[1] then
+                -- DAR DINHEIRO PARA SI MESMO
+                local amount = parseInt(args[1])
+                
+                if amount > 0 then
+                    vRP.generateItem(user_id,"dollars",amount,true)
+                    
+                    TriggerClientEvent("Notify", source, "verde", "Você recebeu <b>$"..amount.."</b>.", 5000)
+                    
+                    local x,y,z = vCLIENT.getPosition(source)
+                    
+                    -- WEBHOOK USANDO SISTEMA CENTRALIZADO
+                    SendWebhook("money", {
+                        embeds = {{
+                            title = "💰 Dinheiro Spawnado",
+                            fields = {
+                                { name = "👤 Admin:", value = identity.name.." "..identity.name2.." #"..user_id },
+                                { name = "💵 Quantidade:", value = "$"..amount },
+                                { name = "📍 Coordenadas:", value = "X: "..math.floor(x).." | Y: "..math.floor(y).." | Z: "..math.floor(z) }
+                            },
+                            color = 16776960,
+                            footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
+                        }}
+                    })
+                else
+                    TriggerClientEvent("Notify", source, "amarelo", "Quantidade deve ser maior que 0.", 5000)
+                end
+            else
+                TriggerClientEvent("Notify", source, "amarelo", "Use: <b>/money [QUANTIDADE]</b> ou <b>/money [ID] [QUANTIDADE]</b>", 5000)
+            end
+        else
+            TriggerClientEvent("Notify", source, "vermelho", "Você não tem permissão para usar este comando.", 5000)
+        end
+    end
+end)
+
+
+------------------------------------------
+-- [ PLAYER DROPPED ]
+------------------------------------------
+AddEventHandler('playerDropped', function(reason)
+    local playerId = source
+    local user_id = vRP.getUserId(playerId)
+    if user_id then
+        local identity = vRP.userIdentity(user_id)
+        local nome = "Sem Nome"
+        if identity then
+            nome = identity.name.." "..identity.name2
+        end
+        print('\n^7[^1'..GetCurrentResourceName()..'^7] Usuario: ^1'..nome..' #'..user_id..'^7 src: ^3'..playerId..'.')
+        print('^7[^1'..GetCurrentResourceName()..'^7] Saiu da ^1cidade^7.^7')
+        print('^7[^5'..GetCurrentResourceName()..'^7] Motivo: ^5'..reason..'^7.^7')
+    else
+        print('\n^7[^1'..GetCurrentResourceName()..'^7] Src: ^3'..playerId..'.')
+        print('^7[^5'..GetCurrentResourceName()..'^7] Motivo: ^5'..reason..'^7.^7')
+    end
+end)
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- FUNÇÃO AUXILIAR PARA OBTER STEAM ID
+-----------------------------------------------------------------------------------------------------------------------------------------
+function getSteam(source)
+    local identifiers = GetPlayerIdentifiers(source)
+    for k,v in pairs(identifiers) do
+        if string.find(v,"steam:") then
+            return v
+        end
+    end
+    return nil
+end
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- FUNÇÃO AUXILIAR PARA OBTER DISCORD ID  
+-----------------------------------------------------------------------------------------------------------------------------------------
+function getDiscord(source)
+    local identifiers = GetPlayerIdentifiers(source)
+    for k,v in pairs(identifiers) do
+        if string.find(v,"discord:") then
+            return v
+        end
+    end
+    return nil
+end
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- FUNÇÃO AUXILIAR PARA OBTER LICENSE
+-----------------------------------------------------------------------------------------------------------------------------------------
+function getLicense(source)
+    local identifiers = GetPlayerIdentifiers(source)
+    for k,v in pairs(identifiers) do
+        if string.find(v,"license:") then
+            return v
+        end
+    end
+    return nil
+end
+
+AddEventHandler("Queue:playerConnecting",function(source,identifiers,deferrals)
+    vRP.prepare("warn/selectCharacters", "SELECT * FROM characters WHERE steam = @steam")
+    local steam = getSteam(source)
+    if steam then
+        local SQL = vRP.query("warn/selectCharacters", {steam = steam})
+        if SQL[1] then
+            local personagens = ""
+            local quantidade = 0
+            local identitysss = ""
+            local quantidadeS2 = 0
+            for k,v in pairs(GetPlayerIdentifiers(source)) do
+                quantidadeS2 = quantidadeS2 + 1
+                if quantidadeS2 == 1 then
+                    identitysss = identitysss .. ""..v.." \n"
+                else
+                    identitysss = identitysss .. ""..v.." \n"
+                end
+            end
+            for k,v in pairs(SQL) do
+                if quantidade == 0 then
+                    personagens = ''..v.name..' '..v.name2..' #'..v.id..''
+                else
+                    personagens = ''..personagens..'\n'..v.name..' '..v.name2..' #'..v.id..''
+                end
+                quantidade = quantidade + 1
+            end
+            print('\n^7[^3'..GetCurrentResourceName()..'^7] steam:^3'..steam..'^7.')
+            for k,v in pairs(SQL) do
+                print('^7[^3'..GetCurrentResourceName()..'^7] Personagem: ^3'..v.name..' '..v.name2..' #^3'..v.id..'^7.^7')
+            end
+            print('^7[^3'..GetCurrentResourceName()..'^7] Esta se ^3conectando^7 na cidade.^7\n')
+        else
+            local quantidade = 0
+
+            local identitysss = ""
+            local quantidadeS2 = 0
+            for k,v in pairs(GetPlayerIdentifiers(source)) do
+                quantidadeS2 = quantidadeS2 + 1
+                if quantidadeS2 == 1 then
+                    identitysss = identitysss .. ""..v.." \n"
+                else
+                    identitysss = identitysss .. ""..v.." \n"
+                end
+            end
+
+            print('\n^7[^1'..GetCurrentResourceName()..'^7] steam:^1'..steam..'^7.')
+            print('^7[^1'..GetCurrentResourceName()..'^7] Esta se ^1conectando^7 na cidade.^7\n')
+        end
+    end
+end)
+
+
