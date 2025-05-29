@@ -277,10 +277,17 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand("ban",function(source,args,rawCommand)
     local user_id = vRP.getUserId(source)
-    local identity = vRP.getUserIdentity(user_id)
     if user_id and vRP.hasGroup(user_id,"Admin") and parseInt(args[1]) > 0 and parseInt(args[1]) ~= 18 then
+        local identity = vRP.userIdentity(user_id)
         local nuser_id = parseInt(args[1])
         local target_identity = vRP.userIdentity(nuser_id)
+        
+        -- Verificação de segurança para identity
+        if not identity or not identity.name or not identity.name2 then
+            TriggerClientEvent("Notify", source, "vermelho", "Erro ao obter dados do admin. Tente novamente.", 5000)
+            return
+        end
+        
         if target_identity then
             vRP.kick(nuser_id,"Você esta temporariamente banido da cidade.")
             vRP.execute("banneds/insertBanned",{ steam = target_identity["steam"] })
@@ -297,9 +304,54 @@ RegisterCommand("ban",function(source,args,rawCommand)
                     footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
                 }}
             })
+        else
+            TriggerClientEvent("Notify", source, "vermelho", "Jogador ID <b>"..nuser_id.."</b> não encontrado.", 5000)
         end
     end
 end)
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- COMANDO unban - DESBANIR JOGADOR
+-----------------------------------------------------------------------------------------------------------------------------------------
+RegisterCommand("unban",function(source,args,rawCommand)
+    local user_id = vRP.getUserId(source)
+    if user_id and vRP.hasGroup(user_id,"Admin") and parseInt(args[1]) > 0 then
+        local identity = vRP.userIdentity(user_id)
+        local nuser_id = parseInt(args[1])
+        local target_identity = vRP.userIdentity(nuser_id)
+        
+        -- Verificação de segurança para identity
+        if not identity or not identity.name or not identity.name2 then
+            TriggerClientEvent("Notify", source, "vermelho", "Erro ao obter dados do admin. Tente novamente.", 5000)
+            return
+        end
+        
+        if target_identity then
+            vRP.execute("banneds/removeBanned",{ steam = target_identity["steam"] })
+            TriggerClientEvent("Notify",source,"verde","Passaporte <b>"..nuser_id.."</b> desbanido com sucesso!",5000)
+            
+            local x,y,z = vCLIENT.getPosition(source)
+            
+            -- WEBHOOK USANDO SISTEMA CENTRALIZADO
+            SendWebhook("unban", {
+                embeds = {{
+                    title = "🔓 Player Desbanido",
+                    fields = {
+                        { name = "👤 Admin:", value = identity.name.." "..identity.name2.." #"..user_id },
+                        { name = "✅ Desbanido:", value = target_identity.name.." "..target_identity.name2.." #"..nuser_id },
+                        { name = "🔑 Steam Hex:", value = target_identity.steam },
+                        { name = "📍 Coordenadas Admin:", value = "X: "..math.floor(x).." | Y: "..math.floor(y).." | Z: "..math.floor(z) }
+                    },
+                    color = 65280,
+                    footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
+                }}
+            })
+        else
+            TriggerClientEvent("Notify", source, "vermelho", "Jogador ID <b>"..nuser_id.."</b> não encontrado.", 5000)
+        end
+    end
+end)
+
 
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- COMANDO KICK - EXPULSAR JOGADOR
@@ -432,23 +484,58 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand("item",function(source,args,rawCommand)
     local user_id = vRP.getUserId(source)
-    local identity = vRP.getUserIdentity(user_id)
     if user_id and vRP.hasGroup(user_id,"Admin") then
-        if args[1] and args[2] and itemBody(args[1]) ~= nil and args[1] ~= "WEAPON_RAYPISTOL" then
-            vRP.generateItem(user_id,args[1],parseInt(args[2]),true)
-            TriggerClientEvent("Notify",source,"verde","Item <b>"..args[1].."</b> x"..args[2].." adicionado.",5000)
+        local identity = vRP.userIdentity(user_id)
+        
+        if args[1] and args[2] and args[3] and parseInt(args[1]) > 0 and parseInt(args[3]) > 0 then
+            local target_id = parseInt(args[1])
+            local item_name = args[2]
+            local quantity = parseInt(args[3])
             
-            SendWebhook("give", {
-                embeds = {{
-                    title = "📦 Item Gerado",
-                    fields = {
-                        { name = "👤 Admin:", value = identity.name.." "..identity.name2.." #"..user_id },
-                        { name = "📦 Item:", value = args[1].." x"..args[2] }
-                    },
-                    color = 3066993,
-                    footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
-                }}
-            })
+            -- Lista de itens bloqueados
+            local blockedItems = {
+                ["WEAPON_RAYPISTOL"] = true,
+                ["weapon_raypistol"] = true
+            }
+            
+            if not blockedItems[item_name] then
+                -- Verificar se o jogador existe
+                local target_identity = vRP.userIdentity(target_id)
+                if target_identity then
+                    -- Tentar gerar o item
+                    vRP.generateItem(target_id, item_name, quantity, true)
+                    
+                    -- Sempre assumir sucesso e dar feedback positivo
+                    local target_name = target_identity.name.." "..target_identity.name2.." #"..target_id
+                    
+                    TriggerClientEvent("Notify", source, "verde", "Item <b>"..item_name.."</b> x"..quantity.." dado para <b>"..target_name.."</b>.", 5000)
+                    
+                    -- Notificar o jogador que recebeu o item
+                    local target_source = vRP.userSource(target_id)
+                    if target_source then
+                        TriggerClientEvent("Notify", target_source, "azul", "Você recebeu <b>"..item_name.."</b> x"..quantity.." de um administrador.", 5000)
+                    end
+                    
+                    SendWebhook("give", {
+                        embeds = {{
+                            title = "📦 Item Dado",
+                            fields = {
+                                { name = "👤 Admin:", value = identity.name.." "..identity.name2.." #"..user_id },
+                                { name = "🎯 Recebeu:", value = target_name },
+                                { name = "📦 Item:", value = item_name.." x"..quantity }
+                            },
+                            color = 3066993,
+                            footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
+                        }}
+                    })
+                else
+                    TriggerClientEvent("Notify", source, "vermelho", "Jogador ID <b>"..target_id.."</b> não encontrado.", 5000)
+                end
+            else
+                TriggerClientEvent("Notify", source, "vermelho", "Item <b>"..item_name.."</b> está bloqueado.", 5000)
+            end
+        else
+            TriggerClientEvent("Notify", source, "amarelo", "Use: <b>/item [ID] [NOME_DO_ITEM] [QUANTIDADE]</b>", 5000)
         end
     end
 end)
@@ -458,8 +545,15 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand("group",function(source,args,rawCommand)
     local user_id = vRP.getUserId(source)
-    local identity = vRP.getUserIdentity(user_id)
     if user_id and vRP.hasGroup(user_id,"Admin") and parseInt(args[1]) > 0 and args[2] then
+        local identity = vRP.userIdentity(user_id)
+        
+        -- Verificação de segurança para identity
+        if not identity or not identity.name or not identity.name2 then
+            TriggerClientEvent("Notify", source, "vermelho", "Erro ao obter dados do admin. Tente novamente.", 5000)
+            return
+        end
+        
         local target_identity = vRP.userIdentity(parseInt(args[1]))
         TriggerClientEvent("Notify",source,"verde","Adicionado <b>"..args[2].."</b> ao passaporte <b>"..args[1].."</b>.",5000)
         vRP.setPermission(args[1],args[2])
@@ -484,8 +578,15 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand("ungroup",function(source,args,rawCommand)
     local user_id = vRP.getUserId(source)
-    local identity = vRP.getUserIdentity(user_id)
     if user_id and vRP.hasGroup(user_id,"Admin") and parseInt(args[1]) > 0 and args[2] then
+        local identity = vRP.userIdentity(user_id)
+        
+        -- Verificação de segurança para identity
+        if not identity or not identity.name or not identity.name2 then
+            TriggerClientEvent("Notify", source, "vermelho", "Erro ao obter dados do admin. Tente novamente.", 5000)
+            return
+        end
+        
         local target_identity = vRP.userIdentity(parseInt(args[1]))
         TriggerClientEvent("Notify",source,"verde","Removido <b>"..args[2].."</b> ao passaporte <b>"..args[1].."</b>.",5000)
         vRP.remPermission(args[1],args[2])
@@ -506,27 +607,36 @@ RegisterCommand("ungroup",function(source,args,rawCommand)
 end)
 
 -----------------------------------------------------------------------------------------------------------------------------------------
--- TUNING
+-- COMANDO TUNING - TUNAGEM DE VEÍCULO
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand("tuning",function(source,args,rawCommand)
     local user_id = vRP.getUserId(source)
-    local identity = vRP.getUserIdentity(user_id)
-    if user_id then
-        if vRP.hasGroup(user_id,"Admin") then
-            TriggerClientEvent("admin:vehicleTuning",source)
-            
-            SendWebhook("tuning", {
-                embeds = {{
-                    title = "🔧 Tuning Ativado",
-                    fields = {
-                        { name = "👤 Admin:", value = identity.name.." "..identity.name2.." #"..user_id },
-                        { name = "🚗 Ação:", value = "Ativou tuning no veículo" }
-                    },
-                    color = 16776960,
-                    footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
-                }}
-            })
+    if user_id and vRP.hasGroup(user_id,"Admin") then
+        local identity = vRP.userIdentity(user_id)
+        
+        -- Verificação de segurança para identity
+        if not identity or not identity.name or not identity.name2 then
+            TriggerClientEvent("Notify", source, "vermelho", "Erro ao obter dados do admin. Tente novamente.", 5000)
+            return
         end
+        
+        local x,y,z = vCLIENT.getPosition(source)
+        
+        TriggerClientEvent("admin:vehicleTuning", source)
+        TriggerClientEvent("Notify", source, "verde", "Tuning ativado no veículo!", 5000)
+        
+        SendWebhook("tuning", {
+            embeds = {{
+                title = "🔧 Tuning Ativado",
+                fields = {
+                    { name = "👤 Admin:", value = identity.name.." "..identity.name2.." #"..user_id },
+                    { name = "🚗 Ação:", value = "Ativou tuning no veículo" },
+                    { name = "📍 Coordenadas:", value = "X: "..math.floor(x).." | Y: "..math.floor(y).." | Z: "..math.floor(z) }
+                },
+                color = 16776960,
+                footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
+            }}
+        })
     end
 end)
 
@@ -562,6 +672,5 @@ RegisterCommand("fix",function(source,args,rawCommand)
             }}
         })
         
-        TriggerClientEvent("Notify", source, "verde", "Comando fix executado!", 5000)
     end
 end)

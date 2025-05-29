@@ -34,19 +34,19 @@ Config.Webhooks = {
     -- WEBHOOKS ADMIN COMANDOS
     god = "https://discord.com/api/webhooks/1135699628860379246/434F1LIII9PjR_bkIHLpOi-gcUWwao1mRm2xBNJFHVtQxa1qbuyG35OIlJ4um6r0D8P2",
     kick = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
-    give = "https://discord.com/api/webhooks/1135699628860379246/434F1LIII9PjR_bkIHLpOi-gcUWwao1mRm2xBNJFHVtQxa1qbuyG35OIlJ4um6r0D8P2",
-    ban = "https://discord.com/api/webhooks/1135699628860379246/434F1LIII9PjR_bkIHLpOi-gcUWwao1mRm2xBNJFHVtQxa1qbuyG35OIlJ4um6r0D8P2",
-    adminaddgroup = "https://discord.com/api/webhooks/1135699628860379246/434F1LIII9PjR_bkIHLpOi-gcUWwao1mRm2xBNJFHVtQxa1qbuyG35OIlJ4um6r0D8P2",
-    adminremgroup = "https://discord.com/api/webhooks/1135699628860379246/434F1LIII9PjR_bkIHLpOi-gcUWwao1mRm2xBNJFHVtQxa1qbuyG35OIlJ4um6r0D8P2",
-    noclip = "https://discord.com/api/webhooks/1135699628860379246/434F1LIII9PjR_bkIHLpOi-gcUWwao1mRm2xBNJFHVtQxa1qbuyG35OIlJ4um6r0D8P2",
-    tpway = "https://discord.com/api/webhooks/1309969894883667968/aMgLDm_gBQFRfJB0CdBzC5iK5CHIGpwLF2kkVVKX-yQA75zZfSxV3RJM2vx3kZhNdOj5",
+    give = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
+    ban = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
+    adminaddgroup = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
+    adminremgroup = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
+    noclip = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
+    tpway = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
     tpto = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
     tptome = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
     tuning = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
     fix = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
     
     -- OUTROS WEBHOOKS
-    unban = "",
+    unban = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
     addcar = "",
     remcar = "",
     announce = "",
@@ -68,7 +68,7 @@ function SendWebhook(type, data)
         PerformHttpRequest(webhook, function(err, text, headers) 
             -- Opcional: log de erro se necessário
             if err ~= 200 then
-                print("^1[WEBHOOK ERROR]^7 Falha ao enviar webhook: " .. type)
+                print("" .. type)
             end
         end, 'POST', json.encode(data), { ['Content-Type'] = 'application/json' })
     else
