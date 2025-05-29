@@ -702,3 +702,89 @@ AddEventHandler("admin:fixVehicle", function()
         end
     end
 end)
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- CAR COLOR CHANGE
+-----------------------------------------------------------------------------------------------------------------------------------------
+RegisterNetEvent('admin:changeCarColor')
+AddEventHandler('admin:changeCarColor', function(r, g, b)
+    local ped = PlayerPedId()
+    local vehicle = GetVehiclePedIsIn(ped, false)
+    
+    if vehicle ~= 0 then
+        -- Converter RGB para valores do GTA (0-1)
+        local rNorm = r / 255
+        local gNorm = g / 255
+        local bNorm = b / 255
+        
+        -- Definir cor primária e secundária
+        SetVehicleCustomPrimaryColour(vehicle, r, g, b)
+        SetVehicleCustomSecondaryColour(vehicle, r, g, b)
+        
+        -- Aplicar a cor
+        SetVehicleColours(vehicle, 0, 0)
+        SetVehicleExtraColours(vehicle, 0, 0)
+    end
+end)
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- LIMPAR ÁREA
+-----------------------------------------------------------------------------------------------------------------------------------------
+RegisterNetEvent('syncarea')
+AddEventHandler('syncarea', function(x, y, z, radius)
+    local playerPed = PlayerPedId()
+    local playerCoords = GetEntityCoords(playerPed)
+    local distance = #(vector3(x, y, z) - playerCoords)
+    
+    if distance <= radius then
+        -- Limpar veículos abandonados
+        local vehicles = GetGamePool('CVehicle')
+        for i = 1, #vehicles do
+            local vehicle = vehicles[i]
+            if DoesEntityExist(vehicle) then
+                local vehicleCoords = GetEntityCoords(vehicle)
+                local vehicleDistance = #(vector3(x, y, z) - vehicleCoords)
+                
+                if vehicleDistance <= radius then
+                    local driver = GetPedInVehicleSeat(vehicle, -1)
+                    if driver == 0 or not IsPedAPlayer(driver) then
+                        -- Se não há motorista ou o motorista não é um jogador
+                        SetEntityAsMissionEntity(vehicle, true, true)
+                        DeleteVehicle(vehicle)
+                    end
+                end
+            end
+        end
+        
+        -- Limpar objetos
+        local objects = GetGamePool('CObject')
+        for i = 1, #objects do
+            local object = objects[i]
+            if DoesEntityExist(object) then
+                local objectCoords = GetEntityCoords(object)
+                local objectDistance = #(vector3(x, y, z) - objectCoords)
+                
+                if objectDistance <= radius then
+                    SetEntityAsMissionEntity(object, true, true)
+                    DeleteObject(object)
+                end
+            end
+        end
+        
+        -- Limpar peds NPCs
+        local peds = GetGamePool('CPed')
+        for i = 1, #peds do
+            local ped = peds[i]
+            if DoesEntityExist(ped) and not IsPedAPlayer(ped) then
+                local pedCoords = GetEntityCoords(ped)
+                local pedDistance = #(vector3(x, y, z) - pedCoords)
+                
+                if pedDistance <= radius then
+                    SetEntityAsMissionEntity(ped, true, true)
+                    DeletePed(ped)
+                end
+            end
+        end
+        
+    end
+end)

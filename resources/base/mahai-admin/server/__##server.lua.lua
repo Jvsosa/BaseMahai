@@ -674,3 +674,618 @@ RegisterCommand("fix",function(source,args,rawCommand)
         
     end
 end)
+
+------------------------------------------
+-- [ PLAYER ON CONSOLE ]
+------------------------------------------
+
+RegisterCommand("playersc",function(source,args,rawCommand)
+    if source == 0 then
+        print('^7[^4'..GetCurrentResourceName()..'^7] Membros Online: ^2 '..GetNumPlayerIndices()..' ^7')
+    end
+end)
+
+------------------------------------------
+-- [ GROUP CONSOLE ]
+------------------------------------------
+
+RegisterCommand('groupc',function(source,args,rawCommand)
+    if source == 0 then
+        if args[1] and args[2] then
+            local identity = vRP.userIdentity(parseInt(args[1]))
+            vRP.setPermission(parseInt(args[1]),args[2])
+            print('^7[^4'..GetCurrentResourceName()..'^7] Setado a permissao ^2 '..args[2]..'^7 no passaporte ^2 '..identity.name..' '..identity.name2..' '..args[1]..' ^7')
+        end
+    end
+end)
+
+------------------------------------------
+-- [ UNGROUP CONSOLE ]
+------------------------------------------
+
+RegisterCommand('ungroupc',function(source,args,rawCommand)
+    if source == 0 then
+        if args[1] and args[2] then
+            local identity = vRP.userIdentity(parseInt(args[1]))
+            vRP.remPermission(parseInt(args[1]),args[2])
+            print('^7[^4'..GetCurrentResourceName()..'^7] Retirado a permissao ^2 '..args[2]..'^7 no passaporte ^2 '..identity.name..' '..identity.name2..' '..args[1]..' ^7')
+        end
+    end
+end)
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- COMANDOS DE COORDENADAS
+-----------------------------------------------------------------------------------------------------------------------------------------
+function mathLength(number)
+    return math.floor(number * 100) / 100
+end
+
+RegisterCommand("cds",function(source,args,rawCommand)
+    local user_id = vRP.getUserId(source)
+    if user_id and vRP.hasGroup(user_id,"Admin") then
+        local ped = GetPlayerPed(source)
+        local coords = GetEntityCoords(ped)
+        local heading = GetEntityHeading(ped)
+        
+        local coordsText = mathLength(coords["x"])..","..mathLength(coords["y"])..","..mathLength(coords["z"])..","..mathLength(heading)
+        vRP.prompt(source,"Coordenadas:",coordsText)
+        
+        TriggerClientEvent("Notify", source, "azul", "Coordenadas copiadas!", 3000)
+    end
+end)
+
+RegisterCommand('cds2',function(source,args,rawCommand)
+    local user_id = vRP.getUserId(source)
+    if user_id and vRP.hasGroup(user_id,"Admin") then
+        local ped = GetPlayerPed(source)
+        local coords = GetEntityCoords(ped)
+        
+        local coordsText = "x = "..mathLength(coords.x)..", y = "..mathLength(coords.y)..", z = "..mathLength(coords.z)
+        vRP.prompt(source,"Coordenadas:",coordsText)
+        
+        TriggerClientEvent("Notify", source, "azul", "Coordenadas copiadas!", 3000)
+    end
+end)
+
+RegisterCommand('cds3',function(source,args,rawCommand)
+    local user_id = vRP.getUserId(source)
+    if user_id and vRP.hasGroup(user_id,"Admin") then
+        local ped = GetPlayerPed(source)
+        local coords = GetEntityCoords(ped)
+        
+        local coordsText = "['x'] = "..mathLength(coords.x)..", ['y'] = "..mathLength(coords.y)..", ['z'] = "..mathLength(coords.z)
+        vRP.prompt(source,"Coordenadas:",coordsText)
+        
+        TriggerClientEvent("Notify", source, "azul", "Coordenadas copiadas!", 3000)
+    end
+end)
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- COMANDO TPCDS - TELEPORT PARA COORDENADAS
+-----------------------------------------------------------------------------------------------------------------------------------------
+RegisterCommand("tpcds", function(source, args, rawCommand)
+    local user_id = vRP.getUserId(source)
+    if user_id and vRP.hasGroup(user_id,"Admin") then
+        local identity = vRP.userIdentity(user_id)
+        local fcoords = vRP.prompt(source, "Coordenadas:", "")
+        
+        if fcoords == "" then
+            TriggerClientEvent("Notify", source, "vermelho", "Coordenadas não informadas!", 5000)
+            return
+        end
+
+        local coords = {}
+
+        -- Formato: x,y,z ou x,y,z,heading
+        if string.match(fcoords, "^[-%d%.]+,[-%d%.]+,[-%d%.]+,?[-%d%.]*$") then
+            for coord in string.gmatch(fcoords, "[^,]+") do
+                table.insert(coords, tonumber(coord))
+            end
+        -- Formato: x = 123, y = 456, z = 789
+        elseif string.match(fcoords, "x%s*=%s*[-%d%.]+,?%s*y%s*=%s*[-%d%.]+,?%s*z%s*=%s*[-%d%.]+") then
+            local x, y, z = string.match(fcoords, "x%s*=%s*([-%d%.]+),?%s*y%s*=%s*([-%d%.]+),?%s*z%s*=%s*([-%d%.]+)")
+            coords = { tonumber(x), tonumber(y), tonumber(z) }
+        -- Formato: ['x'] = 123, ['y'] = 456, ['z'] = 789
+        elseif string.match(fcoords, "%['x'%]%s*=%s*[-%d%.]+,%s*%['y'%]%s*=%s*[-%d%.]+,%s*%['z'%]%s*=%s*[-%d%.]+") then
+            local x, y, z = string.match(fcoords,"%['x'%]%s*=%s*([-%d%.]+),%s*%['y'%]%s*=%s*([-%d%.]+),%s*%['z'%]%s*=%s*([-%d%.]+)")
+            coords = { tonumber(x), tonumber(y), tonumber(z) }
+        else
+            TriggerClientEvent("Notify",source,"vermelho","Formato inválido de coordenadas!",5000)
+            return
+        end
+
+        if coords[1] and coords[2] and coords[3] then
+            vRP.teleport(source, coords[1], coords[2], coords[3])
+            TriggerClientEvent("Notify", source, "verde", "Teleportado para as coordenadas!", 5000)
+            
+            -- Webhook para tpcds usando sistema centralizado
+            SendWebhook("tpto", {
+                embeds = {{
+                    title = "🌀 Teleport por Coordenadas",
+                    fields = {
+                        { name = "👤 Admin:", value = identity.name.." "..identity.name2.." #"..user_id },
+                        { name = "📍 Coordenadas:", value = "X: "..coords[1].." | Y: "..coords[2].." | Z: "..coords[3] }
+                    },
+                    color = 2829875,
+                    footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
+                }}
+            })
+        else
+            TriggerClientEvent("Notify",source,"vermelho","Coordenadas inválidas!",5000)
+        end
+    end
+end)
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- COMANDO SETMOCHILA - AUMENTAR MOCHILA DO JOGADOR
+-----------------------------------------------------------------------------------------------------------------------------------------
+RegisterCommand('setmochila',function(source,args,rawCommand)
+    local user_id = vRP.getUserId(source)
+    if user_id and vRP.hasGroup(user_id,"Admin") then
+        local identity = vRP.userIdentity(user_id)
+        
+        -- Verificação de segurança para identity
+        if not identity or not identity.name or not identity.name2 then
+            TriggerClientEvent("Notify", source, "vermelho", "Erro ao obter dados do admin. Tente novamente.", 5000)
+            return
+        end
+        
+        if args[1] and args[2] then
+            local target_id = parseInt(args[1])
+            local weight = parseInt(args[2])
+            
+            if target_id > 0 and weight > 0 then
+                local nplayer = vRP.userSource(target_id)
+                if nplayer then
+                    local nidentity = vRP.userIdentity(target_id)
+                    
+                    if nidentity then
+                        vRP.setWeight(target_id, weight)
+                        
+                        TriggerClientEvent("Notify", source, "verde", "Mochila do passaporte <b>"..target_id.."</b> alterada para <b>"..weight.."kg</b>!", 5000)
+                        TriggerClientEvent("Notify", nplayer, "azul", "Sua mochila foi alterada para <b>"..weight.."kg</b> por um administrador.", 5000)
+                        
+                        -- WEBHOOK USANDO SISTEMA CENTRALIZADO
+                        SendWebhook("setmochila", {
+                            embeds = {{
+                                title = "🎒 Mochila Alterada",
+                                fields = {
+                                    { name = "👤 Admin:", value = identity.name.." "..identity.name2.." #"..user_id },
+                                    { name = "🎯 Jogador:", value = nidentity.name.." "..nidentity.name2.." #"..target_id },
+                                    { name = "📦 Nova Capacidade:", value = weight.."kg" }
+                                },
+                                color = 3066993,
+                                footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
+                            }}
+                        })
+                    else
+                        TriggerClientEvent("Notify", source, "vermelho", "Erro ao obter dados do jogador.", 5000)
+                    end
+                else
+                    TriggerClientEvent("Notify", source, "vermelho", "Jogador ID <b>"..target_id.."</b> não está online.", 5000)
+                end
+            else
+                TriggerClientEvent("Notify", source, "amarelo", "IDs devem ser maiores que 0.", 5000)
+            end
+        else
+            TriggerClientEvent("Notify", source, "amarelo", "Use: <b>/setmochila [ID] [PESO]</b>", 5000)
+        end
+    else
+        TriggerClientEvent("Notify", source, "vermelho", "Você não tem permissão para usar este comando.", 5000)
+    end
+end)
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- COMANDO MOCHILARESET - RESETAR MOCHILA DO JOGADOR
+-----------------------------------------------------------------------------------------------------------------------------------------
+RegisterCommand('mochilareset',function(source,args,rawCommand)
+    local user_id = vRP.getUserId(source)
+    if user_id and vRP.hasGroup(user_id,"Admin") then
+        local identity = vRP.userIdentity(user_id)
+        
+        -- Verificação de segurança para identity
+        if not identity or not identity.name or not identity.name2 then
+            TriggerClientEvent("Notify", source, "vermelho", "Erro ao obter dados do admin. Tente novamente.", 5000)
+            return
+        end
+        
+        if args[1] then
+            local target_id = parseInt(args[1])
+            
+            if target_id > 0 then
+                local nplayer = vRP.userSource(target_id)
+                if nplayer then
+                    local nidentity = vRP.userIdentity(target_id)
+                    
+                    if nidentity then
+                        vRP.resetWeight(target_id)
+                        
+                        TriggerClientEvent("Notify", source, "verde", "Mochila do passaporte <b>"..target_id.."</b> foi resetada!", 5000)
+                        TriggerClientEvent("Notify", nplayer, "azul", "Sua mochila foi resetada por um administrador.", 5000)
+                        
+                        -- WEBHOOK USANDO SISTEMA CENTRALIZADO
+                        SendWebhook("resetmochila", {
+                            embeds = {{
+                                title = "🔄 Mochila Resetada",
+                                fields = {
+                                    { name = "👤 Admin:", value = identity.name.." "..identity.name2.." #"..user_id },
+                                    { name = "🎯 Jogador:", value = nidentity.name.." "..nidentity.name2.." #"..target_id },
+                                    { name = "🔧 Ação:", value = "Mochila resetada ao padrão" }
+                                },
+                                color = 16776960,
+                                footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
+                            }}
+                        })
+                    else
+                        TriggerClientEvent("Notify", source, "vermelho", "Erro ao obter dados do jogador.", 5000)
+                    end
+                else
+                    TriggerClientEvent("Notify", source, "vermelho", "Jogador ID <b>"..target_id.."</b> não está online.", 5000)
+                end
+            else
+                TriggerClientEvent("Notify", source, "amarelo", "ID deve ser maior que 0.", 5000)
+            end
+        else
+            TriggerClientEvent("Notify", source, "amarelo", "Use: <b>/mochilareset [ID]</b>", 5000)
+        end
+    else
+        TriggerClientEvent("Notify", source, "vermelho", "Você não tem permissão para usar este comando.", 5000)
+    end
+end)
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- COMANDO LIMPARINV - LIMPAR INVENTÁRIO DO JOGADOR
+-----------------------------------------------------------------------------------------------------------------------------------------
+RegisterCommand('limparinv',function(source,args,rawCommand)
+    local user_id = vRP.getUserId(source)
+    if user_id and vRP.hasGroup(user_id,"Admin") then
+        local identity = vRP.userIdentity(user_id)
+        
+        -- Verificação de segurança para identity
+        if not identity or not identity.name or not identity.name2 then
+            TriggerClientEvent("Notify", source, "vermelho", "Erro ao obter dados do admin. Tente novamente.", 5000)
+            return
+        end
+        
+        if args[1] then
+            local target_id = parseInt(args[1])
+            
+            if target_id > 0 then
+                local nplayer = vRP.userSource(target_id)
+                if nplayer then
+                    local nidentity = vRP.userIdentity(target_id)
+                    
+                    if nidentity then
+                        -- Obter inventário atual ANTES de limpar
+                        local inventory = vRP.userInventory(target_id)
+                        local itemsRemoved = {}
+                        local totalItems = 0
+                        
+                        -- Contar e coletar itens para log
+                        if inventory then
+                            for slot, item in pairs(inventory) do
+                                if item and item.item then
+                                    table.insert(itemsRemoved, {
+                                        item = item.item,
+                                        amount = item.amount or 1
+                                    })
+                                    totalItems = totalItems + (item.amount or 1)
+                                end
+                            end
+                        end
+                        
+                        -- MÉTODO 1: Limpar item por item usando vRP.removeInventoryItem
+                        if inventory then
+                            for slot, item in pairs(inventory) do
+                                if item and item.item then
+                                    vRP.removeInventoryItem(target_id, item.item, item.amount or 1, false)
+                                end
+                            end
+                        end
+                        
+                        -- MÉTODO 2 (alternativo): Resetar inventário via datatable
+                        local dataTable = vRP.getDatatable(target_id)
+                        if dataTable then
+                            dataTable["inventory"] = {}
+                        end
+                        
+                        -- Forçar atualização do inventário no cliente
+                        if nplayer then
+                            -- Aguardar um pouco para garantir que o servidor processou
+                            Citizen.SetTimeout(500, function()
+                                TriggerClientEvent("inventory:Update", nplayer, "updateMochila")
+                            end)
+                            
+                            -- Segunda atualização para garantir
+                            Citizen.SetTimeout(1500, function()
+                                TriggerClientEvent("inventory:Update", nplayer, "updateMochila")
+                            end)
+                        end
+                        
+                        TriggerClientEvent("Notify", source, "verde", "Inventário do passaporte <b>"..target_id.."</b> foi limpo! ("..totalItems.." itens removidos)", 5000)
+                        TriggerClientEvent("Notify", nplayer, "amarelo", "Seu inventário foi limpo por um administrador.", 5000)
+                        
+                        -- Preparar lista de itens para webhook
+                        local itemsList = ""
+                        if #itemsRemoved > 0 then
+                            for i, item in ipairs(itemsRemoved) do
+                                if i <= 10 then -- Limitar a 10 itens no webhook
+                                    itemsList = itemsList .. item.item .. " x" .. item.amount .. "\n"
+                                elseif i == 11 then
+                                    itemsList = itemsList .. "... e mais " .. (#itemsRemoved - 10) .. " itens"
+                                    break
+                                end
+                            end
+                        else
+                            itemsList = "Nenhum item encontrado"
+                        end
+                        
+                        -- WEBHOOK USANDO SISTEMA CENTRALIZADO
+                        SendWebhook("limparinv", {
+                            embeds = {{
+                                title = "🗑️ Inventário Limpo",
+                                fields = {
+                                    { name = "👤 Admin:", value = identity.name.." "..identity.name2.." #"..user_id },
+                                    { name = "🎯 Jogador:", value = nidentity.name.." "..nidentity.name2.." #"..target_id },
+                                    { name = "📦 Total de Itens:", value = totalItems.." itens removidos" },
+                                    { name = "📋 Itens Removidos:", value = itemsList }
+                                },
+                                color = 16711680,
+                                footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
+                            }}
+                        })
+                    else
+                        TriggerClientEvent("Notify", source, "vermelho", "Erro ao obter dados do jogador.", 5000)
+                    end
+                else
+                    TriggerClientEvent("Notify", source, "vermelho", "Jogador ID <b>"..target_id.."</b> não está online.", 5000)
+                end
+            else
+                TriggerClientEvent("Notify", source, "amarelo", "ID deve ser maior que 0.", 5000)
+            end
+        else
+            TriggerClientEvent("Notify", source, "amarelo", "Use: <b>/limparinv [ID]</b>", 5000)
+        end
+    else
+        TriggerClientEvent("Notify", source, "vermelho", "Você não tem permissão para usar este comando.", 5000)
+    end
+end)
+
+------------------------------------------
+-- [ COMANDO DE TROCAR COR DO CARRO - VERSÃO CORRIGIDA ]
+------------------------------------------
+
+RegisterCommand('carcolor',function(source,args,rawCommand)
+    local user_id = vRP.getUserId(source)
+    if user_id and vRP.hasGroup(user_id,"Admin") then
+        local identity = vRP.userIdentity(user_id)
+        
+        -- Verificação de segurança para identity
+        if not identity or not identity.name or not identity.name2 then
+            TriggerClientEvent("Notify", source, "vermelho", "Erro ao obter dados do admin. Tente novamente.", 5000)
+            return
+        end
+        
+        -- Verificar se o jogador está em um veículo
+        local vehicle = GetVehiclePedIsIn(GetPlayerPed(source), false)
+        if vehicle == 0 then
+            TriggerClientEvent("Notify", source, "vermelho", "Você precisa estar em um veículo!", 5000)
+            return
+        end
+        
+        if args[1] and args[2] and args[3] then
+            -- Usar argumentos diretos: /carcolor 255 0 0
+            local r = tonumber(args[1])
+            local g = tonumber(args[2])
+            local b = tonumber(args[3])
+            
+            if r and g and b and r >= 0 and r <= 255 and g >= 0 and g <= 255 and b >= 0 and b <= 255 then
+                -- Enviar para o cliente para mudar a cor
+                TriggerClientEvent('admin:changeCarColor', source, r, g, b)
+                TriggerClientEvent("Notify", source, "verde", "Cor do veículo alterada para RGB("..r..","..g..","..b..")!", 5000)
+                
+                local x,y,z = vCLIENT.getPosition(source)
+                
+                -- WEBHOOK USANDO SISTEMA CENTRALIZADO
+                SendWebhook("carcolor", {
+                    embeds = {{
+                        title = "🎨 Cor do Veículo Alterada",
+                        fields = {
+                            { name = "👤 Admin:", value = identity.name.." "..identity.name2.." #"..user_id },
+                            { name = "🚗 Veículo:", value = "Veículo atual" },
+                            { name = "🎨 Nova Cor:", value = "RGB("..r..","..g..","..b..")" },
+                            { name = "📍 Coordenadas:", value = "X: "..math.floor(x).." | Y: "..math.floor(y).." | Z: "..math.floor(z) }
+                        },
+                        color = 2829875,
+                        footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
+                    }}
+                })
+            else
+                TriggerClientEvent("Notify", source, "vermelho", "Valores RGB devem ser entre 0 e 255!", 5000)
+            end
+        else
+            -- Usar prompt para cores RGB
+            local rgb = vRP.prompt(source, "RGB (formato: R G B):", "255 0 0")
+            if rgb and rgb ~= "" then
+                local colors = {}
+                for color in string.gmatch(rgb, "%S+") do
+                    table.insert(colors, tonumber(color))
+                end
+                
+                if #colors == 3 then
+                    local r, g, b = colors[1], colors[2], colors[3]
+                    if r and g and b and r >= 0 and r <= 255 and g >= 0 and g <= 255 and b >= 0 and b <= 255 then
+                        -- Enviar para o cliente para mudar a cor
+                        TriggerClientEvent('admin:changeCarColor', source, r, g, b)
+                        TriggerClientEvent("Notify", source, "verde", "Cor do veículo alterada para RGB("..r..","..g..","..b..")!", 5000)
+                        
+                        local x,y,z = vCLIENT.getPosition(source)
+                        
+                        -- WEBHOOK USANDO SISTEMA CENTRALIZADO
+                        SendWebhook("carcolor", {
+                            embeds = {{
+                                title = "🎨 Cor do Veículo Alterada",
+                                fields = {
+                                    { name = "👤 Admin:", value = identity.name.." "..identity.name2.." #"..user_id },
+                                    { name = "🚗 Veículo:", value = "Veículo atual" },
+                                    { name = "🎨 Nova Cor:", value = "RGB("..r..","..g..","..b..")" },
+                                    { name = "📍 Coordenadas:", value = "X: "..math.floor(x).." | Y: "..math.floor(y).." | Z: "..math.floor(z) }
+                                },
+                                color = 2829875,
+                                footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
+                            }}
+                        })
+                    else
+                        TriggerClientEvent("Notify", source, "vermelho", "Valores RGB devem ser entre 0 e 255!", 5000)
+                    end
+                else
+                    TriggerClientEvent("Notify", source, "vermelho", "Formato inválido! Use: R G B (ex: 255 0 0)", 5000)
+                end
+            else
+                TriggerClientEvent("Notify", source, "amarelo", "Use: <b>/carcolor [R] [G] [B]</b> ou sem argumentos para usar prompt", 5000)
+            end
+        end
+    else
+        TriggerClientEvent("Notify", source, "vermelho", "Você não tem permissão para usar este comando.", 5000)
+    end
+end)
+
+------------------------------------------
+-- [ COMANDO DE KICK ALL - VERSÃO CORRIGIDA ]
+------------------------------------------
+
+RegisterCommand("kickall",function(source,args,rawCommand)
+    local user_id = vRP.getUserId(source)
+    if user_id and vRP.hasGroup(user_id,"Admin") then
+        local identity = vRP.userIdentity(user_id)
+        
+        -- Verificação de segurança para identity
+        if not identity or not identity.name or not identity.name2 then
+            TriggerClientEvent("Notify", source, "vermelho", "Erro ao obter dados do admin. Tente novamente.", 5000)
+            return
+        end
+        
+        -- Obter lista de jogadores online
+        local playerList = vRP.userList()
+        local totalPlayers = 0
+        
+        -- Contar jogadores
+        for k,v in pairs(playerList) do
+            totalPlayers = totalPlayers + 1
+        end
+        
+        TriggerClientEvent("Notify", source, "amarelo", "Kickando "..totalPlayers.." jogadores...", 5000)
+        
+        -- Kickar todos os jogadores
+        for k,v in pairs(playerList) do
+            if k ~= user_id then -- Não kickar o próprio admin
+                vRP.kick(k,"Desconectado, a cidade vai reiniciar.")
+                Citizen.Wait(100)
+            end
+        end
+        
+        TriggerClientEvent("Notify", source, "verde", "Todos os jogadores foram kickados! ("..totalPlayers.." players)", 5000)
+        
+        -- Trigger evento personalizado se necessário
+        TriggerEvent("admin:KickAll")
+        
+        -- WEBHOOK USANDO SISTEMA CENTRALIZADO
+        SendWebhook("kickall", {
+            embeds = {{
+                title = "🚪 KICK ALL Executado",
+                fields = {
+                    { name = "👤 Admin:", value = identity.name.." "..identity.name2.." #"..user_id },
+                    { name = "👥 Jogadores Kickados:", value = totalPlayers.." players" },
+                    { name = "⚠️ Motivo:", value = "Reinicialização da cidade" }
+                },
+                color = 16776960,
+                footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
+            }}
+        })
+        
+    else
+        TriggerClientEvent("Notify", source, "vermelho", "Você não tem permissão para usar este comando.", 5000)
+    end
+end)
+
+------------------------------------------
+-- [ COMANDO DE KICKALL CONSOLE ]
+------------------------------------------
+RegisterCommand("kickallc",function(source,args,rawCommand)
+    if source == 0 then
+        local playerList = vRP.userList()
+        local totalPlayers = 0
+        
+        -- Contar jogadores
+        for k,v in pairs(playerList) do
+            totalPlayers = totalPlayers + 1
+        end
+        
+        print("^3[ADMIN-CONSOLE]^7 Kickando "..totalPlayers.." jogadores...")
+        
+        -- Kickar todos os jogadores
+        for k,v in pairs(playerList) do
+            vRP.kick(k,"Desconectado, a cidade vai reiniciar.")
+            Citizen.Wait(100)
+        end
+        
+        print("^2[ADMIN-CONSOLE]^7 Todos os jogadores foram kickados! ("..totalPlayers.." players)")
+        TriggerEvent("admin:KickAll")
+    end
+end)
+
+------------------------------------------
+-- [ COMANDO DE LIMPAR AREA - VERSÃO CORRIGIDA ]
+------------------------------------------
+
+RegisterCommand("limparea",function(source,args,rawCommand)
+    local user_id = vRP.getUserId(source)
+    if user_id and vRP.hasGroup(user_id,"Admin") then
+        local identity = vRP.userIdentity(user_id)
+        
+        -- Verificação de segurança para identity
+        if not identity or not identity.name or not identity.name2 then
+            TriggerClientEvent("Notify", source, "vermelho", "Erro ao obter dados do admin. Tente novamente.", 5000)
+            return
+        end
+        
+        local ped = GetPlayerPed(source)
+        local coords = GetEntityCoords(ped)
+        
+        -- Obter lista de jogadores online
+        local playerList = vRP.userList()
+        local playersAffected = 0
+        
+        -- Enviar comando de limpeza para todos os jogadores online
+        for user_id_loop, source_loop in pairs(playerList) do
+            if source_loop then
+                TriggerClientEvent("syncarea", source_loop, coords["x"], coords["y"], coords["z"], 100)
+                playersAffected = playersAffected + 1
+            end
+        end
+        
+        TriggerClientEvent("Notify", source, "verde", "Área limpa! Comando enviado para "..playersAffected.." jogadores.", 5000)
+        
+        local x,y,z = vCLIENT.getPosition(source)
+        
+        -- WEBHOOK USANDO SISTEMA CENTRALIZADO
+        SendWebhook("limparea", {
+            embeds = {{
+                title = "🧹 Área Limpa",
+                fields = {
+                    { name = "👤 Admin:", value = identity.name.." "..identity.name2.." #"..user_id },
+                    { name = "📍 Coordenadas:", value = "X: "..math.floor(coords["x"]).." | Y: "..math.floor(coords["y"]).." | Z: "..math.floor(coords["z"]) },
+                    { name = "👥 Jogadores Afetados:", value = playersAffected.." players" },
+                    { name = "🌀 Raio:", value = "100 metros" }
+                },
+                color = 2829875,
+                footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
+            }}
+        })
+        
+    else
+        TriggerClientEvent("Notify", source, "vermelho", "Você não tem permissão para usar este comando.", 5000)
+    end
+end)

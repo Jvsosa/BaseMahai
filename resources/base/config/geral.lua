@@ -32,7 +32,7 @@ Config.Webhooks = {
     addss = "https://discord.com/api/webhooks/1130290237592064092/fQ_H0Gy5zr1FH8ecpwppa5csrQ6NIby8xWjJFserI4jturhULRoAK45HT3r-scYP2Uch",
     
     -- WEBHOOKS ADMIN COMANDOS
-    god = "https://discord.com/api/webhooks/1135699628860379246/434F1LIII9PjR_bkIHLpOi-gcUWwao1mRm2xBNJFHVtQxa1qbuyG35OIlJ4um6r0D8P2",
+    god = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
     kick = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
     give = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
     ban = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
@@ -44,7 +44,16 @@ Config.Webhooks = {
     tptome = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
     tuning = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
     fix = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
-    
+    setmochila = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
+    resetmochila = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
+    limparinv = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
+    carcolor = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
+    kickall = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
+    limparea = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
+
+
+
+
     -- OUTROS WEBHOOKS
     unban = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
     addcar = "",
