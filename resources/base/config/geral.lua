@@ -22,6 +22,15 @@ Config.General = {
     autoGenerateIdentity = true
 }
 
+Config.Basico = {
+    radios = {
+        { channel = 911, perm = "Police.permission" },
+        { channel = 112, perm = "admin.permission" },
+        { channel = 113, perm = "admin.permission" }
+
+    }
+}
+
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- WEBHOOKS CENTRALIZADOS
 -----------------------------------------------------------------------------------------------------------------------------------------
@@ -90,3 +99,4 @@ end
 -- Tornar a função global
 _G.SendWebhook = SendWebhook
 
+return Config

@@ -48,7 +48,7 @@ body {
     height: 100%;
     color: #fff;
     font-family: "Mukta", sans-serif;
-    display: block;
+    display: none;
     background-image: url('assests/background.png');
     background-size: cover;
     background-position: center;
