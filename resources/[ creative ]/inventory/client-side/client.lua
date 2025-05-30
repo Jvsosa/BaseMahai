@@ -864,6 +864,22 @@ function loadAnimDict(dict)
     end
     loadedAnims[dict] = true
 end
+
+function isPlayerNearby(distance)
+    local ped = PlayerPedId()
+    local px,py,pz = table.unpack(GetEntityCoords(ped))
+    for _,player in ipairs(GetActivePlayers()) do
+        local targetPed = GetPlayerPed(player)
+        if targetPed ~= ped then
+            local tx,ty,tz = table.unpack(GetEntityCoords(targetPed))
+            if #(vector3(px,py,pz) - vector3(tx,ty,tz)) <= distance then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- DROPITEM - OTIMIZADO
 -----------------------------------------------------------------------------------------------------------------------------------------
@@ -975,9 +991,13 @@ end)
 -- PICKUPITEM
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterNUICallback("pickupItem",function(data)
-	if MumbleIsConnected() then
-		TriggerServerEvent("inventory:Pickup",data["id"],data["amount"],data["target"])
-	end
+    if MumbleIsConnected() then
+        if isPlayerNearby(2.0) then
+            TriggerEvent("Notify","amarelo","Aproxime-se mais do item para pegar. Aguarde outros jogadores saírem de perto.",5000)
+        else
+            TriggerServerEvent("inventory:Pickup",data["id"],data["amount"],data["target"])
+        end
+    end
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- WHEELCHAIR
