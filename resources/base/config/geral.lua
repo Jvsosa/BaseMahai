@@ -56,9 +56,6 @@ Config.Webhooks = {
     wl = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
     unwl = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
 
-
-
-wl
     -- OUTROS WEBHOOKS
     unban = "https://discord.com/api/webhooks/1377326641113731122/8dVnisbP_q6l9UIDTS0eQMZG2GUVKKZlghndjjZYZWSft8YajwX0ELfFcnl18b2Ir2lJ",
     addcar = "",

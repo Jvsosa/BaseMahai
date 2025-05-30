@@ -1,48 +1,50 @@
 $(document).ready(function(){
-	window.addEventListener("message",function(event){
-		switch(event["data"]["action"]){
-			case "showMenu":
+    window.addEventListener("message",function(event){
+        switch(event["data"]["action"]){
+            case "showMenu":
 
-				$("#nomeperso").html(event.data.nome);
-				$("#cargoperso").html(event.data.cargo);
-				$("#vipPlayer").html(event.data.vip);
-				$("#bancoPlayer").html(event.data.banco + " $");
-				$("#telefonePlayer").html(event.data.celular);
-				$("#idadePlayer").html(event.data.sangue);
-				$("#perolasPlayer").html(event.data.gemas);
-				$("#passaporteslds").html(event.data.user_id);
-				$(".imgperso").attr(`src`,`${event.data.imagem}` );
+                $("#nomeperso").html(event.data.nome);
+                $("#cargoperso").html(event.data.cargo);
+                updateCargos(event.data.cargo); // Atualiza os cargos dinamicamente
+                $("#vipPlayer").html(event.data.vip);
+                $("#bancoPlayer").html(event.data.banco + " $");
+                $("#telefonePlayer").html(event.data.celular);
+                $("#idadePlayer").html(event.data.sangue);
+                $("#perolasPlayer").html(event.data.gemas);
+                $("#warningsPlayer").html(event.data.warnings);
+                $("#passaporteslds").html(event.data.user_id);
+                $(".imgperso").attr(`src`,`${event.data.imagem}` );
 
-				if (event.data.item_inv == true){
-					$(".identidadePart3").hide();
-					$(".identidadePart2").show();
-				} else { 
-					$(".identidadePart2").hide();
-					$(".identidadePart3").show();
-				}
+                if (event.data.item_inv == true){
+                    $(".identidadePart3").hide();
+                    $(".identidadePart2").show();
+                } else { 
+                    $(".identidadePart2").hide();
+                    $(".identidadePart3").show();
+                }
 
-				updateMochila();
-				$("body").show(500);
-			break;
+                updateMochila();
+                $("body").show(500);
+            break;
 
-			case "hideMenu":
-				$("body").hide(500);
-				$(".ui-tooltip").hide();
-			break;
+            case "hideMenu":
+                $("body").hide(500);
+                $(".ui-tooltip").hide();
+            break;
 
-			case "updateMochila":
-				updateMochila();
-			break;
-		}
-	});
+            case "updateMochila":
+                updateMochila();
+            break;
+        }
+    });
 
-	document.onkeyup = data => {
-		if (data["key"] === "Escape"){
-			$.post("http://inventory/invClose");
-			$(".invRight").html("");
-			$(".invLeft").html("");
-		}
-	};
+    document.onkeyup = data => {
+        if (data["key"] === "Escape"){
+            $.post("http://inventory/invClose");
+            $(".invRight").html("");
+            $(".invLeft").html("");
+        }
+    };
 });
 
 const updateDrag = () => {
@@ -562,4 +564,25 @@ function setMochilaNivel(nivel) {
             $(this).removeClass('active');
         }
     });
+}
+
+// FUNÇÃO PARA ATUALIZAR CARGOS (MÚLTIPLOS)
+function updateCargos(cargosData) {
+    const cargosContainer = $("#cargo-player");
+    cargosContainer.empty(); // Limpa os cargos existentes
+    
+    if (cargosData && cargosData.trim() !== "") {
+        // Dividir os cargos por "/" ou outro separador
+        let cargos = cargosData.split('/'); // Ajuste o separador se necessário
+        
+        // Adiciona cada cargo como um item separado
+        cargos.forEach(function(cargo) {
+            if (cargo.trim() !== "") {
+                cargosContainer.append(`<div class="cargo-item">${cargo.trim()}</div>`);
+            }
+        });
+    } else {
+        // Se não tem cargo, mostra mensagem padrão
+        cargosContainer.html(`<div class="cargo-item no-cargo">Nenhum cargo</div>`);
+    }
 }

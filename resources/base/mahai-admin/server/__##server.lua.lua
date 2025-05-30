@@ -247,17 +247,19 @@ RegisterCommand("registro", function(source, args, rawCommand)
     if vRP.hasPermission(user_id, "Admin") then
         local message = ""
         local Players_Ilegal = 0
-        local keys = {}  
+        local keys = {}
 
+        -- Ordenar as empresas
         for k, _ in pairs(Empresas_Pontos) do
             table.insert(keys, k)
         end
         table.sort(keys)
 
+        -- Contar jogadores ilegais
         for _, k in ipairs(keys) do
             local SQL = vRP.query("admin/getEmpresas", { empresa = k })
             if SQL[1] then
-                for a, b in pairs(SQL) do
+                for _, b in pairs(SQL) do
                     local id = vRP.userSource(tonumber(b.user_id))
                     if id then
                         Players_Ilegal = Players_Ilegal + 1
@@ -265,41 +267,45 @@ RegisterCommand("registro", function(source, args, rawCommand)
                 end
             end
         end
-        
+
+        -- Contar jogadores por empresa
         local SQL_empresas = vRP.query("admin/verEmpresas")
-        for z,w in pairs(SQL_empresas) do
-            for k,v in pairs(Empresas_Pontos) do
+        for _, w in pairs(SQL_empresas) do
+            for k, _ in pairs(Empresas_Pontos) do
                 if w.empresa == k then
                     if w.empresa == "FacExtra" then
                         w.empresa = "Desmanche2"
                     end
                     local SQL = vRP.query("admin/getEmpresas", { empresa = w.empresa })
                     local count = 0
-                    for l,s in pairs(SQL) do
+                    for _, s in pairs(SQL) do
                         local id = vRP.userSource(tonumber(s.user_id))
                         if id then
                             count = count + 1
                         end
                     end
-                    message = message .. w.empresa .. ": **" .. count .. "/"..#SQL.."** Online\n"
+                    message = message .. w.empresa .. ": **" .. count .. "/" .. #SQL .. "** Online\n"
                 end
             end
         end
-        
+
+        -- Enviar para o webhook
         SendWebhook("registro", {
             content = "@everyone",
-            embeds = {{     
+            embeds = {{
                 title = "** Contagem **",
                 fields = {
                     { name = "<:eg_globe:1132318084363989003> Contagem:", value = message },
                     { name = "<:eg_addemoji:1132315996837920768> Jogadores Ilegal:", value = Players_Ilegal },
                     { name = "<:eg_cautions:1132315882337619978> Jogadores Online:", value = GetNumPlayerIndices() }
-                }, 
+                },
                 footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S'), icon_url = "https://media.discordapp.net/attachments/1094973674437750834/1101630131610591323/512.png" },
                 thumbnail = { url = "https://media.discordapp.net/attachments/1094973674437750834/1101630131610591323/512.png" },
                 color = 15486285
             }}
         })
+    else
+        TriggerClientEvent("Notify", source, "vermelho", "Você não tem permissão para usar este comando.", 5000)
     end
 end)
 
@@ -1826,6 +1832,193 @@ AddEventHandler("Queue:playerConnecting",function(source,identifiers,deferrals)
             print('\n^7[^1'..GetCurrentResourceName()..'^7] steam:^1'..steam..'^7.')
             print('^7[^1'..GetCurrentResourceName()..'^7] Esta se ^1conectando^7 na cidade.^7\n')
         end
+    end
+end)
+
+------------------------------------------
+-- [ COMANDO RG2 - INFORMAÇÕES COMPLETAS DO JOGADOR ]
+------------------------------------------
+
+RegisterCommand('rg2', function(source, args, rawCommand)
+    local user_id = vRP.getUserId(source)
+    if user_id and vRP.hasGroup(user_id, "Admin") then
+        local identity = vRP.userIdentity(user_id)
+        
+        -- Verificação de segurança para identity
+        if not identity or not identity.name or not identity.name2 then
+            TriggerClientEvent("Notify", source, "vermelho", "Erro ao obter dados do admin. Tente novamente.", 5000)
+            return
+        end
+        
+        if args[1] then
+            local target_id = parseInt(args[1])
+            
+            if target_id > 0 then
+                local target_identity = vRP.userIdentity(target_id)
+                
+                if target_identity then
+                    local target_source = vRP.userSource(target_id)
+                    
+                    -- INFORMAÇÕES BÁSICAS
+                    local playerInfo = {
+                        name = target_identity.name or "N/A",
+                        name2 = target_identity.name2 or "N/A",
+                        age = target_identity.age or "N/A",
+                        phone = target_identity.phone or "N/A",
+                        registration = target_identity.registration or "N/A",
+                        steam = target_identity.steam or "N/A",
+                        discord = target_identity.discord or "N/A",
+                        license = target_identity.license or "N/A"
+                    }
+                    
+                    -- INFORMAÇÕES DE LOCALIZAÇÃO (se online)
+                    local locationInfo = {
+                        online = target_source ~= nil,
+                        x = 0,
+                        y = 0,
+                        z = 0
+                    }
+                    
+                    if target_source then
+                        local coords = vCLIENT.getPosition(target_source)
+                        if coords then
+                            locationInfo.x = math.floor(coords[1] or 0)
+                            locationInfo.y = math.floor(coords[2] or 0)
+                            locationInfo.z = math.floor(coords[3] or 0)
+                        end
+                    end
+                    
+                    -- INFORMAÇÕES FINANCEIRAS
+                    local financialInfo = {
+                        wallet = vRP.getInventoryItemAmount(target_id, "dollars") or 0,
+                        bank = vRP.getBankMoney(target_id) or 0
+                    }
+                    
+                    -- INFORMAÇÕES DE GRUPOS/CARGOS
+                    local groups = vRP.getUserGroups(target_id) or {}
+                    local groupsList = ""
+                    local groupCount = 0
+                    
+                    for group, _ in pairs(groups) do
+                        if groupCount == 0 then
+                            groupsList = group
+                        else
+                            groupsList = groupsList .. ", " .. group
+                        end
+                        groupCount = groupCount + 1
+                    end
+                    
+                    if groupsList == "" then
+                        groupsList = "Nenhum cargo"
+                    end
+                    
+                    -- INFORMAÇÕES DE SAÚDE (se online)
+                    local healthInfo = {
+                        health = "N/A",
+                        thirst = "N/A",
+                        hunger = "N/A",
+                        stress = "N/A"
+                    }
+                    
+                    if target_source then
+                        healthInfo.health = GetEntityHealth(GetPlayerPed(target_source)) or "N/A"
+                        healthInfo.thirst = vRP.getThirst(target_id) or "N/A"
+                        healthInfo.hunger = vRP.getHunger(target_id) or "N/A"
+                        healthInfo.stress = vRP.getStress(target_id) or "N/A"
+                    end
+                    
+                    -- INFORMAÇÕES DE INVENTÁRIO
+                    local inventory = vRP.userInventory(target_id) or {}
+                    local itemCount = 0
+                    local totalWeight = 0
+                    local maxWeight = vRP.getWeight(target_id) or 0
+                    
+                    for slot, item in pairs(inventory) do
+                        if item and item.item then
+                            itemCount = itemCount + (item.amount or 1)
+                        end
+                    end
+                    
+                    -- Calcular peso atual
+                    for slot, item in pairs(inventory) do
+                        if item and item.item then
+                            local itemWeight = vRP.getItemWeight(item.item) or 0
+                            totalWeight = totalWeight + (itemWeight * (item.amount or 1))
+                        end
+                    end
+                    
+                    -- MONTAR MENSAGEM PARA ADMIN
+                    local message = "📋 <b>INFORMAÇÕES COMPLETAS - " .. playerInfo.name .. " " .. playerInfo.name2 .. " #" .. target_id .. "</b><br><br>"
+                    
+                    message = message .. "👤 <b>DADOS PESSOAIS:</b><br>"
+                    message = message .. "• Nome: " .. playerInfo.name .. " " .. playerInfo.name2 .. "<br>"
+                    message = message .. "• Idade: " .. playerInfo.age .. " anos<br>"
+                    message = message .. "• Telefone: " .. playerInfo.phone .. "<br>"
+                    message = message .. "• RG: " .. playerInfo.registration .. "<br><br>"
+                    
+                    message = message .. "🌐 <b>STATUS:</b><br>"
+                    message = message .. "• Online: " .. (locationInfo.online and "✅ Sim" or "❌ Não") .. "<br>"
+                    if locationInfo.online then
+                        message = message .. "• Localização: X:" .. locationInfo.x .. " Y:" .. locationInfo.y .. " Z:" .. locationInfo.z .. "<br>"
+                    end
+                    message = message .. "<br>"
+                    
+                    message = message .. "💰 <b>FINANCEIRO:</b><br>"
+                    message = message .. "• Carteira: $" .. financialInfo.wallet .. "<br>"
+                    message = message .. "• Banco: $" .. financialInfo.bank .. "<br>"
+                    message = message .. "• Total: $" .. (financialInfo.wallet + financialInfo.bank) .. "<br><br>"
+                    
+                    message = message .. "🏷️ <b>CARGOS:</b><br>"
+                    message = message .. "• " .. groupsList .. "<br><br>"
+                    
+                    if locationInfo.online then
+                        message = message .. "❤️ <b>SAÚDE:</b><br>"
+                        message = message .. "• Vida: " .. healthInfo.health .. "<br>"
+                        message = message .. "• Sede: " .. healthInfo.thirst .. "%<br>"
+                        message = message .. "• Fome: " .. healthInfo.hunger .. "%<br>"
+                        message = message .. "• Stress: " .. healthInfo.stress .. "%<br><br>"
+                    end
+                    
+                    message = message .. "🎒 <b>INVENTÁRIO:</b><br>"
+                    message = message .. "• Itens: " .. itemCount .. " unidades<br>"
+                    message = message .. "• Peso: " .. math.floor(totalWeight) .. "/" .. maxWeight .. "kg<br>"
+                    
+                    -- EXIBIR PARA O ADMIN
+                    TriggerClientEvent("Notify", source, "azul", message, 15000)
+                    
+                    local x, y, z = vCLIENT.getPosition(source)
+                    
+                    -- WEBHOOK USANDO SISTEMA CENTRALIZADO
+                    SendWebhook("rg2", {
+                        embeds = {{
+                            title = "📋 Consulta RG2 - Informações Completas",
+                            fields = {
+                                { name = "👤 Admin:", value = identity.name .. " " .. identity.name2 .. " #" .. user_id },
+                                { name = "🎯 Consultado:", value = playerInfo.name .. " " .. playerInfo.name2 .. " #" .. target_id },
+                                { name = "📱 Telefone:", value = playerInfo.phone },
+                                { name = "📄 RG:", value = playerInfo.registration },
+                                { name = "🌐 Status:", value = locationInfo.online and "✅ Online" or "❌ Offline" },
+                                { name = "💰 Dinheiro:", value = "$" .. financialInfo.wallet .. " (carteira) + $" .. financialInfo.bank .. " (banco)" },
+                                { name = "🏷️ Cargos:", value = groupsList },
+                                { name = "🎒 Inventário:", value = itemCount .. " itens (" .. math.floor(totalWeight) .. "/" .. maxWeight .. "kg)" },
+                                { name = "📍 Admin Local:", value = "X: " .. math.floor(x) .. " | Y: " .. math.floor(y) .. " | Z: " .. math.floor(z) }
+                            },
+                            color = 3447003,
+                            footer = { text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S') }
+                        }}
+                    })
+                    
+                else
+                    TriggerClientEvent("Notify", source, "vermelho", "Jogador ID <b>" .. target_id .. "</b> não encontrado.", 5000)
+                end
+            else
+                TriggerClientEvent("Notify", source, "amarelo", "ID deve ser maior que 0.", 5000)
+            end
+        else
+            TriggerClientEvent("Notify", source, "amarelo", "Use: <b>/rg2 [ID]</b>", 5000)
+        end
+    else
+        TriggerClientEvent("Notify", source, "vermelho", "Você não tem permissão para usar este comando.", 5000)
     end
 end)
 
