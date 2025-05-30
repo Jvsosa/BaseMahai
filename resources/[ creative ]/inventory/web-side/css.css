@@ -976,8 +976,8 @@ input::-webkit-inner-spin-button { -webkit-appearance: none; }
 .hotbar-slot {
     width: 6vw;
     height: 6vw;
-   background: rgba(15, 15, 15, 0.133);
-    border: 1px solid rgba(255, 255, 255, 0.12); /* Deixe a borda sempre */
+    background: rgba(15, 15, 15, 0.133);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 8px;
     display: flex;
     align-items: center;
@@ -985,17 +985,11 @@ input::-webkit-inner-spin-button { -webkit-appearance: none; }
     font-family: 'Archivo Black', 'Nunito', Arial, sans-serif;
     font-size: 2.5vw;
     color: #88888878;
-    transition: border-color 0.2s, background 0.2s; /* Só anima a cor da borda */
+    transition: border-color 0.2s, background 0.2s;
     box-shadow: 0 0 8px 0 rgba(0,0,0,0.3);
     user-select: none;
-}
-
-
-.hotbar-slot.active,
-.hotbar-slot:hover {
-    border: 2px solid #fff;
-    background: rgba(40,40,60,0.7);
-    color: #fff;
+    position: relative; /* Adicionar para posicionar elementos filhos */
+    cursor: pointer; /* Adicionar cursor pointer */
 }
 
 .hotbar-slot.active,
@@ -1005,51 +999,46 @@ input::-webkit-inner-spin-button { -webkit-appearance: none; }
     color: #fff;
 }
 
-.mochila-nivel {
+/* Adicionar suporte para itens na hotbar */
+.hotbar-slot.has-item {
+    background: rgba(25, 25, 35, 0.8);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.hotbar-slot.has-item:hover {
+    border: 2px solid #00ff88;
+}
+
+.hotbar-slot .hotbar-item-image {
+    width: 4vw;
+    height: 4vw;
+    object-fit: contain;
     position: absolute;
-    display: flex;
-    align-items: center;
-    background: rgba(15, 15, 15, 0.133);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 7px;
-    padding: 0.4vw 1vw;
-    width: 29.6vw;
-    height: 2.2vw;
-    box-sizing: border-box;
-    
-    /* Posicionamento absoluto - agora você pode mover */
-    top: 43.2vw;    /* Mude este valor para cima/baixo */
-    left: 8vw;   /* Mude este valor para esquerda/direita */
-    
-    /* Remove as margens antigas */
-    margin: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
-#cargo-player {
-    display: flex;
-    flex-direction: column; /* Força os cargos a ficarem em coluna */
-    gap: 0px; /* Remove o espaçamento entre os cargos */
-    align-items: center; /* Centraliza os cargos no contêiner */
-    width: 100%; /* Garante que ocupe toda a largura */
-    padding: 0; /* Remove qualquer espaçamento interno */
-    margin-top: 0; /* Remove a margem superior */
-    background-color: rgba(255, 255, 255, 0); /* Fundo igual ao restante da interface */
-    border-radius: 8px; /* Bordas arredondadas */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0); /* Sombra para destacar */
+.hotbar-slot .hotbar-item-amount {
+    position: absolute;
+    bottom: 0.2vw;
+    right: 0.2vw;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    font-size: 0.7vw;
+    padding: 0.1vw 0.3vw;
+    border-radius: 3px;
+    font-family: 'Inter', sans-serif;
 }
 
-.cargo-item {
-    padding: 4px 0px; /* Reduz o espaçamento interno */
-    background: rgba(0, 8, 255, 0.2); /* Fundo azul claro */
-    border: none; /* Remove a borda */
-    border-radius: 4px; /* Bordas arredondadas */
-    color: #fff; /* Cor do texto */
-    font-size: 14px; /* Tamanho da fonte */
-    text-align: center; /* Centraliza o texto */
-    white-space: nowrap; /* Impede quebra de linha */
-    overflow: hidden; /* Esconde texto que ultrapassa */
-    text-overflow: ellipsis; /* Adiciona "..." se o texto for muito longo */
-    width: 100%; /* Garante que ocupe toda a largura do contêiner */
-    margin: 0; /* Remove qualquer margem */
-    box-shadow: none; /* Remove a sombra extra */
+.hotbar-slot .slot-number {
+    position: absolute;
+    top: 0.2vw;
+    left: 0.2vw;
+    background: rgba(0, 0, 0, 0.6);
+    color: #ccc;
+    font-size: 0.8vw;
+    padding: 0.1vw 0.3vw;
+    border-radius: 3px;
+    font-family: 'Inter', sans-serif;
 }

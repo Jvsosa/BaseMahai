@@ -241,17 +241,36 @@ end)
 -- OPENBACKPACK
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand("openBackpack",function(source,args,rawCommand)
-	if GetEntityHealth(playerPed) > 101 and not LocalPlayer["state"]["Buttons"] then
-		if not LocalPlayer["state"]["Commands"] and not LocalPlayer["state"]["Handcuff"] and not IsPlayerFreeAiming(PlayerId()) then
-			Backpack = true
-			SetNuiFocus(true,true)
-			SetCursorLocation(0.5, 0.5)
-			StartScreenEffect("MenuMGSelectionIn", 0, true)
-			TriggerEvent("hud:Active",false)
-			local user_id,item_inv,nome,sangue,vip,cargo,celular,gemas,banco,imagem = vSERVER.Identidade()
-			SendNUIMessage({ action = "showMenu", user_id = user_id, item_inv = item_inv, nome = nome,sangue = sangue,vip = vip,cargo = cargo,celular = celular,gemas = gemas,banco = banco,imagem = imagem})
-		end
-	end
+    if GetEntityHealth(playerPed) > 101 and not LocalPlayer["state"]["Buttons"] then
+        if not LocalPlayer["state"]["Commands"] and not LocalPlayer["state"]["Handcuff"] and not IsPlayerFreeAiming(PlayerId()) then
+            Backpack = true
+            SetNuiFocus(true,true)
+            SetCursorLocation(0.5, 0.5)
+            StartScreenEffect("MenuMGSelectionIn", 0, true)
+            TriggerEvent("hud:Active",false)
+            local user_id,item_inv,nome,sangue,vip,cargo,celular,gemas,banco,imagem = vSERVER.Identidade()
+            
+            -- Busca inventário e hotbar do servidor
+            local inventario, invPeso, invMaxpeso, hotbar = vSERVER.requestInventory()
+            SendNUIMessage({
+                action = "showMenu",
+                user_id = user_id,
+                item_inv = item_inv,
+                nome = nome,
+                sangue = sangue,
+                vip = vip,
+                cargo = cargo,
+                celular = celular,
+                gemas = gemas,
+                banco = banco,
+                imagem = imagem,
+                inventario = inventario,
+                invPeso = invPeso,
+                invMaxpeso = invMaxpeso,
+                hotbar = hotbar
+            })
+        end
+    end
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- KEYMAPPING
@@ -1413,3 +1432,24 @@ function cRP.tyreStatus()
 
 	return false
 end
+
+RegisterNUICallback("moveToHotbar", function(data)
+    if MumbleIsConnected() then
+        TriggerServerEvent("inventory:SaveHotbar", data.slot, data.item, data.originalSlot)
+    end
+end)
+
+RegisterNUICallback("returnHotbarToInventory", function(data)
+    if MumbleIsConnected() then
+        TriggerServerEvent("inventory:RemoveHotbar", data.slot)
+    end
+end)
+
+RegisterNetEvent("inventory:useItemFromHotbar")
+AddEventHandler("inventory:useItemFromHotbar", function(slot, amount)
+    if slot then
+        TriggerServerEvent("inventory:useItem", slot, amount)
+    else
+        TriggerEvent("Notify", "amarelo", "Nenhum item configurado nesse slot da hotbar.", 5000)
+    end
+end)

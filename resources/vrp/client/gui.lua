@@ -441,7 +441,7 @@ RegisterCommand("cRbind",function(source,args,rawCommand)
 		local ped = PlayerPedId()
 		if not IsPauseMenuActive() and not LocalPlayer["state"]["Buttons"] and not LocalPlayer["state"]["Commands"] and not LocalPlayer["state"]["Phone"] and GetEntityHealth(ped) > 101 and not LocalPlayer["state"]["Cancel"] and not IsPedReloading(ped) then
 			if parseInt(args[1]) >= 1 and parseInt(args[1]) <= 5 then
-				TriggerServerEvent("inventory:useItem",args[1],1)
+				TriggerServerEvent("inventory:UseHotbarItem",args[1])
 			elseif args[1] == "6" then
 				if not IsPedInAnyVehicle(ped) and not IsPedArmed(ped,6) and not IsPedSwimming(ped) then
 					if IsEntityPlayingAnim(ped,"anim@heists@heist_corona@single_team","single_team_loop_boss",3) then

@@ -347,45 +347,63 @@ local lootItens = {
 -- REQUESTINVENTORY
 -----------------------------------------------------------------------------------------------------------------------------------------
 function cRP.requestInventory()
-	local source = source
-	local user_id = vRP.getUserId(source)
-	if user_id then
-		local myInventory = {}
-		local inventory = vRP.userInventory(user_id)
-		for k,v in pairs(inventory) do
-			if (parseInt(v["amount"]) <= 0 or itemBody(v["item"]) == nil) then
-				vRP.removeInventoryItem(user_id,v["item"],parseInt(v["amount"]),false)
-			else
-				v["amount"] = parseInt(v["amount"])
-				v["name"] = itemName(v["item"])
-				v["peso"] = itemWeight(v["item"])
-				v["index"] = itemIndex(v["item"])
-				v["max"] = itemMaxAmount(v["item"])
-				v["type"] = itemType(v["item"])
-				v["desc"] = itemDescription(v["item"])
-				v["key"] = v["item"]
-				v["slot"] = k
-	
-				local splitName = splitString(v["item"],"-")
-				if splitName[2] ~= nil then
-					if itemDurability(v["item"]) then
-						v["durability"] = parseInt(os.time() - splitName[2])
-						v["days"] = itemDurability(v["item"])
-					else
-						v["durability"] = 0
-						v["days"] = 1
-					end
-				else
-					v["durability"] = 0
-					v["days"] = 1
-				end
+    local source = source
+    local user_id = vRP.getUserId(source)
+    if user_id then
+        local myInventory = {}
+        local inventory = vRP.userInventory(user_id)
 
-				myInventory[k] = v
-			end
-		end
+        -- Carregar hotbar salva
+        local hotbar = {}
+        local hotbarData = vRP.getUData(user_id, "hotbar")
+        if hotbarData and hotbarData ~= "" then
+            hotbar = json.decode(hotbarData) or {}
+        end
 
-		return myInventory,vRP.inventoryWeight(user_id),vRP.getWeight(user_id)
-	end
+        -- Montar inventário ignorando itens da hotbar
+        for k,v in pairs(inventory) do
+            local isInHotbar = false
+            for _, hotbarItem in pairs(hotbar) do
+                if hotbarItem and hotbarItem.key == v["item"] then
+                    isInHotbar = true
+                    break
+                end
+            end
+            if not isInHotbar then
+                if (parseInt(v["amount"]) <= 0 or itemBody(v["item"]) == nil) then
+                    vRP.removeInventoryItem(user_id,v["item"],parseInt(v["amount"]),false)
+                else
+                    v["amount"] = parseInt(v["amount"])
+                    v["name"] = itemName(v["item"])
+                    v["peso"] = itemWeight(v["item"])
+                    v["index"] = itemIndex(v["item"])
+                    v["max"] = itemMaxAmount(v["item"])
+                    v["type"] = itemType(v["item"])
+                    v["desc"] = itemDescription(v["item"])
+                    v["key"] = v["item"]
+                    v["slot"] = k
+
+                    local splitName = splitString(v["item"],"-")
+                    if splitName[2] ~= nil then
+                        if itemDurability(v["item"]) then
+                            v["durability"] = parseInt(os.time() - splitName[2])
+                            v["days"] = itemDurability(v["item"])
+                        else
+                            v["durability"] = 0
+                            v["days"] = 1
+                        end
+                    else
+                        v["durability"] = 0
+                        v["days"] = 1
+                    end
+
+                    myInventory[k] = v
+                end
+            end
+        end
+
+        return myInventory, vRP.inventoryWeight(user_id), vRP.getWeight(user_id), hotbar
+    end
 end
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- INVUPDATE
@@ -6449,4 +6467,61 @@ AddEventHandler("inventory:removeTyres",function(Entity,Tyre)
 			end
 		end
 	end
+end)
+
+local hotbars = {}
+
+RegisterServerEvent("inventory:SaveHotbar")
+AddEventHandler("inventory:SaveHotbar", function(slot, item, originalSlot)
+    local source = source
+    local user_id = vRP.getUserId(source)
+    if user_id then
+        if not hotbars[user_id] then hotbars[user_id] = {} end
+        hotbars[user_id][tostring(slot)] = item
+        vRP.setUData(user_id, "hotbar", json.encode(hotbars[user_id]))
+        local hotbarData = vRP.getUData(user_id, "hotbar")
+    end
+end)
+
+RegisterServerEvent("inventory:RemoveHotbar")
+AddEventHandler("inventory:RemoveHotbar", function(slot)
+    local source = source
+    local user_id = vRP.getUserId(source)
+    if user_id then
+        -- Carrega a hotbar do banco
+        local hotbarData = vRP.getUData(user_id, "hotbar")
+        local hotbar = {}
+        if hotbarData and hotbarData ~= "" then
+            hotbar = json.decode(hotbarData) or {}
+        end
+
+        -- Remove do cache local
+        if hotbars[user_id] then
+            hotbars[user_id][tostring(slot)] = nil
+        end
+
+        -- Remove do banco
+        hotbar[tostring(slot)] = nil
+        vRP.setUData(user_id, "hotbar", json.encode(hotbar))
+    end
+end)
+
+
+RegisterServerEvent("inventory:UseHotbarItem")
+AddEventHandler("inventory:UseHotbarItem", function(slot)
+    local source = source
+    local user_id = vRP.getUserId(source)
+    if user_id then
+        local hotbarData = vRP.getUData(user_id, "hotbar")
+        if hotbarData and hotbarData ~= "" then
+            local hotbar = json.decode(hotbarData) or {}
+            local item = hotbar[tostring(slot)]
+            -- Só envia se item.slot existir
+            if item and item.slot then
+                TriggerClientEvent("inventory:useItemFromHotbar", source, item.slot, item.amount or 1)
+            else
+            end
+        else
+        end
+    end
 end)

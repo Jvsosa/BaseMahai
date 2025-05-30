@@ -379,3 +379,17 @@ end)
 -- SMARTPHONE:USERSOURCE
 -----------------------------------------------------------------------------------------------------------------------------------------
 vRP.getUserSource = vRP.userSource
+
+-- Salvar dado do usuário
+function vRP.setUData(user_id, key, value)
+    exports.oxmysql:executeSync("REPLACE INTO playerdata(user_id, dkey, dvalue) VALUES (?, ?, ?)", { user_id, key, value })
+end
+
+-- Ler dado do usuário
+function vRP.getUData(user_id, key)
+    local result = exports.oxmysql:executeSync("SELECT dvalue FROM playerdata WHERE user_id = ? AND dkey = ?", { user_id, key })
+    if result and result[1] then
+        return result[1].dvalue
+    end
+    return nil
+end
