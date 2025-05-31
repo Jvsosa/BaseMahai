@@ -1047,13 +1047,15 @@ input::-webkit-inner-spin-button { -webkit-appearance: none; }
     width: 100%;
     height: 100%;
     display: flex;
-    align-items: center;      /* Centraliza verticalmente */
-    justify-content: center;  /* Centraliza horizontalmente */
+    flex-direction: column;    /* ADICIONAR ESTA LINHA */
+    align-items: center;
+    justify-content: flex-start; /* MUDAR DE center PARA flex-start */
     font-family: 'Archivo Black', 'Nunito', Arial, sans-serif;
-    margin-top: -4.5vw;
+    margin-top: -1vw;             /* MUDAR DE -4.5vw PARA 0 */
     font-size: 0.8vw;
     background-color: rgba(255, 0, 0, 0);
     color: #ffffff;
     font-weight: bold;
     text-align: center;
+    gap: 0vw;               /* ADICIONAR ESPAÇO ENTRE OS CARGOS */
 }

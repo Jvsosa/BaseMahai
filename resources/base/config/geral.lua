@@ -31,6 +31,75 @@ Config.Basico = {
     }
 }
 
+
+
+Config = Config or {}
+
+Config.Toggle = {
+    ['Paramedic'] = { 
+        blip = { x = 1127.35, y = -1621.46, z = 34.87 },
+        webhook = "",
+        MarcarGPS = { ativo = true, nome = "Hospital", cor = 23 },
+        cargos = {
+            [1] = { em_servico = "Diretor-Paramedic", fora_de_servico = "waitDiretor-Paramedic" },
+            [2] = { em_servico = "Gerente-Paramedic", fora_de_servico = "waitGerente-Paramedic" },
+            [3] = { em_servico = "Paramedic", fora_de_servico = "waitParamedic" },
+        }
+    },
+    ['Cafe'] = { 
+        blip = { x = -593.96, y = -1052.45, z = 22.34 },
+        webhook = "",
+        cargos = {
+            [1] = { em_servico = "Chefe-Cafe", fora_de_servico = "waitChefe-Cafe" },
+            [2] = { em_servico = "Gerente-Cafe", fora_de_servico = "waitGerente-Cafe" },
+            [3] = { em_servico = "Cafe", fora_de_servico = "waitCafe" },
+        }
+    },
+    ['Police'] = { 
+        blip = { x = 2507.82, y = -347.16, z = 94.09 },
+        webhook = "",
+        cargos = {
+            [1] = { em_servico = "Police", fora_de_servico = "waitpolice" },
+        }
+    },
+    ['Exercito'] = { 
+        blip = { x = -2187.66, y = 3187.85, z = 32.82 },
+        webhook = "",
+        cargos = {
+            [1] = { em_servico = "Exercito", fora_de_servico = "waitExercito" },
+        }
+    },
+    ['Corrections'] = { 
+        blip = { x = 1840.20, y = 2578.48, z = 46.07 },
+        webhook = "",
+        cargos = {
+            [1] = { em_servico = "Corrections", fora_de_servico = "waitCorrections" },
+        }
+    },
+    ['Mechanic'] = { 
+        blip = { x = 153.16, y = -3052.8, z = 7.04 },
+        webhook = "",
+        cargos = {
+            [1] = { em_servico = "Mechanic", fora_de_servico = "waitMechanic" },
+        }
+    },
+}
+
+-- ADICIONAR NOVA SEÇÃO PARA COORDENADAS DOS SERVIÇOS
+Config.ServiceLocations = {
+    { 2507.82, -347.16, 94.09, "Police", 1.8, 6 },
+    { -2187.66, 3187.85, 32.82, "Exercito", 1.8, 6 },
+    --{ 1852.85, 3687.79, 34.07, "Sheriff-1", 1.0, 17 },
+    --{ -447.28, 6013.01, 32.41, "Sheriff-2", 1.0, 17 },
+    { 1840.20, 2578.48, 46.07, "Corrections", 1.0, 24 },
+    --{ 385.43, 794.42, 187.48, "Ranger", 1.0, 69 },
+    --{ 382.01, -1596.39, 29.91, "State", 1.0, 11 },
+    { 1144.37, -1543.05, 35.03, "Paramedic-1", 1.0, 6 },
+    { -813.75, -1236.11, 8.14, "Paramedic-2", 1.8, 6 },
+    { -813.89, -1236.68, 7.33, "Paramedic-3", 1.5, 6 },
+    { 153.16, -3052.8, 7.04, "Mechanic", 1.8, 6 }
+}
+
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- WEBHOOKS CENTRALIZADOS
 -----------------------------------------------------------------------------------------------------------------------------------------
