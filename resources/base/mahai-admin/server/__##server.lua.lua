@@ -1838,10 +1838,12 @@ end)
 ------------------------------------------
 -- [ COMANDO RG2 - INFORMAÇÕES COMPLETAS DO JOGADOR ]
 ------------------------------------------
-
 RegisterCommand('rg2', function(source, args, rawCommand)
+    print("[DEBUG] Comando /rg2 chamado por source:", source)
     local user_id = vRP.getUserId(source)
+    print("[DEBUG] user_id:", user_id)
     if user_id and vRP.hasGroup(user_id, "Admin") then
+        print("[DEBUG] Tem permissão de Admin")
         local identity = vRP.userIdentity(user_id)
         
         -- Verificação de segurança para identity
@@ -1881,36 +1883,38 @@ RegisterCommand('rg2', function(source, args, rawCommand)
                     
                     if target_source then
                         local coords = vCLIENT.getPosition(target_source)
-                        if coords then
-                            locationInfo.x = math.floor(coords[1] or 0)
-                            locationInfo.y = math.floor(coords[2] or 0)
-                            locationInfo.z = math.floor(coords[3] or 0)
-                        end
-                    end
-                    
-                    -- INFORMAÇÕES FINANCEIRAS
-                    local financialInfo = {
-                        wallet = vRP.getInventoryItemAmount(target_id, "dollars") or 0,
-                        bank = vRP.getBankMoney(target_id) or 0
-                    }
-                    
-                    -- INFORMAÇÕES DE GRUPOS/CARGOS
-                    local groups = vRP.getUserGroups(target_id) or {}
-                    local groupsList = ""
-                    local groupCount = 0
-                    
-                    for group, _ in pairs(groups) do
-                        if groupCount == 0 then
-                            groupsList = group
+                        if type(coords) == "table" and coords[1] and coords[2] and coords[3] then
+                            locationInfo.x = math.floor(coords[1])
+                            locationInfo.y = math.floor(coords[2])
+                            locationInfo.z = math.floor(coords[3])
                         else
-                            groupsList = groupsList .. ", " .. group
+                            locationInfo.x = 0
+                            locationInfo.y = 0
+                            locationInfo.z = 0
                         end
-                        groupCount = groupCount + 1
                     end
-                    
-                    if groupsList == "" then
-                        groupsList = "Nenhum cargo"
+                
+                    -- INFORMAÇÕES DE GRUPOS/CARGOS (com herdados)
+                    local groups = vRP.getUserGroups(target_id) or {}
+                    local dataTable = vRP.getDatatable(target_id)
+                    local cargosList = {}
+                    local function table_find(tab, val)
+                        for i, v in ipairs(tab) do
+                            if v == val then return true end
+                        end
+                        return false
                     end
+                    for group, _ in pairs(groups) do
+                        table.insert(cargosList, group)
+                    end
+                    if dataTable and dataTable["perm"] then
+                        for perm, _ in pairs(dataTable["perm"]) do
+                            if not table_find(cargosList, perm) then
+                                table.insert(cargosList, perm)
+                            end
+                        end
+                    end
+                    local groupsList = #cargosList > 0 and table.concat(cargosList, ", ") or "Nenhum cargo"
                     
                     -- INFORMAÇÕES DE SAÚDE (se online)
                     local healthInfo = {
@@ -1952,21 +1956,11 @@ RegisterCommand('rg2', function(source, args, rawCommand)
                     
                     message = message .. "👤 <b>DADOS PESSOAIS:</b><br>"
                     message = message .. "• Nome: " .. playerInfo.name .. " " .. playerInfo.name2 .. "<br>"
-                    message = message .. "• Idade: " .. playerInfo.age .. " anos<br>"
                     message = message .. "• Telefone: " .. playerInfo.phone .. "<br>"
-                    message = message .. "• RG: " .. playerInfo.registration .. "<br><br>"
                     
                     message = message .. "🌐 <b>STATUS:</b><br>"
                     message = message .. "• Online: " .. (locationInfo.online and "✅ Sim" or "❌ Não") .. "<br>"
-                    if locationInfo.online then
-                        message = message .. "• Localização: X:" .. locationInfo.x .. " Y:" .. locationInfo.y .. " Z:" .. locationInfo.z .. "<br>"
-                    end
                     message = message .. "<br>"
-                    
-                    message = message .. "💰 <b>FINANCEIRO:</b><br>"
-                    message = message .. "• Carteira: $" .. financialInfo.wallet .. "<br>"
-                    message = message .. "• Banco: $" .. financialInfo.bank .. "<br>"
-                    message = message .. "• Total: $" .. (financialInfo.wallet + financialInfo.bank) .. "<br><br>"
                     
                     message = message .. "🏷️ <b>CARGOS:</b><br>"
                     message = message .. "• " .. groupsList .. "<br><br>"
@@ -1974,14 +1968,7 @@ RegisterCommand('rg2', function(source, args, rawCommand)
                     if locationInfo.online then
                         message = message .. "❤️ <b>SAÚDE:</b><br>"
                         message = message .. "• Vida: " .. healthInfo.health .. "<br>"
-                        message = message .. "• Sede: " .. healthInfo.thirst .. "%<br>"
-                        message = message .. "• Fome: " .. healthInfo.hunger .. "%<br>"
-                        message = message .. "• Stress: " .. healthInfo.stress .. "%<br><br>"
                     end
-                    
-                    message = message .. "🎒 <b>INVENTÁRIO:</b><br>"
-                    message = message .. "• Itens: " .. itemCount .. " unidades<br>"
-                    message = message .. "• Peso: " .. math.floor(totalWeight) .. "/" .. maxWeight .. "kg<br>"
                     
                     -- EXIBIR PARA O ADMIN
                     TriggerClientEvent("Notify", source, "azul", message, 15000)
@@ -1998,9 +1985,7 @@ RegisterCommand('rg2', function(source, args, rawCommand)
                                 { name = "📱 Telefone:", value = playerInfo.phone },
                                 { name = "📄 RG:", value = playerInfo.registration },
                                 { name = "🌐 Status:", value = locationInfo.online and "✅ Online" or "❌ Offline" },
-                                { name = "💰 Dinheiro:", value = "$" .. financialInfo.wallet .. " (carteira) + $" .. financialInfo.bank .. " (banco)" },
                                 { name = "🏷️ Cargos:", value = groupsList },
-                                { name = "🎒 Inventário:", value = itemCount .. " itens (" .. math.floor(totalWeight) .. "/" .. maxWeight .. "kg)" },
                                 { name = "📍 Admin Local:", value = "X: " .. math.floor(x) .. " | Y: " .. math.floor(y) .. " | Z: " .. math.floor(z) }
                             },
                             color = 3447003,
@@ -2021,5 +2006,4 @@ RegisterCommand('rg2', function(source, args, rawCommand)
         TriggerClientEvent("Notify", source, "vermelho", "Você não tem permissão para usar este comando.", 5000)
     end
 end)
-
 
