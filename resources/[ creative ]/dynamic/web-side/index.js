@@ -10,8 +10,10 @@ $(document).ready(function(){
 			normalButtons = 0;
 
 			$.post("http://dynamic/close");
+			$("body").fadeOut(200);
 			$("button").remove();
 		} else if(data["which"] == 8){
+			$("body").fadeOut(200);
 			$("button").remove();
 
 			for (i = 0; i < buttons["length"]; ++i){
@@ -23,6 +25,7 @@ $(document).ready(function(){
 			}
 
 			$(".container").append(submenus).show();
+
 		}
 	}
 
@@ -32,15 +35,15 @@ $(document).ready(function(){
 		if(item["addbutton"] == true){
 			if(item.id == false || null){
 				normalButtons = normalButtons + 1;
-				var b = (`<button id="normalbutton-${normalButtons}" data-trigger="`+item["trigger"]+`" data-parm="`+item["par"]+`" data-server="`+item["server"]+`" class="btn normalbutton"><div class="title">`+item["title"]+`</div><div class="description" >`+item["description"]+`</div></button>`);
+				var b = (`<button id="normalbutton-${normalButtons}" data-trigger="`+item["trigger"]+`" data-parm="`+item["par"]+`" data-server="`+item["server"]+`" class="btn normalbutton"><div class="title2">`+item["title"]+`</div><div class="description2" >`+item["description"]+`</div></button>`);
 				$(".container").append(b);
 				buttons.push(b);
 			} else {
-				var b = (`<button id="`+item["id"]+`"data-trigger="`+item["trigger"]+`" data-parm="`+item["par"]+`" data-server="`+item["server"]+`" class="a btn"><div class="title">`+item["title"]+`</div><div class="description" >`+item["description"]+`</div></button>`);
+				var b = (`<button id="`+item["id"]+`"data-trigger="`+item["trigger"]+`" data-parm="`+item["par"]+`" data-server="`+item["server"]+`" class="a btn"><div class="title2">`+item["title"]+`</div><div class="description2" >`+item["description"]+`</div></button>`);
 				buttons.push(b);
 			}
 		} else if(item["addmenu"] == true){
-			var aa = (`<button data-menu="`+item["menuid"]+`"class="b btn"><div class="title">`+item["title"]+`</div><div class="description" >`+item["description"]+`</div><i class="fas fa-chevron-right" style="float:right;margin-top:-10%"></i></button>`)
+			var aa = (`<button data-menu="`+item["menuid"]+`"class="b btn"><i class=" `+item["icons"]+` icon1"></i><div class="title">`+item["title"]+`</div><div class="description" >`+item["description"]+`</div><i class="fas fa-chevron-right" style="float:right;margin-top:-10%"></i></button>`)
 			$(".container").append(aa);
 			submenus.push(aa);
 		}
@@ -49,12 +52,14 @@ $(document).ready(function(){
 			normalButtons = 0;
 			buttons["length"] = 0;
 			submenus["length"] = 0;
+			$("body").hide(0);
 			$("button").remove();
 			$(".container").html("");
 		}
 
 		if (item["show"] == true){
 			$(".container").show();
+			$("body").fadeIn(200);
 		}
 	});
 

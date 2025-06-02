@@ -484,92 +484,99 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterServerEvent("inventory:Drops")
 AddEventHandler("inventory:Drops",function(Item,Slot,Amount,x,y,z)
-	local source = source
-	local Slot = tostring(Slot)
-	local user_id = vRP.getUserId(source)
-	if user_id then
-		if Active[user_id] == nil and not vPLAYER.getHandcuff(source) and not exports["hud"]:Wanted(user_id) and not vRPC.inVehicle(source) then
-		
-			if itemDurability(Item) then
-				if vRP.checkBroken(Item) then
-					TriggerClientEvent("Notify",source,"vermelho","<b>"..itemName(Item).."</b> quebrado.",5000)
-					TriggerClientEvent("inventory:Update",source,"updateMochila")
-					return
-				end
-			end
+    local source = source
+    local Slot = tostring(Slot)
+    local user_id = vRP.getUserId(source)
+    if user_id then
+        -- VERIFICAR SE O PLAYER TEM CARGO POLICE
+        if vRP.hasPermission(user_id, "Police") then
+            TriggerClientEvent("Notify",source,"vermelho","Policiais não podem dropar itens.",5000)
+            TriggerClientEvent("inventory:Update",source,"updateMochila")
+            return
+        end
 
-			if vRP.tryGetInventoryItem(user_id,Item,Amount,false,Slot) then
-				local Days = 1
-				local Number = 0
-				local Durability = 0
-				local splitName = splitString(Item,"-")
+        if Active[user_id] == nil and not vPLAYER.getHandcuff(source) and not exports["hud"]:Wanted(user_id) and not vRPC.inVehicle(source) then
+        
+            if itemDurability(Item) then
+                if vRP.checkBroken(Item) then
+                    TriggerClientEvent("Notify",source,"vermelho","<b>"..itemName(Item).."</b> quebrado.",5000)
+                    TriggerClientEvent("inventory:Update",source,"updateMochila")
+                    return
+                end
+            end
 
-				repeat
-					Number = Number + 1
-				until Drops[tostring(Number)] == nil
+            if vRP.tryGetInventoryItem(user_id,Item,Amount,false,Slot) then
+                local Days = 1
+                local Number = 0
+                local Durability = 0
+                local splitName = splitString(Item,"-")
 
-				if splitName[2] ~= nil then
-					if itemDurability(Item) then
-						Durability = parseInt(os.time() - splitName[2])
-						Days = itemDurability(Item)
-					else
-						Durability = 0
-						Days = 1
-					end
-				else
-					Durability = 0
-					Days = 1
-				end
+                repeat
+                    Number = Number + 1
+                until Drops[tostring(Number)] == nil
 
-				Drops[tostring(Number)] = {
-					["key"] = Item,
-					["amount"] = Amount,
-					["coords"] = { x,y,z },
-					["name"] = itemName(Item),
-					["peso"] = itemWeight(Item),
-					["index"] = itemIndex(Item),
-					["days"] = Days,
-					["durability"] = Durability
-				}
+                if splitName[2] ~= nil then
+                    if itemDurability(Item) then
+                        Durability = parseInt(os.time() - splitName[2])
+                        Days = itemDurability(Item)
+                    else
+                        Durability = 0
+                        Days = 1
+                    end
+                else
+                    Durability = 0
+                    Days = 1
+                end
 
-				TriggerClientEvent("drops:Adicionar",-1,tostring(Number),Drops[tostring(Number)])
-				TriggerClientEvent("inventory:Update",source,"updateMochila")
+                Drops[tostring(Number)] = {
+                    ["key"] = Item,
+                    ["amount"] = Amount,
+                    ["coords"] = { x,y,z },
+                    ["name"] = itemName(Item),
+                    ["peso"] = itemWeight(Item),
+                    ["index"] = itemIndex(Item),
+                    ["days"] = Days,
+                    ["durability"] = Durability
+                }
 
-				-- local identity = vRP.userIdentity(user_id)
-				-- PerformHttpRequest("https://discord.com/api/webhooks/1129670667596464209/7SibVN-8Ys7Z691q7-sxqvxq9O7RnnlZ6BDNZ63auGaI3DmkWE7xgICm7th4cYNOLmlC", function(err, text, headers) end, 'POST', json.encode({
-				-- 	embeds = {
-				-- 		{     
-				-- 			title = "**Dropou Item**",
-				-- 			fields = {
-				-- 				{ 
-				-- 					name = "📝 Author:", 
-				-- 					value = "" ..identity.name.." "..identity.name2.." **#"..user_id.."** ",
-				-- 				},
-				-- 				{ 
-				-- 					name = "🎒 Item:", 
-				-- 					value = " "..itemName(Item).."",
-				-- 				},
-				-- 				{ 
-				-- 					name = "📦 Quantidade:", 
-				-- 					value = "" ..Amount.."",
-				-- 				},
-				-- 			}, 
-				-- 			footer = { 
-				-- 				text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S'),
-				-- 				icon_url = "https://media.discordapp.net/attachments/1094973674437750834/1101630131610591323/512.png"
-				-- 			},
-				-- 			thumbnail = { 
-				-- 				url = "https://media.discordapp.net/attachments/1094973674437750834/1101630131610591323/512.png"
-				-- 			},
-				-- 			color = 3092790
-				-- 		}
-				-- 	}
-				-- }), { ['Content-Type'] = 'application/json' })
-			end
-		else
-			TriggerClientEvent("inventory:Update",source,"updateMochila")
-		end
-	end
+                TriggerClientEvent("drops:Adicionar",-1,tostring(Number),Drops[tostring(Number)])
+                TriggerClientEvent("inventory:Update",source,"updateMochila")
+
+                -- local identity = vRP.userIdentity(user_id)
+                -- PerformHttpRequest("https://discord.com/api/webhooks/1129665515124703314/-BdwB-bEMPbdlmbJy6_1RBB_6Bpu2MD3bdo_Jm5an103q5YyM40ZxhBN_R2DI6hUHODr", function(err, text, headers) end, 'POST', json.encode({
+                -- 	embeds = {
+                -- 		{     
+                -- 			title = "**Function: inventory:Drops**",
+                -- 			fields = {
+                -- 				{ 
+                -- 					name = "📝 Author:", 
+                -- 					value = "" ..identity.name.." "..identity.name2.." **#"..user_id.."** ",
+                -- 				},
+                -- 				{ 
+                -- 					name = "📦 Item:", 
+                -- 					value = " "..itemName(Item).."",
+                -- 				},
+                -- 				{ 
+                -- 					name = "✌ Quantidade:", 
+                -- 					value = " "..parseFormat(Amount).."",
+                -- 				},
+                -- 			}, 
+                -- 			footer = { 
+                -- 				text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S'),
+                -- 				icon_url = "https://media.discordapp.net/attachments/1094973674437750834/1101630131610591323/512.png"
+                -- 			},
+                -- 			thumbnail = { 
+                -- 				url = "https://media.discordapp.net/attachments/1094973674437750834/1101630131610591323/512.png"
+                -- 			},
+                -- 			color = 3092790
+                -- 		}
+                -- 	}
+                -- }), { ['Content-Type'] = 'application/json' })
+            end
+        else
+            TriggerClientEvent("inventory:Update",source,"updateMochila")
+        end
+    end
 end)
 
 RegisterServerEvent("inventory:lixoItem")

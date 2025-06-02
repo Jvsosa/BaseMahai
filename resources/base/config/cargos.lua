@@ -26,16 +26,35 @@ Config.Cargos = {
     -------------------------------
     -- [ FORÇAS DE SEGURANÇA ]
     -------------------------------
-    ["Police"] = {
-        ["Police"] = true,	
+    ['Comando-Militar'] = {
+        inventario = { nome = "Comando Militar", imagem = "policia", posicao = 999 },
+        perms = { 'Comando-Militar','SubComando-Militar','Militar','Police','Comando-Policia' },
     },
-    ["Exercito"] = {
-        ["Exercito"] = true,	
+    
+    ['waitComando-Militar'] = {
+        inventario = { nome = "Fora de Serviço", imagem = "policia", posicao = 999 },
+        perms = { 'waitComando-Militar' },
     },
-    ["Fbi"] = {
-        ["Fbi"] = true,	
+    
+    ['SubComando-Militar'] = {
+        inventario = { nome = "SubComando Militar", imagem = "policia", posicao = 999 },
+        perms = { 'SubComando-Militar','Militar','Police','SubComando-Policia' },
     },
-
+    
+    ['waitSubComando-Militar'] = {
+        inventario = { nome = "Fora de Serviço", imagem = "policia", posicao = 999 },
+        perms = { 'waitSubComando-Militar' },
+    },
+    
+    ['Militar'] = {
+        inventario = { nome = "Policia Militar", imagem = "policia", posicao = 999 },
+        perms = { 'Militar','Police' },
+    },
+    
+    ['waitMilitar'] = {
+        inventario = { nome = "Fora de Serviço", imagem = "policia", posicao = 999 },
+        perms = { 'waitMilitar' },
+    },
     -------------------------------
     -- [ SAÚDE E EMERGÊNCIA ]
     -------------------------------
@@ -46,6 +65,7 @@ Config.Cargos = {
         ["Hospital"] = true,
         ["Paramedic"] = true,
     },
+
 
     -------------------------------
     -- [ SERVIÇOS ]

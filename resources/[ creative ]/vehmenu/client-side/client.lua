@@ -49,7 +49,7 @@ end)
 RegisterNUICallback("menuActive",function(data)
 	local ped = PlayerPedId()
 	if GetVehiclePedIsTryingToEnter(ped) <= 0 then
-		if data["active"] == "chest" then
+		if data["active"] == "trunk" then
 			TriggerServerEvent("trunkchest:openTrunk")
 
 			SendNUIMessage({ show = false })

@@ -22,13 +22,13 @@ local animalFollow = false
 -- ADDBUTTON
 -----------------------------------------------------------------------------------------------------------------------------------------
 exports("AddButton",function(title,description,trigger,par,id,server)
-	SendNUIMessage({ addbutton = true, title = title, description = description, trigger = trigger, par = par, id = id, server = server })
+	SendNUIMessage({ addbutton = true, title = title, description = description, trigger = trigger, par = par, id = id, server = server, })
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- SUBMENU
 -----------------------------------------------------------------------------------------------------------------------------------------
-exports("SubMenu",function(title,description,id)
-	SendNUIMessage({ addmenu = true, title = title, description = description, menuid = id })
+exports("SubMenu",function(title,description,id,icons)
+	SendNUIMessage({ addmenu = true, title = title, description = description, menuid = id, icons = icons })
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- OPENMENU
@@ -46,6 +46,11 @@ RegisterNUICallback("clicked",function(data)
 		TriggerServerEvent(data["trigger"],data["param"])
 	else
 		TriggerEvent(data["trigger"],data["param"])
+		if data["closeinterface"] then
+			SendNUIMessage({ close = true })
+			SetNuiFocus(false,false)
+			menuOpen = false
+		end
 	end
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
@@ -78,40 +83,38 @@ RegisterCommand("globalFunctions",function(source,args,rawCommand)
 			exports["dynamic"]:AddButton("Calças","Colocar/Retirar as calças.","player:outfitFunctions","Pants","clothes",true)
 			exports["dynamic"]:AddButton("Sapatos","Colocar/Retirar os sapatos.","player:outfitFunctions","Shoes","clothes",true)
 
-			exports["dynamic"]:AddButton("Aplicar","Vestir as roupas salvas.","player:outfitFunctions","aplicar","outfit",true)
-			exports["dynamic"]:AddButton("Salvar","Guardar as roupas do corpo.","player:outfitFunctions","salvar","outfit",true)
-			exports["dynamic"]:AddButton("Remover","Remover as roupas salvas.","player:outfitFunctions","remover","outfit",true)
 
-			exports["dynamic"]:AddButton("Aplicar","Vestir as roupas salvas.","player:outfitFunctions","preaplicar","premiumfit",true)
-			exports["dynamic"]:AddButton("Salvar","Guardar as roupas do corpo.","player:outfitFunctions","presalvar","premiumfit",true)
 
-			if animalHash ~= nil then
-				exports["dynamic"]:AddButton("Seguir","Seguir o proprietário.","dynamic:animalFunctions","seguir","animal",false)
-				exports["dynamic"]:AddButton("Colocar no Veículo","Colocar o animal no veículo.","dynamic:animalFunctions","colocar","animal",false)
-				exports["dynamic"]:AddButton("Remover do Veículo","Remover o animal no veículo.","dynamic:animalFunctions","remover","animal",false)
-			end
+			-- if animalHash ~= nil then
+			-- 	exports["dynamic"]:AddButton("Seguir","Seguir o proprietário.","dynamic:animalFunctions","seguir","animal",false)
+			-- 	exports["dynamic"]:AddButton("Colocar no Veículo","Colocar o animal no veículo.","dynamic:animalFunctions","colocar","animal",false)
+			-- 	exports["dynamic"]:AddButton("Remover do Veículo","Remover o animal no veículo.","dynamic:animalFunctions","remover","animal",false)
+			-- end
 			
 			exports["dynamic"]:AddButton("Comercialização","Iniciar/Finalizar venda de drogas.","drugs:toggleService","","others",false)
-			exports["dynamic"]:AddButton("Ferimentos","Verificar ferimentos no corpo.","paramedic:myInjuries","","others",false)
+			exports["dynamic"]:AddButton("Terminar","Terminar Relacionamento.","wnIdentidade:Terminar","","others",false)
+			--exports["dynamic"]:AddButton("Ferimentos","Verificar ferimentos no corpo.","paramedic:myInjuries","","others",false)
+
+			exports["dynamic"]:AddButton("Transferir","Transferir veiculos para outra pessoa.","verCarrosVehs","","others",false)
 
 			if not IsPedInAnyVehicle(ped) then
 				exports["dynamic"]:AddButton("Rebocar","Colocar veículo na prancha do reboque.","towdriver:invokeTow","","others",false)
 				exports["dynamic"]:AddButton("Desbugar","Recarregar o personagem.","barbershop:debug","","others",true)
 
-				exports["dynamic"]:AddButton("Trancar","Trancar a propriedade.","homes:invokeSystem","trancar","propertys",true)
-				exports["dynamic"]:AddButton("Garagem","Comprar garagem da propriedade.","homes:invokeSystem","garagem","propertys",true)
-				exports["dynamic"]:AddButton("Permissões","Checar permissões da propriedade.","homes:invokeSystem","checar","propertys",true)
-				exports["dynamic"]:AddButton("Taxas","Pagar as taxas da propriedade.","homes:invokeSystem","tax","propertys",true)
-				exports["dynamic"]:AddButton("Armário","Aumentar o armário da propriedade.","homes:invokeSystem","armario","propertys",true)
-				exports["dynamic"]:AddButton("Geladeira","Aumentar a galadeira da propriedade.","homes:invokeSystem","geladeira","propertys",true)
-				exports["dynamic"]:AddButton("Vender","Vender a propriedade.","homes:invokeSystem","vender","propertys",true)
+				-- exports["dynamic"]:AddButton("Trancar","Trancar a propriedade.","homes:invokeSystem","trancar","propertys",true)
+				-- exports["dynamic"]:AddButton("Garagem","Comprar garagem da propriedade.","homes:invokeSystem","garagem","propertys",true)
+				-- exports["dynamic"]:AddButton("Permissões","Checar permissões da propriedade.","homes:invokeSystem","checar","propertys",true)
+				-- exports["dynamic"]:AddButton("Taxas","Pagar as taxas da propriedade.","homes:invokeSystem","tax","propertys",true)
+				-- exports["dynamic"]:AddButton("Armário","Aumentar o armário da propriedade.","homes:invokeSystem","armario","propertys",true)
+				-- exports["dynamic"]:AddButton("Geladeira","Aumentar a galadeira da propriedade.","homes:invokeSystem","geladeira","propertys",true)
+				-- exports["dynamic"]:AddButton("Vender","Vender a propriedade.","homes:invokeSystem","vender","propertys",true)
 
 				exports["dynamic"]:AddButton("Colocar no Veículo","Colocar no veículo mais próximo.","player:cvFunctions","cv","otherPlayers",true)
 				exports["dynamic"]:AddButton("Remover do Veículo","Remover do veículo mais próximo.","player:cvFunctions","rv","otherPlayers",true)
 				exports["dynamic"]:AddButton("Checar Porta-Malas","Vericar pessoa dentro do mesmo.","player:checkTrunk","","otherPlayers",true)
-				exports["dynamic"]:AddButton("Checar Lixeira","Vericar pessoa dentro da mesma.","player:checkTrash","","otherPlayers",true)
+				--exports["dynamic"]:AddButton("Checar Lixeira","Vericar pessoa dentro da mesma.","player:checkTrash","","otherPlayers",true)
 				
-				exports["dynamic"]:SubMenu("Jogador","Pessoa mais próxima de você.","otherPlayers")
+				exports["dynamic"]:SubMenu("Jogador","Pessoa mais próxima de você.","otherPlayers","fa-light fa-user")
 			else
 				exports["dynamic"]:AddButton("Banco Dianteiro Esquerdo","Sentar no banco do motorista.","player:seatPlayer","0","vehicle",false)
 				exports["dynamic"]:AddButton("Banco Dianteiro Direito","Sentar no banco do passageiro.","player:seatPlayer","1","vehicle",false)
@@ -120,22 +123,26 @@ RegisterCommand("globalFunctions",function(source,args,rawCommand)
 				exports["dynamic"]:AddButton("Levantar Vidros","Levantar todos os vidros.","player:winsFunctions","1","vehicle",true)
 				exports["dynamic"]:AddButton("Abaixar Vidros","Abaixar todos os vidros.","player:winsFunctions","0","vehicle",true)
 
-				exports["dynamic"]:SubMenu("Veículo","Funções do veículo.","vehicle")
+				exports["dynamic"]:SubMenu("Veículo","Funções do veículo.","vehicle","fa-light fa-car")
 			end
 
-			exports["dynamic"]:AddButton("Propriedades","Ativa/Desativa as propriedades no mapa.","homes:togglePropertys","","propertys",false)
+			--exports["dynamic"]:AddButton("Propriedades","Ativa/Desativa as propriedades no mapa.","homes:togglePropertys","","propertys",false)
+			exports["dynamic"]:AddButton("Menu Presets","Vestir as roupas salvas.","wnPreset:abrir","aplicar","outfit",false)
+			exports["dynamic"]:AddButton("Copiar Preset","Copiar o seu preset.","wnVerRoupas","aplicar","outfit",false)
+			exports["dynamic"]:SubMenu("Roupas","Colocar/Retirar roupas.","clothes","fa-light fa-clothes-hanger")
+			exports["dynamic"]:SubMenu("Vestuário","Mudança de roupas rápidas.","outfit","fa-light fa-shirt")
 
-			exports["dynamic"]:SubMenu("Roupas","Colocar/Retirar roupas.","clothes")
-			exports["dynamic"]:SubMenu("Vestuário","Mudança de roupas rápidas.","outfit")
-			exports["dynamic"]:SubMenu("Vestuário Premium","Mudança de roupas premium.","premiumfit")
-			exports["dynamic"]:SubMenu("Propriedades","Todas as funções das propriedades.","propertys")
+			exports["dynamic"]:AddButton("Chamar Staff","Preciso de Suporte.","chamados:chamado","aplicar","chamado",false)
 
-			if animalHash ~= nil then
-				exports["dynamic"]:SubMenu("Domésticos","Todas as funções dos animais domésticos.","animal")
-			end
+			--exports["dynamic"]:SubMenu("Propriedades","Todas as funções das propriedades.","propertys","fa-light fa-house")
 
-			exports["dynamic"]:SubMenu("Outros","Todas as funções do personagem.","others")
+			-- if animalHash ~= nil then
+			-- 	exports["dynamic"]:SubMenu("Domésticos","Todas as funções dos animais domésticos.","animal")
+			-- end
 
+			exports["dynamic"]:SubMenu("Outros","Todas as funções do personagem.","others","fa-light fa-sliders")
+			exports["dynamic"]:SubMenu("Chamados","Chamados Admin.","chamado","fa-solid fa-phone-volume")
+		
 			exports["dynamic"]:openMenu()
 		end
 	end
@@ -162,25 +169,7 @@ RegisterCommand("emergencyFunctions",function(source,args,rawCommand)
 					exports["dynamic"]:AddButton("Remover Máscara","Remover da pessoa mais próxima.","skinshop:removeProps","Mask","player",true)
 					exports["dynamic"]:AddButton("Remover Óculos","Remover da pessoa mais próxima.","skinshop:removeProps","Glasses","player",true)
 
-					exports["dynamic"]:AddButton("Miami Police","Fardamento CORE.","player:presetFunctions","1","prePolice",true)
-					exports["dynamic"]:AddButton("Miami Police","Fardamento GTM.","player:presetFunctions","2","prePolice",true)
-					exports["dynamic"]:AddButton("Miami Police","Fardamento de Policia.","player:presetFunctions","3","prePolice",true)
-					exports["dynamic"]:AddButton("Miami Police","Fardamento G.R.A.R).","player:presetFunctions","4","prePolice",true)
-					exports["dynamic"]:AddButton("Miami Police","Fardamento Recruta.","player:presetFunctions","5","prePolice",true)
-					exports["dynamic"]:AddButton("Miami Police","Fardamento G.R.A.E.R.","player:presetFunctions","6","prePolice",true)
-					exports["dynamic"]:AddButton("Miami Police","Fardamento D.I.G.","player:presetFunctions","7","prePolice",true)
-
-					exports["dynamic"]:SubMenu("Fardamentos","Todos os fardamentos policiais.","prePolice")
-					exports["dynamic"]:AddButton("Invadir","Invadir a residência.","homes:invadeSystem","",false,true)
-					exports["dynamic"]:AddButton("Computador","Computador de bordo policial.","police:openSystem","",false,false)
-				elseif LocalPlayer["state"]["Paramedic"] then
-					exports["dynamic"]:AddButton("Hospital","Fardamento de Estagiário(a).","player:presetFunctions","8","preMedic",true)
-				--	exports["dynamic"]:AddButton("Hospital","Fardamento de Médico(a).","player:presetFunctions","9","preMedic",true)
-				--	exports["dynamic"]:AddButton("Hospital","Fardamento de Diretor(a).","player:presetFunctions","10","preMedic",true)
-				--	exports["dynamic"]:AddButton("Fire departamentStore","Fardamento de atendimentos.","player:presetFunctions","9","preMedic",true)
-				--	exports["dynamic"]:AddButton("Fire departamentStore","Fardamento de mergulhador.","player:presetFunctions","10","preMedic",true)
-
-					exports["dynamic"]:SubMenu("Fardamentos","Todos os fardamentos médicos.","preMedic")
+					exports["dynamic"]:AddButton("Perimetro","Anunciar Perimetro na cidade.","basecore:perimetro","",false,true)
 				end
 
 				exports["dynamic"]:openMenu()
