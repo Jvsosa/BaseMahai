@@ -38,6 +38,21 @@ local Stockade = {}
 local openIdentity = {}
 local verifyObjects = {}
 local verifyAnimals = {}
+
+
+
+
+local function isPolice(user_id)
+    local identity = vRP.getUserIdentity(user_id)
+    if identity and identity.job then
+        return identity.job == "Police"
+    end
+    return false
+end
+
+
+
+
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- DISMANTLE
 -----------------------------------------------------------------------------------------------------------------------------------------
@@ -669,86 +684,57 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 RegisterServerEvent("inventory:sendItem")
 AddEventHandler("inventory:sendItem",function(Slot,Amount)
-	local source = source
-	local Slot = tostring(Slot)
-	local Amount = parseInt(Amount)
-	local user_id = vRP.getUserId(source)
-	if Amount > 0 then
-		if user_id and Active[user_id] == nil then
-			local Player = vRPC.nearestPlayer(source)
-			if Player then
-				Active[user_id] = os.time() + 100
-	
-				local inventory = vRP.userInventory(user_id)
-				if not inventory[Slot] or inventory[Slot]["item"] == nil then
-					Active[user_id] = nil
-					return
-				end
-	
-				if Amount == 0 then Amount = 1 end
-				local Item = inventory[Slot]["item"]
-	
-				local nuser_id = vRP.getUserId(Player)
-				if not vRP.checkMaxItens(nuser_id,Item,Amount) then
-					if (vRP.inventoryWeight(nuser_id) + itemWeight(Item) * Amount) <= vRP.getWeight(nuser_id) then
-						if vRP.tryGetInventoryItem(user_id,Item,Amount,true,Slot) then
-							vRPC.createObjects(source,"mp_safehouselost@","package_dropoff","prop_paper_bag_small",16,28422,0.0,-0.05,0.05,180.0,0.0,0.0)
-	
-							Citizen.Wait(3000)
-	
-							vRP.giveInventoryItem(nuser_id,Item,Amount,true)
-							TriggerClientEvent("inventory:Update",source,"updateMochila")
-							TriggerClientEvent("inventory:Update",Player,"updateMochila")
-							vRPC.removeObjects(source)
+    local source = source
+    local Slot = tostring(Slot)
+    local Amount = parseInt(Amount)
+    local user_id = vRP.getUserId(source)
 
-							-- local identity = vRP.userIdentity(user_id)
-							-- local identity2 = vRP.userIdentity(nuser_id)
-							-- PerformHttpRequest("https://discord.com/api/webhooks/1129670667596464209/7SibVN-8Ys7Z691q7-sxqvxq9O7RnnlZ6BDNZ63auGaI3DmkWE7xgICm7th4cYNOLmlC", function(err, text, headers) end, 'POST', json.encode({
-							-- 	embeds = {
-							-- 		{     
-							-- 			title = "**Enviou Item**",
-							-- 			fields = {
-							-- 				{ 
-							-- 					name = "📝 Author:", 
-							-- 					value = "" ..identity.name.." "..identity.name2.." **#"..user_id.."** ",
-							-- 				},
-							-- 				{ 
-							-- 					name = "📝 Player:", 
-							-- 					value = "" ..nome.." **#"..args[1].."** ",
-							-- 				},
-							-- 				{ 
-							-- 					name = "🎒 Item:", 
-							-- 					value = " "..itemName(Item).."",
-							-- 				},
-							-- 				{ 
-							-- 					name = "📦 Quantidade:", 
-							-- 					value = "" ..Amount.."",
-							-- 				},
-							-- 			}, 
-							-- 			footer = { 
-							-- 				text = os.date('Dia: %d/%m/%Y - Horas: %H:%M:%S'),
-							-- 				icon_url = "https://media.discordapp.net/attachments/1094973674437750834/1101630131610591323/512.png"
-							-- 			},
-							-- 			thumbnail = { 
-							-- 				url = "https://media.discordapp.net/attachments/1094973674437750834/1101630131610591323/512.png"
-							-- 			},
-							-- 			color = 3092790
-							-- 		}
-							-- 	}
-							-- }), { ['Content-Type'] = 'application/json' })
+    -- BLOQUEIO PARA POLICIAIS
+    if vRP.hasPermission(user_id, "Police") then
+        TriggerClientEvent("Notify",source,"vermelho","Policiais não podem enviar itens.",5000)
+        return
+    end
 
-						end
-					else
-						TriggerClientEvent("Notify",source,"vermelho","Mochila cheia.",5000)
-					end
-				else
-					TriggerClientEvent("Notify",source,"amarelo","Limite atingido.",3000)
-				end
-	
-				Active[user_id] = nil
-			end
-		end
-	end
+    if Amount > 0 then
+        if user_id and Active[user_id] == nil then
+            local Player = vRPC.nearestPlayer(source)
+            if Player then
+                Active[user_id] = os.time() + 100
+
+                local inventory = vRP.userInventory(user_id)
+                if not inventory[Slot] or inventory[Slot]["item"] == nil then
+                    Active[user_id] = nil
+                    return
+                end
+
+                if Amount == 0 then Amount = 1 end
+                local Item = inventory[Slot]["item"]
+
+                local nuser_id = vRP.getUserId(Player)
+                if not vRP.checkMaxItens(nuser_id,Item,Amount) then
+                    if (vRP.inventoryWeight(nuser_id) + itemWeight(Item) * Amount) <= vRP.getWeight(nuser_id) then
+                        if vRP.tryGetInventoryItem(user_id,Item,Amount,true,Slot) then
+                            vRPC.createObjects(source,"mp_safehouselost@","package_dropoff","prop_paper_bag_small",16,28422,0.0,-0.05,0.05,180.0,0.0,0.0)
+
+                            Citizen.Wait(3000)
+
+                            vRP.giveInventoryItem(nuser_id,Item,Amount,true)
+                            TriggerClientEvent("inventory:Update",source,"updateMochila")
+                            TriggerClientEvent("inventory:Update",Player,"updateMochila")
+                            vRPC.removeObjects(source)
+
+                        end
+                    else
+                        TriggerClientEvent("Notify",source,"vermelho","Mochila cheia.",5000)
+                    end
+                else
+                    TriggerClientEvent("Notify",source,"amarelo","Limite atingido.",3000)
+                end
+
+                Active[user_id] = nil
+            end
+        end
+    end
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- INVENTORY:DELIVER
