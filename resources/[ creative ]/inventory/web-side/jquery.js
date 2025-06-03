@@ -67,7 +67,10 @@ $(document).ready(function(){
 
 const updateDrag = () => {
     $(".populated").draggable({
-        helper: "clone"
+        helper: "clone",
+        start: function(event, ui) {
+            ui.helper.css("z-index", 9999);
+        }
     });
 
     // Permitir arrastar da hotbar

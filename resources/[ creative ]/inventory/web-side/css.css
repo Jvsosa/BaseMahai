@@ -451,7 +451,7 @@ body::after {
 	justify-content: space-between;
 }
 
-.invLeft > .item:nth-child(1){
+/* .invLeft > .item:nth-child(1){
 	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='133px' width='133px'><text x='45' y='95' font-size='75' fill='gray' opacity='.5' font-family='Roboto, Arial, Helvetica, sans-serif'>1</text></svg>");
 }
 
@@ -465,7 +465,7 @@ body::after {
 
 .invLeft > .item:nth-child(4){
 	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='133px' width='133px'><text x='45' y='95' font-size='75' fill='gray' opacity='.5' font-family='Roboto, Arial, Helvetica, sans-serif'>4</text></svg>");
-}
+} */
 
 
 
@@ -1058,4 +1058,11 @@ input::-webkit-inner-spin-button { -webkit-appearance: none; }
     font-weight: bold;
     text-align: center;
     gap: 0vw;               /* ADICIONAR ESPAÇO ENTRE OS CARGOS */
+}
+
+.ui-draggable-dragging {
+    z-index: 99999 !important;
+    pointer-events: none;
+    position: fixed !important;
+    will-change: transform;
 }
